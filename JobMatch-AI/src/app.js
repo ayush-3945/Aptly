@@ -19,4 +19,7 @@ app.use('/api/applications', require('./routes/applicationRoutes'));
 app.use('/api/test', require('./routes/testRoute'));
 // app.use('/api/candidates', require('./routes/candidateRoutes'));
 
+// Global Error Handler Middleware
+app.use(require('./middlewares/errorHandler'));
+
 module.exports = app;
