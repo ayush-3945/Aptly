@@ -11,7 +11,7 @@ const createJob = async (req, res) => {
       company,
       requiredSkills,
       location,
-      postedBy: req.user._id, // Set the recruiter's ID from the token
+      postedBy: req.user._id,
     });
 
     res.status(201).json(job);
@@ -23,7 +23,6 @@ const createJob = async (req, res) => {
 // Get all jobs
 const getJobs = async (req, res) => {
   try {
-    // Populate postedBy to show recruiter name and email
     const jobs = await Job.find({}).populate('postedBy', 'name email');
     res.status(200).json(jobs);
   } catch (error) {
@@ -35,7 +34,7 @@ const getJobs = async (req, res) => {
 const getJobById = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id).populate('postedBy', 'name email');
-    
+
     if (job) {
       res.status(200).json(job);
     } else {
@@ -46,4 +45,55 @@ const getJobById = async (req, res) => {
   }
 };
 
-module.exports = { createJob, getJobs, getJobById };
+// Update a job (only the recruiter who posted it)
+const updateJob = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+
+    if (!job) {
+      return res.status(404).json({ message: 'Job not found' });
+    }
+
+    // Check ownership
+    if (job.postedBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to update this job' });
+    }
+
+    const { title, description, company, requiredSkills, location } = req.body;
+
+    job.title = title || job.title;
+    job.description = description || job.description;
+    job.company = company || job.company;
+    job.requiredSkills = requiredSkills || job.requiredSkills;
+    job.location = location || job.location;
+
+    const updatedJob = await job.save();
+    res.status(200).json(updatedJob);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete a job (only the recruiter who posted it)
+const deleteJob = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+
+    if (!job) {
+      return res.status(404).json({ message: 'Job not found' });
+    }
+
+    // Check ownership
+    if (job.postedBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to delete this job' });
+    }
+
+    await job.deleteOne();
+    res.status(200).json({ message: 'Job deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { createJob, getJobs, getJobById, updateJob, deleteJob };
+
