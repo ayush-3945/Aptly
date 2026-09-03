@@ -20,7 +20,23 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['candidate', 'recruiter'],
     required: true,
-  }
+  },
+  bio: {
+    type: String,
+    default: '',
+  },
+  targetRole: {
+    type: String,
+    default: '',
+  },
+  skills: {
+    type: [String],
+    default: [],
+  },
+  location: {
+    type: String,
+    default: '',
+  },
 }, { timestamps: true }); // timestamps adds createdAt and updatedAt automatically
 
 // Hash password before saving
