@@ -74,4 +74,62 @@ const getJobApplications = async (req, res) => {
   }
 };
 
-module.exports = { applyForJob, getMyApplications, getJobApplications };
+// PATCH /api/applications/:id/status - Recruiter updates application status
+const updateApplicationStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const allowedStatuses = ['applied', 'shortlisted', 'interview', 'rejected', 'hired'];
+
+    if (!status || !allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        message: `Invalid status. Allowed statuses are: ${allowedStatuses.join(', ')}`,
+      });
+    }
+
+    const application = await Application.findById(req.params.id).populate('job');
+    if (!application) {
+      return res.status(404).json({ message: 'Application not found' });
+    }
+
+    // Verify the logged-in recruiter posted the job
+    if (!application.job || application.job.postedBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to update status for this application' });
+    }
+
+    application.status = status;
+    await application.save();
+
+    res.status(200).json(application);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// DELETE /api/applications/:id - Candidate withdraws an application
+const withdrawApplication = async (req, res) => {
+  try {
+    const application = await Application.findById(req.params.id);
+    if (!application) {
+      return res.status(404).json({ message: 'Application not found' });
+    }
+
+    // Verify application belongs to candidate
+    if (application.candidate.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to withdraw this application' });
+    }
+
+    await application.deleteOne();
+
+    res.status(200).json({ message: 'Application withdrawn successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = {
+  applyForJob,
+  getMyApplications,
+  getJobApplications,
+  updateApplicationStatus,
+  withdrawApplication,
+};
