@@ -34,11 +34,12 @@ const applyForJob = async (req, res) => {
   }
 };
 
-// GET /api/applications/my - Candidate views their applications
+// GET /api/applications/my - Candidate views their applications with status and job details
 const getMyApplications = async (req, res) => {
   try {
     const applications = await Application.find({ candidate: req.user._id })
       .populate('job', 'title company location')
+      .select('job status resumeUrl appliedAt updatedAt')
       .sort({ appliedAt: -1 });
 
     res.status(200).json(applications);
