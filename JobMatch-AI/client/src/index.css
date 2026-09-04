@@ -212,3 +212,97 @@ a {
 .spin {
   animation: spin 1s linear infinite;
 }
+
+/* Form & Input Utility Classes */
+.form-group {
+  margin-bottom: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  text-align: left;
+}
+
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 0.9rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.input-addon-right {
+  position: absolute;
+  right: 0.85rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  transition: var(--transition);
+}
+
+.input-addon-right:hover {
+  color: var(--text-primary);
+}
+
+.form-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 0.92rem;
+  transition: var(--transition);
+  outline: none;
+}
+
+.form-input.has-icon-left {
+  padding-left: 2.6rem;
+}
+
+.form-input.has-icon-right {
+  padding-right: 2.6rem;
+}
+
+.form-input:focus {
+  border-color: var(--border-focus);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.15);
+}
+
+.form-input::placeholder {
+  color: var(--text-muted);
+}
+
+.alert-error {
+  background: var(--danger-bg);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #FCA5A5;
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  font-size: 0.86rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.4;
+  text-align: left;
+}

@@ -1,44 +1,304 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { UserPlus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { UserPlus, User, Mail, Lock, Eye, EyeOff, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Signup = () => {
+  const navigate = useNavigate();
+  const { register } = useAuth();
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'candidate', // Default: 'candidate'
+  });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const { name, email, password, role } = formData;
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+    if (error) setError('');
+  };
+
+  const handleRoleSelect = (selectedRole) => {
+    setFormData({
+      ...formData,
+      role: selectedRole,
+    });
+    if (error) setError('');
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    // Form validations
+    if (!name.trim()) {
+      setError('Please enter your full name.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await register({
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+        role,
+      });
+
+      // Role-based redirection
+      if (res.role === 'recruiter') {
+        navigate('/dashboard');
+      } else {
+        navigate('/jobs');
+      }
+    } catch (err) {
+      console.error('Signup error:', err);
+      const message = err.response?.data?.message || 'Registration failed. Please try again.';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="container" style={{ padding: '5rem 1.5rem', minHeight: '65vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <div className="card-glass" style={{ maxWidth: '440px', width: '100%', padding: '2.5rem 2rem' }}>
+    <div
+      className="container animate-fade-in"
+      style={{
+        padding: '3.5rem 1.5rem 5rem',
+        minHeight: '75vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <div
+        className="card-glass"
+        style={{
+          maxWidth: '480px',
+          width: '100%',
+          padding: '2.5rem 2.25rem',
+          boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.6)',
+        }}
+      >
+        {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
-          <div style={{
-            width: '46px',
-            height: '46px',
-            borderRadius: '12px',
-            background: 'var(--accent-gradient)',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: '0.75rem'
-          }}>
-            <UserPlus size={22} color="#fff" />
+          <div
+            style={{
+              width: '50px',
+              height: '50px',
+              borderRadius: '14px',
+              background: 'var(--accent-gradient)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '0.85rem',
+              boxShadow: 'var(--accent-glow)',
+            }}
+          >
+            <UserPlus size={24} color="#fff" />
           </div>
-          <h2 style={{ fontSize: '1.6rem' }}>Join Aptly AI</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.25rem' }}>
-            Choose Candidate or Recruiter profile to get started
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Create Your Account</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.35rem' }}>
+            Get started with AI-driven job matching and ATS resume intelligence
           </p>
         </div>
 
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.04)',
-          borderRadius: 'var(--radius-sm)',
-          padding: '1.25rem',
-          textAlign: 'center',
-          color: 'var(--text-muted)',
-          fontSize: '0.88rem',
-          marginBottom: '1.5rem'
-        }}>
-          Multi-role Candidate & Recruiter registration will be wired in Day 17.
+        {/* Role Switcher Pill */}
+        <div style={{ marginBottom: '1.75rem' }}>
+          <label className="form-label" style={{ marginBottom: '0.5rem' }}>
+            I am joining as:
+          </label>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '0.65rem',
+              background: 'rgba(255, 255, 255, 0.03)',
+              padding: '0.35rem',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border-subtle)',
+            }}
+          >
+            {/* Candidate Option */}
+            <button
+              type="button"
+              onClick={() => handleRoleSelect('candidate')}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0.75rem 0.5rem',
+                borderRadius: '6px',
+                border: role === 'candidate' ? '1px solid rgba(6, 182, 212, 0.45)' : '1px solid transparent',
+                background: role === 'candidate' ? 'rgba(6, 182, 212, 0.15)' : 'transparent',
+                color: role === 'candidate' ? '#F8FAFC' : 'var(--text-secondary)',
+                cursor: 'pointer',
+                transition: 'var(--transition)',
+              }}
+            >
+              <span style={{ fontSize: '1rem', fontWeight: 700 }}>🎯 Candidate</span>
+              <span style={{ fontSize: '0.75rem', color: role === 'candidate' ? '#67E8F9' : 'var(--text-muted)', marginTop: '2px' }}>
+                Seek roles & match resume
+              </span>
+            </button>
+
+            {/* Recruiter Option */}
+            <button
+              type="button"
+              onClick={() => handleRoleSelect('recruiter')}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0.75rem 0.5rem',
+                borderRadius: '6px',
+                border: role === 'recruiter' ? '1px solid rgba(138, 43, 226, 0.45)' : '1px solid transparent',
+                background: role === 'recruiter' ? 'rgba(138, 43, 226, 0.18)' : 'transparent',
+                color: role === 'recruiter' ? '#F8FAFC' : 'var(--text-secondary)',
+                cursor: 'pointer',
+                transition: 'var(--transition)',
+              }}
+            >
+              <span style={{ fontSize: '1rem', fontWeight: 700 }}>🏢 Recruiter</span>
+              <span style={{ fontSize: '0.75rem', color: role === 'recruiter' ? '#C084FC' : 'var(--text-muted)', marginTop: '2px' }}>
+                Post jobs & screen candidates
+              </span>
+            </button>
+          </div>
         </div>
 
-        <div style={{ textAlign: 'center', fontSize: '0.88rem', color: 'var(--text-secondary)' }}>
-          Already have an account? <Link to="/login" style={{ color: 'var(--accent-indigo)', fontWeight: 600 }}>Sign In</Link>
+        {/* Error Alert Banner */}
+        {error && (
+          <div className="alert-error">
+            <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
+            <div>{error}</div>
+          </div>
+        )}
+
+        {/* Signup Form */}
+        <form onSubmit={handleSubmit}>
+          {/* Full Name */}
+          <div className="form-group">
+            <label className="form-label" htmlFor="name">
+              Full Name
+            </label>
+            <div className="input-wrapper">
+              <User size={16} className="input-icon" />
+              <input
+                id="name"
+                type="text"
+                name="name"
+                value={name}
+                onChange={handleChange}
+                placeholder="e.g. Ayush Pandey"
+                className="form-input has-icon-left"
+                autoComplete="name"
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          {/* Email Address */}
+          <div className="form-group">
+            <label className="form-label" htmlFor="email">
+              Email Address
+            </label>
+            <div className="input-wrapper">
+              <Mail size={16} className="input-icon" />
+              <input
+                id="email"
+                type="email"
+                name="email"
+                value={email}
+                onChange={handleChange}
+                placeholder="you@example.com"
+                className="form-input has-icon-left"
+                autoComplete="email"
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          {/* Password */}
+          <div className="form-group" style={{ marginBottom: '1.75rem' }}>
+            <label className="form-label" htmlFor="password">
+              Password <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 400 }}>(min 6 chars)</span>
+            </label>
+            <div className="input-wrapper">
+              <Lock size={16} className="input-icon" />
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={password}
+                onChange={handleChange}
+                placeholder="Create a strong password"
+                className="form-input has-icon-left has-icon-right"
+                autoComplete="new-password"
+                disabled={loading}
+              />
+              <button
+                type="button"
+                className="input-addon-right"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: '100%', padding: '0.8rem', fontSize: '1rem' }}
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Loader2 size={18} className="spin" />
+                <span>Creating Account...</span>
+              </>
+            ) : (
+              <>
+                <span>Complete Registration</span>
+                <ArrowRight size={16} />
+              </>
+            )}
+          </button>
+        </form>
+
+        {/* Footer Navigation */}
+        <div style={{ textAlign: 'center', marginTop: '1.75rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+          Already have an account?{' '}
+          <Link to="/login" style={{ color: 'var(--accent-indigo)', fontWeight: 600 }}>
+            Sign In
+          </Link>
         </div>
       </div>
     </div>
