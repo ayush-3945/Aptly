@@ -46,7 +46,7 @@ const generateFallbackEvaluation = (job, resumeText, reason = 'Gemini API not co
   let recommendation = 'Moderate Match';
   if (matchScore >= 75) {
     recommendation = 'Strong Match';
-  } else if (matchScore < 45) {
+  } else if (matchScore < 40) {
     recommendation = 'Low Match';
   }
 
@@ -186,7 +186,7 @@ Analyze the match and provide the evaluation in the requested JSON structure.`;
     const validRecommendations = ['Strong Match', 'Moderate Match', 'Low Match'];
     const recommendation = validRecommendations.includes(parsed.recommendation)
       ? parsed.recommendation
-      : (matchScore >= 75 ? 'Strong Match' : matchScore >= 45 ? 'Moderate Match' : 'Low Match');
+      : (matchScore >= 75 ? 'Strong Match' : matchScore >= 40 ? 'Moderate Match' : 'Low Match');
 
     return {
       matchScore,
