@@ -20,10 +20,36 @@ const createJob = async (req, res) => {
   }
 };
 
-// Get all jobs
+// Get all jobs with optional keyword, location, and skill filtering
 const getJobs = async (req, res) => {
   try {
-    const jobs = await Job.find({}).populate('postedBy', 'name email');
+    const { keyword, location, skill } = req.query;
+    const query = {};
+
+    // Keyword search across title, company, and description
+    if (keyword && keyword.trim()) {
+      const regex = new RegExp(keyword.trim(), 'i');
+      query.$or = [
+        { title: regex },
+        { company: regex },
+        { description: regex },
+      ];
+    }
+
+    // Location filter
+    if (location && location.trim() && location.toLowerCase() !== 'all') {
+      query.location = new RegExp(location.trim(), 'i');
+    }
+
+    // Skill filter
+    if (skill && skill.trim() && skill.toLowerCase() !== 'all') {
+      query.requiredSkills = { $in: [new RegExp(`^${skill.trim()}$`, 'i')] };
+    }
+
+    const jobs = await Job.find(query)
+      .populate('postedBy', 'name email')
+      .sort({ createdAt: -1 });
+
     res.status(200).json(jobs);
   } catch (error) {
     res.status(500).json({ message: error.message });
