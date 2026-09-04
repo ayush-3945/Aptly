@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, FileText, CheckCircle2, TrendingUp, ShieldCheck, ArrowRight, Zap, Target } from 'lucide-react';
+import { Sparkles, FileText, CheckCircle2, ShieldCheck, ArrowRight, Zap, Target } from 'lucide-react';
 
 const Hero = () => {
   return (
