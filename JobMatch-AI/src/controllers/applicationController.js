@@ -72,8 +72,8 @@ const applyForJob = async (req, res) => {
 const getMyApplications = async (req, res) => {
   try {
     const applications = await Application.find({ candidate: req.user._id })
-      .populate('job', 'title company location')
-      .select('job status resumeUrl aiMatchScore recommendation fitSummary appliedAt updatedAt')
+      .populate('job', 'title company location requiredSkills')
+      .select('job status resumeUrl aiMatchScore matchedSkills missingSkills fitSummary experienceFit recommendation appliedAt updatedAt')
       .sort({ appliedAt: -1 });
 
     res.status(200).json(applications);

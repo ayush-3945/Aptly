@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import JobsList from './pages/JobsList';
+import JobDetail from './pages/JobDetail';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -20,6 +21,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/jobs" element={<JobsList />} />
+              <Route path="/jobs/:id" element={<JobDetail />} />
               <Route
                 path="/dashboard"
                 element={

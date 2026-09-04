@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   Briefcase,
   Search,
@@ -16,69 +16,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ApplyModal from '../components/ApplyModal';
 
-// Curated default jobs to guarantee an active job board even if the local database is fresh
-const FALLBACK_JOBS = [
-  {
-    _id: 'job_fallback_1',
-    title: 'Senior Full-Stack MERN & AI Engineer',
-    company: 'TechPulse Solutions',
-    location: 'Remote',
-    requiredSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'Docker'],
-    description:
-      'We are looking for a Senior Full-Stack MERN & AI Engineer to build scalable web applications. You will architect Node.js microservices, build responsive React 19 frontends, and integrate Google Gemini AI for automated candidate matching.',
-    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    _id: 'job_fallback_2',
-    title: 'Frontend AI Interface Architect',
-    company: 'HyperScale AI',
-    location: 'San Francisco, CA',
-    requiredSkills: ['React', 'TypeScript', 'TailwindCSS', 'Gemini AI', 'Next.js'],
-    description:
-      'Lead our frontend engineering initiatives building generative AI copilots and real-time streaming interfaces. Strong mastery of React component trees, responsive CSS, and AI streaming APIs required.',
-    createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    _id: 'job_fallback_3',
-    title: 'Backend Systems & API Engineer',
-    company: 'CloudCore Labs',
-    location: 'Remote',
-    requiredSkills: ['Node.js', 'Express', 'MongoDB', 'Docker', 'Redis', 'Microservices'],
-    description:
-      'Architect robust backend services, secure authentication, and high-performance MongoDB aggregation pipelines. You will optimize database throughput and scale services handling millions of daily events.',
-    createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    _id: 'job_fallback_4',
-    title: 'Full-Stack Software Engineer',
-    company: 'DataSphere Analytics',
-    location: 'Austin, TX',
-    requiredSkills: ['React', 'Node.js', 'MongoDB', 'Python', 'REST API'],
-    description:
-      'Join our product engineering team delivering modern data analytics dashboards. Build full-stack features from MERN interfaces to data pipelines and secure customer access controls.',
-    createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    _id: 'job_fallback_5',
-    title: 'Cloud Infrastructure & DevOps Engineer',
-    company: 'InfraNexus',
-    location: 'New York, NY',
-    requiredSkills: ['Docker', 'AWS', 'Kubernetes', 'CI/CD', 'Node.js'],
-    description:
-      'Manage cloud infrastructure, automated deployment pipelines, and Docker container clusters for our AI microservices platform. Experience with continuous delivery and zero-downtime rollouts is essential.',
-    createdAt: new Date(Date.now() - 11 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    _id: 'job_fallback_6',
-    title: 'Junior Full-Stack Web Developer',
-    company: 'Apex Code Ventures',
-    location: 'Remote',
-    requiredSkills: ['React', 'JavaScript', 'Express', 'MongoDB', 'Git'],
-    description:
-      'Great opportunity for a rising full-stack developer to contribute to our MERN platform. You will build user-facing components, write API endpoints, and learn automated ATS workflows.',
-    createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-];
+import { FALLBACK_JOBS } from '../data/fallbackJobs';
 
 const POPULAR_SKILLS = ['All', 'React', 'Node.js', 'MongoDB', 'Gemini AI', 'Docker', 'Python', 'TypeScript'];
 const LOCATIONS = ['All Locations', 'Remote', 'San Francisco, CA', 'Austin, TX', 'New York, NY'];
@@ -397,7 +335,14 @@ const JobsList = () => {
                     lineHeight: 1.35,
                   }}
                 >
-                  {job.title}
+                  <Link
+                    to={`/jobs/${job._id}`}
+                    style={{ color: 'inherit', textDecoration: 'none', transition: 'var(--transition)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-cyan)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'inherit')}
+                  >
+                    {job.title}
+                  </Link>
                 </h3>
 
                 {/* Location Badge */}
