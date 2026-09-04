@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Sparkles, Briefcase, LayoutDashboard, ArrowRight, User, LogOut } from 'lucide-react';
+import { Sparkles, Briefcase, LayoutDashboard, ArrowRight, User, LogOut, PlusCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
@@ -93,6 +93,24 @@ const Navbar = () => {
             <LayoutDashboard size={16} />
             <span>ATS Pipeline</span>
           </Link>
+
+          {user?.role === 'recruiter' && (
+            <Link
+              to="/jobs/post"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                fontSize: '0.92rem',
+                fontWeight: 600,
+                color: isActive('/jobs/post') ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                transition: 'var(--transition)',
+              }}
+            >
+              <PlusCircle size={16} />
+              <span>Post a Job</span>
+            </Link>
+          )}
         </nav>
 
         {/* Dynamic User Authentication Actions */}

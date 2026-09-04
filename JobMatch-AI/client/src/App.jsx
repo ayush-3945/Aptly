@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import JobsList from './pages/JobsList';
 import JobDetail from './pages/JobDetail';
+import PostJob from './pages/PostJob';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -23,9 +24,25 @@ function App() {
               <Route path="/jobs" element={<JobsList />} />
               <Route path="/jobs/:id" element={<JobDetail />} />
               <Route
+                path="/jobs/post"
+                element={
+                  <ProtectedRoute allowedRoles={['recruiter']}>
+                    <PostJob />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/dashboard"
                 element={
                   <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/pipeline/:jobId"
+                element={
+                  <ProtectedRoute allowedRoles={['recruiter']}>
                     <Dashboard />
                   </ProtectedRoute>
                 }
