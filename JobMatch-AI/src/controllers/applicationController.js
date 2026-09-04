@@ -1,10 +1,14 @@
+const fs = require('fs');
+const path = require('path');
 const Application = require('../models/Application');
 const Job = require('../models/Job');
+const { extractTextFromPDF } = require('../services/resumeParserService');
+const { evaluateMatch } = require('../services/aiMatcherService');
 
 // POST /api/applications - Apply for a job
 const applyForJob = async (req, res) => {
   try {
-    const { jobId, resumeUrl } = req.body;
+    const { jobId, resumeUrl, resumeText: rawResumeText } = req.body;
 
     // Check if job exists
     const job = await Job.findById(jobId);
@@ -22,10 +26,40 @@ const applyForJob = async (req, res) => {
       return res.status(400).json({ message: 'You have already applied for this job' });
     }
 
+    // Extract text from resume PDF if available
+    let resumeText = rawResumeText || '';
+    if (!resumeText && resumeUrl) {
+      try {
+        let candidatePath = resumeUrl;
+        if (!fs.existsSync(candidatePath)) {
+          const relativeToCwd = path.join(process.cwd(), candidatePath);
+          if (fs.existsSync(relativeToCwd)) {
+            candidatePath = relativeToCwd;
+          }
+        }
+
+        if (fs.existsSync(candidatePath)) {
+          const parsed = await extractTextFromPDF(candidatePath);
+          resumeText = parsed.text;
+        }
+      } catch (parseError) {
+        console.warn('Resume text extraction failed during application submission:', parseError.message);
+      }
+    }
+
+    // Evaluate candidate fit against the job using Gemini AI
+    const evaluation = await evaluateMatch(job, resumeText);
+
     const application = await Application.create({
       job: jobId,
       candidate: req.user._id,
       resumeUrl,
+      aiMatchScore: evaluation.matchScore,
+      matchedSkills: evaluation.matchedSkills,
+      missingSkills: evaluation.missingSkills,
+      fitSummary: evaluation.fitSummary,
+      experienceFit: evaluation.experienceFit,
+      recommendation: evaluation.recommendation,
     });
 
     res.status(201).json(application);
@@ -39,7 +73,7 @@ const getMyApplications = async (req, res) => {
   try {
     const applications = await Application.find({ candidate: req.user._id })
       .populate('job', 'title company location')
-      .select('job status resumeUrl appliedAt updatedAt')
+      .select('job status resumeUrl aiMatchScore recommendation fitSummary appliedAt updatedAt')
       .sort({ appliedAt: -1 });
 
     res.status(200).json(applications);
