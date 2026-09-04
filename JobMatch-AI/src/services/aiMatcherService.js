@@ -67,15 +67,15 @@ const generateFallbackEvaluation = (job, resumeText, reason = 'Gemini API not co
  * @returns {Promise<Object>} Formatted evaluation containing matchScore, skills, fitSummary, etc.
  */
 const evaluateMatch = async (job, resumeText) => {
-  // If no resume text provided at all
-  if (!resumeText || resumeText.trim().length === 0) {
+  // If no resume text provided or text is too short to be meaningful (scanned/image PDF)
+  if (!resumeText || resumeText.trim().length < 30) {
     return {
-      matchScore: 0,
+      matchScore: null,
       matchedSkills: [],
       missingSkills: Array.isArray(job?.requiredSkills) ? job.requiredSkills : [],
-      experienceFit: 'No resume content available for evaluation.',
-      fitSummary: 'Resume text is empty or could not be parsed.',
-      recommendation: 'Low Match',
+      experienceFit: 'Resume text is empty, scanned, or could not be extracted.',
+      fitSummary: 'Text could not be extracted from the resume PDF. Flagged for manual recruiter review.',
+      recommendation: 'Pending Evaluation',
     };
   }
 
@@ -120,7 +120,8 @@ ${resumeText.substring(0, 15000)}
 Analyze the match and provide the evaluation in the requested JSON structure.`;
 
   try {
-    const response = await aiClient.models.generateContent({
+    // Wrap API call with 15-second timeout for resilience
+    const apiCall = aiClient.models.generateContent({
       model: DEFAULT_MODEL,
       contents: prompt,
       config: {
@@ -168,6 +169,12 @@ Analyze the match and provide the evaluation in the requested JSON structure.`;
         },
       },
     });
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Gemini API call timed out after 15 seconds')), 15000)
+    );
+
+    const response = await Promise.race([apiCall, timeoutPromise]);
 
     let rawText = response.text || '';
     rawText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();

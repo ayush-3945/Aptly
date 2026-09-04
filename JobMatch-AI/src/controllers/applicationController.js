@@ -82,10 +82,21 @@ const getMyApplications = async (req, res) => {
   }
 };
 
-// GET /api/applications/job/:jobId - Recruiter views applications for a job
+// GET /api/applications/job/:jobId - Recruiter views applications for a job with AI sorting, filtering & pagination
 const getJobApplications = async (req, res) => {
   try {
     const { jobId } = req.params;
+    const {
+      sortBy = 'aiMatchScore',
+      order,
+      sortOrder,
+      minScore,
+      maxScore,
+      status,
+      recommendation,
+      page,
+      limit,
+    } = req.query;
 
     // Verify the job exists and is owned by the logged-in recruiter
     const job = await Job.findById(jobId);
@@ -98,11 +109,73 @@ const getJobApplications = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to view applications for this job' });
     }
 
-    const applications = await Application.find({ job: jobId })
-      .populate('candidate', 'name email')
-      .sort({ appliedAt: -1 });
+    // Build filter query
+    const filter = { job: jobId };
 
-    res.status(200).json(applications);
+    // Filter by application status if provided
+    if (status) {
+      filter.status = status;
+    }
+
+    // Filter by recommendation tier if provided
+    if (recommendation) {
+      filter.recommendation = recommendation;
+    }
+
+    // Filter by AI match score range
+    if (minScore !== undefined || maxScore !== undefined) {
+      filter.aiMatchScore = {};
+      if (minScore !== undefined && !isNaN(Number(minScore))) {
+        filter.aiMatchScore.$gte = Number(minScore);
+      }
+      if (maxScore !== undefined && !isNaN(Number(maxScore))) {
+        filter.aiMatchScore.$lte = Number(maxScore);
+      }
+    }
+
+    // Build sort options
+    const effectiveOrder = (sortOrder || order || 'desc').toLowerCase() === 'asc' ? 1 : -1;
+    const sort = {};
+    if (sortBy === 'aiMatchScore') {
+      // Primary sort by score, secondary sort by application date
+      sort.aiMatchScore = effectiveOrder;
+      sort.appliedAt = -1;
+    } else if (sortBy === 'appliedAt') {
+      sort.appliedAt = effectiveOrder;
+    } else {
+      sort[sortBy] = effectiveOrder;
+    }
+
+    // Handle pagination if requested
+    const isPaginated = Boolean(page || limit);
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.max(1, Math.min(100, parseInt(limit, 10) || 10));
+    const skip = (pageNum - 1) * limitNum;
+
+    const totalApplications = await Application.countDocuments(filter);
+
+    let query = Application.find(filter)
+      .populate('candidate', 'name email profile')
+      .sort(sort);
+
+    if (isPaginated) {
+      query = query.skip(skip).limit(limitNum);
+    }
+
+    const applications = await query;
+
+    if (isPaginated) {
+      return res.status(200).json({
+        total: totalApplications,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(totalApplications / limitNum),
+        count: applications.length,
+        applications,
+      });
+    }
+
+    return res.status(200).json(applications);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
