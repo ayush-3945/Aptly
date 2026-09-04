@@ -11,10 +11,12 @@ import {
   RotateCcw,
   Building2,
   Loader2,
+  Bookmark,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ApplyModal from '../components/ApplyModal';
+import { useSavedJobs } from '../utils/savedJobs';
 
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
 
@@ -34,6 +36,19 @@ const JobsList = () => {
   // Modal State
   const [selectedJob, setSelectedJob] = useState(null);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+
+  // Bookmark State
+  const { isSaved, toggleSave } = useSavedJobs();
+  const [bookmarkToast, setBookmarkToast] = useState(null);
+
+  const handleToggleSave = (job) => {
+    const isNowSaved = toggleSave(job._id);
+    setBookmarkToast({
+      message: isNowSaved ? `Saved "${job.title}" to your bookmarks!` : `Removed "${job.title}" from saved jobs.`,
+      isSaved: isNowSaved,
+    });
+    setTimeout(() => setBookmarkToast(null), 3000);
+  };
 
   // Fetch jobs from backend with fallback
   useEffect(() => {
@@ -312,17 +327,50 @@ const JobsList = () => {
                     </span>
                   </div>
 
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.35rem',
-                      fontSize: '0.78rem',
-                      color: 'var(--text-muted)',
-                    }}
-                  >
-                    <Calendar size={13} />
-                    <span>{formatDate(job.createdAt)}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        fontSize: '0.78rem',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      <Calendar size={13} />
+                      <span>{formatDate(job.createdAt)}</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleToggleSave(job);
+                      }}
+                      style={{
+                        background: isSaved(job._id) ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+                        border: `1px solid ${isSaved(job._id) ? 'rgba(245, 158, 11, 0.4)' : 'rgba(255, 255, 255, 0.08)'}`,
+                        borderRadius: '8px',
+                        padding: '0.35rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: isSaved(job._id) ? '#F59E0B' : 'var(--text-muted)',
+                        transition: 'var(--transition)',
+                      }}
+                      title={isSaved(job._id) ? 'Remove saved job' : 'Save job for later'}
+                    >
+                      <Bookmark
+                        size={15}
+                        fill={isSaved(job._id) ? '#F59E0B' : 'none'}
+                        style={{
+                          transition: 'transform 0.2s ease',
+                          transform: isSaved(job._id) ? 'scale(1.15)' : 'scale(1)',
+                        }}
+                      />
+                    </button>
                   </div>
                 </div>
 
@@ -444,6 +492,37 @@ const JobsList = () => {
         isOpen={isApplyModalOpen}
         onClose={() => setIsApplyModalOpen(false)}
       />
+
+      {/* Bookmark Toast Banner */}
+      {bookmarkToast && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.65rem',
+            padding: '0.85rem 1.25rem',
+            borderRadius: '12px',
+            background: bookmarkToast.isSaved ? 'rgba(99, 102, 241, 0.95)' : 'rgba(30, 41, 59, 0.95)',
+            color: '#FFFFFF',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(12px)',
+            fontSize: '0.88rem',
+            fontWeight: 600,
+            animation: 'fadeIn 0.25s ease-out',
+          }}
+        >
+          <Bookmark
+            size={17}
+            fill={bookmarkToast.isSaved ? '#F59E0B' : 'none'}
+            color={bookmarkToast.isSaved ? '#F59E0B' : '#FFFFFF'}
+          />
+          <span>{bookmarkToast.message}</span>
+        </div>
+      )}
     </div>
   );
 };

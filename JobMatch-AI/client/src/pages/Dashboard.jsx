@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import CandidateDashboard from './CandidateDashboard';
 import RecruiterJobs from '../components/RecruiterJobs';
+import RecruiterAnalytics from '../components/RecruiterAnalytics';
 import { ShieldCheck } from 'lucide-react';
 
 const Dashboard = () => {
@@ -15,7 +16,11 @@ const Dashboard = () => {
   // Recruiter Dashboard View
   return (
     <div className="container" style={{ padding: '3.5rem 1.5rem', minHeight: '80vh' }}>
+      {/* Active Job Postings Management */}
       <RecruiterJobs />
+
+      {/* Recruiter Talent Analytics & Hiring Telemetry */}
+      <RecruiterAnalytics />
 
       {/* Recruiter Lifecycle Overview Section */}
       <div

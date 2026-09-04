@@ -18,9 +18,14 @@ import {
   AlertCircle,
   Loader2,
   X,
+  Bookmark,
+  MapPin,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import { useSavedJobs } from '../utils/savedJobs';
+import { FALLBACK_JOBS } from '../data/fallbackJobs';
+import ApplyModal from '../components/ApplyModal';
 
 // Curated sample applications so candidate dashboard demonstrates rich state even prior to first application
 const SAMPLE_APPLICATIONS = [
@@ -71,6 +76,13 @@ const CandidateDashboard = () => {
   const [withdrawModalApp, setWithdrawModalApp] = useState(null);
   const [actionMessage, setActionMessage] = useState('');
 
+  // Tab & Saved Jobs State
+  const [activeTab, setActiveTab] = useState('applications'); // 'applications' | 'saved'
+  const { savedJobIds, removeSaved } = useSavedJobs();
+  const [allJobs, setAllJobs] = useState(FALLBACK_JOBS);
+  const [applyModalJob, setApplyModalJob] = useState(null);
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+
   // Fetch candidate's applications
   const fetchApplications = async () => {
     setLoading(true);
@@ -92,7 +104,30 @@ const CandidateDashboard = () => {
 
   useEffect(() => {
     fetchApplications();
+
+    // Fetch all jobs to resolve saved job references
+    const fetchAllJobs = async () => {
+      try {
+        const res = await api.get('/jobs');
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setAllJobs(res.data);
+        }
+      } catch (err) {
+        // fallback active
+      }
+    };
+    fetchAllJobs();
   }, []);
+
+  // Compute resolved saved jobs
+  const savedJobs = useMemo(() => {
+    if (savedJobIds && savedJobIds.length > 0) {
+      return savedJobIds
+        .map((id) => allJobs.find((j) => j._id === id) || FALLBACK_JOBS.find((j) => j._id === id))
+        .filter(Boolean);
+    }
+    return [];
+  }, [savedJobIds, allJobs]);
 
   // Compute metrics
   const metrics = useMemo(() => {
@@ -313,11 +348,83 @@ const CandidateDashboard = () => {
         </div>
       </div>
 
-      {/* Applications List */}
-      <div>
-        <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '1.25rem' }}>
-          Tracked Submissions ({applications.length})
-        </h2>
+      {/* Tab Navigation */}
+      <div
+        style={{
+          display: 'flex',
+          gap: '0.85rem',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          marginBottom: '2rem',
+          paddingBottom: '0.75rem',
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setActiveTab('applications')}
+          style={{
+            padding: '0.65rem 1.35rem',
+            borderRadius: '10px',
+            fontSize: '0.92rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            border:
+              activeTab === 'applications'
+                ? '1px solid var(--accent-indigo)'
+                : '1px solid rgba(255, 255, 255, 0.06)',
+            background:
+              activeTab === 'applications'
+                ? 'rgba(99, 102, 241, 0.22)'
+                : 'rgba(255, 255, 255, 0.02)',
+            color: activeTab === 'applications' ? '#FFFFFF' : 'var(--text-secondary)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            transition: 'var(--transition)',
+          }}
+        >
+          <FileText size={17} color={activeTab === 'applications' ? '#818CF8' : 'currentColor'} />
+          <span>My Applications ({applications.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('saved')}
+          style={{
+            padding: '0.65rem 1.35rem',
+            borderRadius: '10px',
+            fontSize: '0.92rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            border:
+              activeTab === 'saved'
+                ? '1px solid #F59E0B'
+                : '1px solid rgba(255, 255, 255, 0.06)',
+            background:
+              activeTab === 'saved'
+                ? 'rgba(245, 158, 11, 0.18)'
+                : 'rgba(255, 255, 255, 0.02)',
+            color: activeTab === 'saved' ? '#FFFFFF' : 'var(--text-secondary)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            transition: 'var(--transition)',
+          }}
+        >
+          <Bookmark
+            size={17}
+            fill={activeTab === 'saved' ? '#F59E0B' : 'none'}
+            color={activeTab === 'saved' ? '#F59E0B' : 'currentColor'}
+          />
+          <span>Saved Jobs ({savedJobs.length})</span>
+        </button>
+      </div>
+
+      {activeTab === 'applications' ? (
+        /* Applications List */
+        <div>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '1.25rem' }}>
+            Tracked Submissions ({applications.length})
+          </h2>
 
         {loading ? (
           <div style={{ textAlign: 'center', padding: '4rem 1.5rem', color: 'var(--text-secondary)' }}>
@@ -579,6 +686,221 @@ const CandidateDashboard = () => {
           </div>
         )}
       </div>
+      ) : (
+        /* Saved Jobs View */
+        <div>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '1.25rem' }}>
+            Saved Opportunities ({savedJobs.length})
+          </h2>
+
+          {savedJobs.length === 0 ? (
+            <div className="card-glass" style={{ textAlign: 'center', padding: '4rem 2rem', borderRadius: '16px' }}>
+              <div
+                style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '16px',
+                  background: 'rgba(245, 158, 11, 0.12)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#F59E0B',
+                  marginBottom: '1rem',
+                }}
+              >
+                <Bookmark size={28} />
+              </div>
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+                No Bookmarked Positions Yet
+              </h3>
+              <p style={{ color: 'var(--text-secondary)', maxWidth: '440px', margin: '0 auto 1.5rem', fontSize: '0.92rem' }}>
+                Save interesting roles from the Job Explorer or Job Details pages to review, compare, and apply whenever you are ready.
+              </p>
+              <Link to="/jobs" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Briefcase size={16} />
+                <span>Explore Open Roles</span>
+              </Link>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              {savedJobs.map((job) => (
+                <div
+                  key={job._id}
+                  className="card-glass"
+                  style={{
+                    padding: '1.75rem',
+                    borderRadius: '16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1rem',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      flexWrap: 'wrap',
+                      gap: '1rem',
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                        <Link
+                          to={`/jobs/${job._id}`}
+                          style={{
+                            fontSize: '1.25rem',
+                            fontWeight: 700,
+                            color: 'var(--text-primary)',
+                            transition: 'var(--transition)',
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-cyan)')}
+                          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                        >
+                          {job.title}
+                        </Link>
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                          gap: '1.1rem',
+                          fontSize: '0.85rem',
+                          color: 'var(--text-secondary)',
+                        }}
+                      >
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <Building2 size={14} color="var(--accent-indigo)" />
+                          {job.company}
+                        </span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <MapPin size={14} color="var(--accent-cyan)" />
+                          {job.location}
+                        </span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <Calendar size={14} color="var(--text-muted)" />
+                          Posted {formatDate(job.createdAt)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Remove Bookmark Action */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        removeSaved(job._id);
+                        setActionMessage(`Removed "${job.title}" from saved jobs.`);
+                        setTimeout(() => setActionMessage(''), 3000);
+                      }}
+                      className="btn btn-ghost"
+                      style={{
+                        padding: '0.45rem 0.85rem',
+                        fontSize: '0.82rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        color: '#F59E0B',
+                        borderRadius: '8px',
+                      }}
+                      title="Remove from saved jobs"
+                    >
+                      <Bookmark size={15} fill="#F59E0B" />
+                      <span>Bookmarked</span>
+                    </button>
+                  </div>
+
+                  {job.description && (
+                    <p
+                      style={{
+                        fontSize: '0.88rem',
+                        color: 'var(--text-secondary)',
+                        lineHeight: 1.5,
+                        margin: 0,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      {job.description}
+                    </p>
+                  )}
+
+                  {job.requiredSkills && job.requiredSkills.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginRight: '0.2rem' }}>
+                        Required Tech:
+                      </span>
+                      {job.requiredSkills.map((skill, idx) => (
+                        <span
+                          key={idx}
+                          style={{
+                            padding: '0.15rem 0.55rem',
+                            borderRadius: '6px',
+                            background: 'rgba(255, 255, 255, 0.04)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            fontSize: '0.75rem',
+                            color: 'var(--text-secondary)',
+                            fontWeight: 500,
+                          }}
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: '0.75rem',
+                      paddingTop: '0.85rem',
+                      borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+                    }}
+                  >
+                    <Link
+                      to={`/jobs/${job._id}`}
+                      className="btn btn-ghost"
+                      style={{
+                        padding: '0.45rem 0.8rem',
+                        fontSize: '0.82rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                      }}
+                    >
+                      <ExternalLink size={14} />
+                      View Role Overview
+                    </Link>
+
+                    <button
+                      onClick={() => {
+                        setApplyModalJob(job);
+                        setIsApplyModalOpen(true);
+                      }}
+                      className="btn btn-primary"
+                      style={{
+                        padding: '0.55rem 1.25rem',
+                        fontSize: '0.85rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                      }}
+                    >
+                      <Sparkles size={15} />
+                      <span>Apply & Check AI Match</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Confirmation Modal for Application Withdrawal */}
       {withdrawModalApp && (
@@ -662,6 +984,13 @@ const CandidateDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Real-time AI Apply Modal for Saved Jobs */}
+      <ApplyModal
+        job={applyModalJob}
+        isOpen={isApplyModalOpen}
+        onClose={() => setIsApplyModalOpen(false)}
+      />
     </div>
   );
 };

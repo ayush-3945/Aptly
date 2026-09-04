@@ -15,11 +15,13 @@ import {
   Check,
   LayoutDashboard,
   Loader2,
+  Bookmark,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
 import ApplyModal from '../components/ApplyModal';
+import { useSavedJobs } from '../utils/savedJobs';
 
 const JobDetail = () => {
   const { id } = useParams();
@@ -30,6 +32,8 @@ const JobDetail = () => {
   const [loading, setLoading] = useState(true);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const { isSaved, toggleSave } = useSavedJobs();
+  const [bookmarkToast, setBookmarkToast] = useState(null);
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -206,6 +210,38 @@ const JobDetail = () => {
               <span>{copied ? 'Link Copied!' : 'Share'}</span>
             </button>
 
+            <button
+              type="button"
+              onClick={() => {
+                const isNowSaved = toggleSave(job._id);
+                setBookmarkToast({
+                  message: isNowSaved
+                    ? `Saved "${job.title}" to bookmarks!`
+                    : `Removed "${job.title}" from bookmarks.`,
+                  isSaved: isNowSaved,
+                });
+                setTimeout(() => setBookmarkToast(null), 3000);
+              }}
+              className="btn btn-secondary"
+              style={{
+                fontSize: '0.88rem',
+                padding: '0.7rem 1rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                color: isSaved(job._id) ? '#F59E0B' : 'var(--text-secondary)',
+                borderColor: isSaved(job._id) ? 'rgba(245, 158, 11, 0.4)' : 'var(--border-subtle)',
+              }}
+              title={isSaved(job._id) ? 'Remove bookmark' : 'Bookmark this job'}
+            >
+              <Bookmark
+                size={16}
+                fill={isSaved(job._id) ? '#F59E0B' : 'none'}
+                color={isSaved(job._id) ? '#F59E0B' : 'currentColor'}
+              />
+              <span>{isSaved(job._id) ? 'Saved' : 'Save'}</span>
+            </button>
+
             {user?.role === 'recruiter' ? (
               <button
                 onClick={() => navigate('/dashboard')}
@@ -358,6 +394,37 @@ const JobDetail = () => {
         isOpen={isApplyModalOpen}
         onClose={() => setIsApplyModalOpen(false)}
       />
+
+      {/* Bookmark Toast Banner */}
+      {bookmarkToast && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.65rem',
+            padding: '0.85rem 1.25rem',
+            borderRadius: '12px',
+            background: bookmarkToast.isSaved ? 'rgba(99, 102, 241, 0.95)' : 'rgba(30, 41, 59, 0.95)',
+            color: '#FFFFFF',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(12px)',
+            fontSize: '0.88rem',
+            fontWeight: 600,
+            animation: 'fadeIn 0.25s ease-out',
+          }}
+        >
+          <Bookmark
+            size={17}
+            fill={bookmarkToast.isSaved ? '#F59E0B' : 'none'}
+            color={bookmarkToast.isSaved ? '#F59E0B' : '#FFFFFF'}
+          />
+          <span>{bookmarkToast.message}</span>
+        </div>
+      )}
     </div>
   );
 };
