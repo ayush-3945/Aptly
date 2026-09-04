@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import JobsList from './pages/JobsList';
 import JobDetail from './pages/JobDetail';
 import PostJob from './pages/PostJob';
+import JobApplicants from './pages/JobApplicants';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -43,7 +44,7 @@ function App() {
                 path="/dashboard/pipeline/:jobId"
                 element={
                   <ProtectedRoute allowedRoles={['recruiter']}>
-                    <Dashboard />
+                    <JobApplicants />
                   </ProtectedRoute>
                 }
               />
