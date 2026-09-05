@@ -43,6 +43,7 @@ The live production deployment is hosted at **[aptly-zeta.vercel.app](https://ap
 Traditional Applicant Tracking Systems rely on **naive, brittle keyword regex matching**. If a candidate writes *"Containerized backend microservices with Kubernetes & Podman"* instead of the literal string *"Docker"*, legacy filters silently reject them.
 * **Over 75% of qualified engineering candidates** are discarded due to arbitrary lexical discrepancies.
 * **Keyword stuffing games**: Candidates optimize for robot filters rather than describing real architectural impact.
+* **Lack of transparency**: Candidates never receive clinical diagnostic gap reports to understand why they were rejected.
 * **Recruiter overload**: Hiring managers still end up skimming hundreds of non-vetted resumes or miss top-tier specialists.
 
 ### The Aptly.AI Breakthrough
