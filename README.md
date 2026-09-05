@@ -5,7 +5,7 @@
 ### Next-Generation AI Candidate Matching, ATS Telemetry & Recruiter Kanban Pipeline
 
 [![CI Full-Stack Verification](https://github.com/ayush-3945/Aptly/actions/workflows/ci.yml/badge.svg)](https://github.com/ayush-3945/Aptly/actions/workflows/ci.yml)
-[![Vercel Live Demo](https://img.shields.io/badge/Vercel-Live%20Demo-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://aptly-ai.vercel.app)
+[![Vercel Live Demo](https://img.shields.io/badge/Vercel-Live%20Demo-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://aptly-zeta.vercel.app)
 [![Node.js 20+](https://img.shields.io/badge/Node.js-20+-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![React 19](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 [![Google Gemini 2.5](https://img.shields.io/badge/Google%20Gemini-2.5%20Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev)
@@ -13,7 +13,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
 <p align="center">
-  <a href="https://aptly-ai.vercel.app"><strong>Explore Live Demo »</strong></a> •
+  <a href="https://aptly-zeta.vercel.app"><strong>Explore Live Demo »</strong></a> •
   <a href="#-system-architecture--data-flow">System Architecture</a> •
   <a href="#-core-engineering-highlights">Engineering Highlights</a> •
   <a href="#-complete-rest-api-reference">API Reference</a> •
@@ -26,7 +26,7 @@
 
 ## 🎯 Quick-Test Credentials (1-Click Live Demo)
 
-The live production deployment is hosted at **[aptly-ai.vercel.app](https://aptly-ai.vercel.app)** with instant role switching enabled:
+The live production deployment is hosted at **[aptly-zeta.vercel.app](https://aptly-zeta.vercel.app)** with instant role switching enabled:
 
 | Persona | Demo Email | Demo Password | Capabilities & Test Views |
 | :--- | :--- | :--- | :--- |
