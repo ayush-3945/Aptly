@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Logo = ({ size = 30 }) => {
+const Logo = ({ size = 32 }) => {
   return (
     <div
       style={{
@@ -9,31 +9,26 @@ const Logo = ({ size = 30 }) => {
         justifyContent: 'center',
         width: `${size}px`,
         height: `${size}px`,
-        border: '1px solid rgba(245, 166, 35, 0.45)',
-        background: 'rgba(245, 166, 35, 0.08)',
-        borderRadius: '4px',
+        borderRadius: '8px',
+        background: 'linear-gradient(135deg, #0D9488 0%, #0F766E 100%)',
+        boxShadow: '0 2px 8px rgba(13, 148, 136, 0.25)',
         flexShrink: 0,
       }}
-      aria-label="Aptly.AI"
+      aria-label="Aptly Diagnostic Evaluation"
     >
       <svg
-        width={Math.round(size * 0.62)}
-        height={Math.round(size * 0.62)}
+        width={Math.round(size * 0.58)}
+        height={Math.round(size * 0.58)}
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#F5A623"
+        stroke="#FFFFFF"
         strokeWidth="2.2"
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        {/* Technical Corner Framing Brackets */}
-        <path d="M4 8V4h4" />
-        <path d="M16 4h4v4" />
-        <path d="M20 16v4h-4" />
-        <path d="M8 20H4v-4" />
-        {/* Geometric Monogram A */}
-        <path d="M7.5 17L12 7l4.5 10" />
-        <path d="M9.2 13.5h5.6" />
+        {/* Precision Diagnostic Verification Ring */}
+        <circle cx="12" cy="12" r="9" strokeWidth="1.8" stroke="rgba(255, 255, 255, 0.45)" />
+        <path d="M8.5 12.2l2.3 2.3 4.7-4.7" strokeWidth="2.4" />
       </svg>
     </div>
   );

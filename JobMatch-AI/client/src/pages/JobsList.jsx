@@ -137,66 +137,67 @@ const JobsList = () => {
             style={{
               width: '32px',
               height: '32px',
-              borderRadius: '4px',
-              background: 'rgba(245, 166, 35, 0.1)',
-              border: '1px solid rgba(245, 166, 35, 0.3)',
+              borderRadius: '8px',
+              background: '#F0FDFA',
+              border: '1px solid #CCFBF1',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Briefcase size={16} color="var(--accent-amber)" />
+            <Briefcase size={16} color="var(--accent-teal)" />
           </div>
           <span
             style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.78rem',
+              fontFamily: 'var(--font-sans-display)',
+              fontSize: '0.82rem',
               fontWeight: 700,
               textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              color: 'var(--accent-amber)',
+              letterSpacing: '0.04em',
+              color: 'var(--accent-teal-dark)',
             }}
           >
-            [LIVE_ENGINEERING_BOARD]
+            Clinical Competence Registry
           </span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <h1 style={{ fontSize: '2.4rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
+            <h1 style={{ fontSize: '2.5rem', fontWeight: 600, letterSpacing: '-0.02em', color: '#0F172A', fontFamily: 'var(--font-heading)' }}>
               Explore Open Opportunities
             </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.98rem', marginTop: '0.25rem' }}>
-              Browse verified engineering positions and benchmark your resume against requirements with Gemini AI.
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginTop: '0.25rem' }}>
+              Browse verified engineering positions and benchmark your competencies with Gemini AI diagnostics.
             </p>
           </div>
 
           <div
             style={{
-              padding: '0.4rem 0.85rem',
-              borderRadius: '4px',
-              background: '#111114',
+              padding: '0.45rem 1rem',
+              borderRadius: '8px',
+              background: '#FFFFFF',
               border: '1px solid var(--border-subtle)',
-              fontSize: '0.82rem',
+              fontSize: '0.84rem',
               fontWeight: 600,
-              fontFamily: 'var(--font-mono)',
               color: 'var(--text-primary)',
+              boxShadow: 'var(--shadow-subtle)',
             }}
           >
-            SHOWING <strong style={{ color: 'var(--accent-amber)' }}>{filteredJobs.length}</strong> ACTIVE ROLES
+            Showing <strong style={{ color: 'var(--accent-teal-dark)' }}>{filteredJobs.length}</strong> Evaluated Roles
           </div>
         </div>
       </div>
 
       {/* Search & Filter Bar */}
       <div
-        className="card-glass"
+        className="lab-card"
         style={{
-          padding: '1.25rem 1.5rem',
+          padding: '1.35rem 1.5rem',
           marginBottom: '2rem',
           display: 'flex',
           flexDirection: 'column',
           gap: '1rem',
+          background: '#FFFFFF',
         }}
       >
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
@@ -207,7 +208,7 @@ const JobsList = () => {
               type="text"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
-              placeholder="Search by role title, company, or tech stack..."
+              placeholder="Filter by role title, organization, or required competence..."
               className="form-input has-icon-left"
             />
           </div>
@@ -221,7 +222,7 @@ const JobsList = () => {
               style={{ cursor: 'pointer' }}
             >
               {LOCATIONS.map((loc) => (
-                <option key={loc} value={loc} style={{ background: '#0E0E11', color: '#EDEDED' }}>
+                <option key={loc} value={loc} style={{ background: '#FFFFFF', color: '#0F172A' }}>
                   {loc}
                 </option>
               ))}
@@ -243,8 +244,8 @@ const JobsList = () => {
 
         {/* Quick Skill Filter Pills */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, marginRight: '0.25rem', fontFamily: 'var(--font-mono)' }}>
-            FILTER:
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, marginRight: '0.25rem' }}>
+            Competency:
           </span>
           {POPULAR_SKILLS.map((skill) => {
             const isSelected = selectedSkill === skill;
@@ -253,16 +254,16 @@ const JobsList = () => {
                 key={skill}
                 onClick={() => setSelectedSkill(skill)}
                 style={{
-                  padding: '0.25rem 0.65rem',
-                  fontSize: '0.76rem',
-                  fontFamily: 'var(--font-mono)',
-                  fontWeight: 600,
-                  borderRadius: '3px',
-                  border: isSelected ? '1px solid var(--accent-amber)' : '1px solid var(--border-subtle)',
-                  background: isSelected ? 'rgba(245, 166, 35, 0.12)' : 'rgba(255, 255, 255, 0.03)',
-                  color: isSelected ? 'var(--accent-amber)' : 'var(--text-secondary)',
+                  padding: '0.28rem 0.75rem',
+                  fontSize: '0.8rem',
+                  fontWeight: 500,
+                  borderRadius: '6px',
+                  border: isSelected ? '1px solid var(--accent-teal)' : '1px solid var(--border-subtle)',
+                  background: isSelected ? 'var(--accent-teal-subtle)' : '#FFFFFF',
+                  color: isSelected ? 'var(--accent-teal-dark)' : 'var(--text-secondary)',
                   cursor: 'pointer',
                   transition: 'var(--transition)',
+                  boxShadow: '0 1px 2px rgba(15, 23, 42, 0.03)',
                 }}
               >
                 {skill}
@@ -387,9 +388,9 @@ const JobsList = () => {
                 >
                   <Link
                     to={`/jobs/${job._id}`}
-                    style={{ color: 'inherit', textDecoration: 'none', transition: 'var(--transition)' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-amber)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = 'inherit')}
+                    style={{ color: '#0F172A', textDecoration: 'none', transition: 'var(--transition)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-teal)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = '#0F172A')}
                   >
                     {job.title}
                   </Link>
@@ -401,18 +402,17 @@ const JobsList = () => {
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '0.3rem',
-                      fontSize: '0.74rem',
-                      fontFamily: 'var(--font-mono)',
-                      color: 'var(--accent-amber)',
-                      background: 'rgba(245, 166, 35, 0.08)',
-                      border: '1px solid rgba(245, 166, 35, 0.25)',
-                      padding: '0.15rem 0.55rem',
-                      borderRadius: '3px',
+                      gap: '0.35rem',
+                      fontSize: '0.78rem',
+                      color: 'var(--accent-teal-dark)',
+                      background: 'var(--accent-teal-subtle)',
+                      border: '1px solid var(--accent-teal-border)',
+                      padding: '0.2rem 0.65rem',
+                      borderRadius: '9999px',
                       fontWeight: 600,
                     }}
                   >
-                    <MapPin size={12} />
+                    <MapPin size={12} color="var(--accent-teal)" />
                     <span>{job.location}</span>
                   </span>
                 </div>
@@ -420,9 +420,9 @@ const JobsList = () => {
                 {/* Description Snippet */}
                 <p
                   style={{
-                    fontSize: '0.88rem',
+                    fontSize: '0.9rem',
                     color: 'var(--text-secondary)',
-                    lineHeight: 1.5,
+                    lineHeight: 1.55,
                     marginBottom: '1.25rem',
                     display: '-webkit-box',
                     WebkitLineClamp: 3,
@@ -434,19 +434,18 @@ const JobsList = () => {
                 </p>
 
                 {/* Required Skills Tag Chips */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '1.5rem' }}>
                   {job.requiredSkills?.map((skill, idx) => (
                     <span
                       key={idx}
                       style={{
-                        padding: '0.15rem 0.55rem',
-                        fontSize: '0.72rem',
-                        fontFamily: 'var(--font-mono)',
-                        fontWeight: 600,
-                        borderRadius: '3px',
-                        background: 'rgba(255, 255, 255, 0.04)',
-                        border: '1px solid var(--border-subtle)',
-                        color: 'var(--text-primary)',
+                        padding: '0.2rem 0.6rem',
+                        fontSize: '0.76rem',
+                        fontWeight: 500,
+                        borderRadius: '6px',
+                        background: '#F8FAFC',
+                        border: '1px solid #E2E8F0',
+                        color: '#334155',
                       }}
                     >
                       {skill}
@@ -469,19 +468,19 @@ const JobsList = () => {
                   <button
                     onClick={() => navigate('/dashboard')}
                     className="btn btn-secondary"
-                    style={{ width: '100%', fontSize: '0.86rem', padding: '0.6rem' }}
+                    style={{ width: '100%', fontSize: '0.88rem', padding: '0.65rem' }}
                   >
                     <LayoutDashboard size={15} />
-                    <span>View Applicants in ATS</span>
+                    <span>View Applicants in Diagnostic ATS</span>
                   </button>
                 ) : (
                   <button
                     onClick={() => handleOpenApplyModal(job)}
                     className="btn btn-primary"
-                    style={{ width: '100%', fontSize: '0.86rem', padding: '0.6rem' }}
+                    style={{ width: '100%', fontSize: '0.88rem', padding: '0.65rem' }}
                   >
                     <ArrowRight size={15} />
-                    <span>Apply & Check AI Match</span>
+                    <span>Run Clinical Skill Benchmark</span>
                   </button>
                 )}
               </div>

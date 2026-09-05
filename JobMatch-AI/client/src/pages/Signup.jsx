@@ -116,20 +116,20 @@ const Signup = () => {
             style={{
               width: '42px',
               height: '42px',
-              borderRadius: '4px',
-              background: 'rgba(245, 166, 35, 0.1)',
-              border: '1px solid rgba(245, 166, 35, 0.35)',
+              borderRadius: '8px',
+              background: 'var(--accent-teal-subtle)',
+              border: '1px solid var(--accent-teal-border)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '0.85rem',
             }}
           >
-            <UserPlus size={20} color="#F5A623" />
+            <UserPlus size={20} color="#0D9488" />
           </div>
-          <h2 style={{ fontSize: '1.65rem', fontWeight: 800 }}>Create Your Account</h2>
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>Create Diagnostic Account</h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginTop: '0.35rem' }}>
-            Get started with AI-driven job matching and ATS resume intelligence
+            Begin objective skill verification and precision job evaluation
           </p>
         </div>
 
@@ -143,9 +143,9 @@ const Signup = () => {
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
               gap: '0.65rem',
-              background: '#0E0E12',
+              background: 'var(--bg-secondary)',
               padding: '0.35rem',
-              borderRadius: '4px',
+              borderRadius: 'var(--radius-sm)',
               border: '1px solid var(--border-subtle)',
             }}
           >
@@ -159,17 +159,18 @@ const Signup = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: '0.75rem 0.5rem',
-                borderRadius: '4px',
-                border: role === 'candidate' ? '1px solid var(--accent-amber)' : '1px solid transparent',
-                background: role === 'candidate' ? 'rgba(245, 166, 35, 0.12)' : 'transparent',
-                color: role === 'candidate' ? '#EDEDED' : 'var(--text-secondary)',
+                borderRadius: 'var(--radius-xs)',
+                border: role === 'candidate' ? '1.5px solid var(--accent-teal)' : '1px solid transparent',
+                background: role === 'candidate' ? 'var(--bg-card)' : 'transparent',
+                boxShadow: role === 'candidate' ? 'var(--shadow-subtle)' : 'none',
+                color: role === 'candidate' ? 'var(--text-primary)' : 'var(--text-secondary)',
                 cursor: 'pointer',
                 transition: 'var(--transition)',
               }}
             >
               <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>🎯 Candidate</span>
-              <span style={{ fontSize: '0.74rem', color: role === 'candidate' ? 'var(--accent-amber)' : 'var(--text-muted)', marginTop: '2px', fontFamily: 'var(--font-mono)' }}>
-                Seek roles & match resume
+              <span style={{ fontSize: '0.74rem', color: role === 'candidate' ? 'var(--accent-teal)' : 'var(--text-muted)', marginTop: '2px', fontFamily: 'var(--font-sans-display)' }}>
+                Seek roles & verify skills
               </span>
             </button>
 
@@ -183,17 +184,18 @@ const Signup = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: '0.75rem 0.5rem',
-                borderRadius: '4px',
-                border: role === 'recruiter' ? '1px solid var(--accent-amber)' : '1px solid transparent',
-                background: role === 'recruiter' ? 'rgba(245, 166, 35, 0.12)' : 'transparent',
-                color: role === 'recruiter' ? '#EDEDED' : 'var(--text-secondary)',
+                borderRadius: 'var(--radius-xs)',
+                border: role === 'recruiter' ? '1.5px solid var(--accent-teal)' : '1px solid transparent',
+                background: role === 'recruiter' ? 'var(--bg-card)' : 'transparent',
+                boxShadow: role === 'recruiter' ? 'var(--shadow-subtle)' : 'none',
+                color: role === 'recruiter' ? 'var(--text-primary)' : 'var(--text-secondary)',
                 cursor: 'pointer',
                 transition: 'var(--transition)',
               }}
             >
               <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>🏢 Recruiter</span>
-              <span style={{ fontSize: '0.74rem', color: role === 'recruiter' ? 'var(--accent-amber)' : 'var(--text-muted)', marginTop: '2px', fontFamily: 'var(--font-mono)' }}>
-                Post jobs & screen candidates
+              <span style={{ fontSize: '0.74rem', color: role === 'recruiter' ? 'var(--accent-teal)' : 'var(--text-muted)', marginTop: '2px', fontFamily: 'var(--font-sans-display)' }}>
+                Post jobs & diagnose matches
               </span>
             </button>
           </div>

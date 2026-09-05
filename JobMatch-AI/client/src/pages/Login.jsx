@@ -110,28 +110,28 @@ const Login = () => {
             style={{
               width: '42px',
               height: '42px',
-              borderRadius: '4px',
-              background: 'rgba(245, 166, 35, 0.1)',
-              border: '1px solid rgba(245, 166, 35, 0.35)',
+              borderRadius: '8px',
+              background: 'var(--accent-teal-subtle)',
+              border: '1px solid var(--accent-teal-border)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '0.85rem',
             }}
           >
-            <LogIn size={20} color="#F5A623" />
+            <LogIn size={20} color="#0D9488" />
           </div>
-          <h2 style={{ fontSize: '1.65rem', fontWeight: 800 }}>Welcome Back</h2>
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>Diagnostic Sign-In</h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginTop: '0.35rem' }}>
-            Sign in to access your AI match reports and job portal
+            Access clinical candidate evaluations and diagnostic job reports
           </p>
         </div>
 
         {/* Demo Credentials Quick-Fill Pills */}
         <div
           style={{
-            background: '#0E0E12',
-            borderRadius: '4px',
+            background: 'var(--bg-secondary)',
+            borderRadius: 'var(--radius-sm)',
             padding: '0.85rem 1rem',
             marginBottom: '1.5rem',
             border: '1px solid var(--border-subtle)',
@@ -147,11 +147,11 @@ const Login = () => {
               textTransform: 'uppercase',
               letterSpacing: '0.06em',
               color: 'var(--text-muted)',
-              fontFamily: 'var(--font-mono)',
+              fontFamily: 'var(--font-sans-display)',
               marginBottom: '0.6rem',
             }}
           >
-            <Zap size={13} color="var(--accent-amber)" />
+            <Zap size={13} color="var(--accent-teal)" />
             <span>1-Click Test Credentials</span>
           </div>
 
@@ -163,11 +163,7 @@ const Login = () => {
               style={{
                 fontSize: '0.78rem',
                 padding: '0.45rem 0.5rem',
-                borderRadius: '4px',
-                border: '1px solid var(--border-subtle)',
-                background: 'rgba(255, 255, 255, 0.03)',
-                color: 'var(--text-primary)',
-                fontFamily: 'var(--font-mono)',
+                borderRadius: 'var(--radius-xs)',
               }}
             >
               Candidate
@@ -180,11 +176,10 @@ const Login = () => {
               style={{
                 fontSize: '0.78rem',
                 padding: '0.45rem 0.5rem',
-                borderRadius: '4px',
-                border: '1px solid rgba(245, 166, 35, 0.35)',
-                background: 'rgba(245, 166, 35, 0.08)',
-                color: 'var(--accent-amber)',
-                fontFamily: 'var(--font-mono)',
+                borderRadius: 'var(--radius-xs)',
+                borderColor: 'var(--accent-teal)',
+                color: 'var(--accent-teal)',
+                background: 'var(--accent-teal-subtle)',
               }}
             >
               Recruiter

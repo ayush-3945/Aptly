@@ -1,59 +1,78 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 :root {
-  /* Precision Engineering Dark Palette */
-  --bg-primary: #0A0A0A;
-  --bg-secondary: #0F0F12;
-  --bg-tertiary: #141418;
-  --bg-card: #111114;
-  --bg-card-hover: #16161B;
-  --bg-card-solid: #111114;
+  /* Clinical Precision & Lab Diagnostic Palette (Light Paper-White Primary) */
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #F1F5F9;
+  --bg-tertiary: #E2E8F0;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FAFCFE;
+  --bg-card-solid: #FFFFFF;
   
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-glass: rgba(255, 255, 255, 0.12);
-  --border-focus: #F5A623;
+  --border-subtle: #E2E8F0;
+  --border-medium: #CBD5E1;
+  --border-glass: rgba(15, 23, 42, 0.08);
+  --border-focus: #0D9488;
 
-  /* Single Warm Amber Accent (No purple/cyan) */
-  --accent-amber: #F5A623;
-  --accent-amber-hover: #E09418;
-  --accent-amber-subtle: rgba(245, 166, 35, 0.12);
-  --accent-amber-border: rgba(245, 166, 35, 0.35);
-  --accent-amber-glow: 0 0 20px rgba(245, 166, 35, 0.18);
+  /* Clinical Teal-Green Accent (Trust, Precision, Health-Check) */
+  --accent-teal: #0D9488;
+  --accent-teal-dark: #0F766E;
+  --accent-teal-light: #14B8A6;
+  --accent-teal-subtle: #F0FDFA;
+  --accent-teal-border: #CCFBF1;
 
-  --text-primary: #EDEDED;
-  --text-secondary: #A1A1AA;
-  --text-muted: #71717A;
+  /* Compatibility aliases mapping cleanly to clinical theme */
+  --accent-cyan: var(--accent-teal);
+  --accent-indigo: var(--text-primary);
+  --accent-purple: var(--accent-teal-dark);
+  --accent-blue: #0284C7;
+  --accent-gradient: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+  --accent-glow: 0 4px 14px rgba(13, 148, 136, 0.22);
 
-  /* Semantic status colors (crisp, restrained) */
-  --success: #10B981;
-  --success-bg: rgba(16, 185, 129, 0.1);
-  --success-border: rgba(16, 185, 129, 0.3);
+  /* Authoritative Deep Slate Navy Text */
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+
+  /* Semantic Diagnostic Status Colors */
+  --success: #0D9488;
+  --success-bg: #F0FDF4;
+  --success-border: #BBF7D0;
+  --success-text: #166534;
   
-  --warning: #F5A623;
-  --warning-bg: rgba(245, 166, 35, 0.1);
-  --warning-border: rgba(245, 166, 35, 0.3);
+  --warning: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #FDE68A;
+  --warning-text: #92400E;
   
-  --danger: #EF4444;
-  --danger-bg: rgba(239, 68, 68, 0.1);
-  --danger-border: rgba(239, 68, 68, 0.3);
+  --danger: #E11D48;
+  --danger-bg: #FFF1F2;
+  --danger-border: #FECDD3;
+  --danger-text: #9F1239;
   
-  --info: #38BDF8;
-  --info-bg: rgba(56, 189, 248, 0.1);
-  --info-border: rgba(56, 189, 248, 0.3);
+  --info: #0284C7;
+  --info-bg: #F0F9FF;
+  --info-border: #BAE6FD;
+  --info-text: #0369A1;
 
-  /* Sharper Technical Radii (4-6px max, no pill bloat) */
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-full: 4px;
+  /* Soft Elevated Radii */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
 
-  /* Two-Font System: Display Sans + Precision Monospace */
+  /* Typography: Editorial Serif for Headline Authority + Clean Grotesk for Body */
   --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+  --font-heading: 'Newsreader', 'Lora', Georgia, serif;
+  --font-sans-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
   
-  --transition: all 0.15s ease-out;
+  --shadow-subtle: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+  --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.04), 0 12px 24px -4px rgba(15, 23, 42, 0.05);
+  --shadow-elevated: 0 20px 35px -8px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.02);
+
+  --transition: all 0.18s ease;
 }
 
 /* Base Reset */
@@ -64,7 +83,7 @@
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -78,9 +97,12 @@ body {
   line-height: 1.6;
   overflow-x: hidden;
   position: relative;
+  background-image: 
+    radial-gradient(at 100% 0%, rgba(13, 148, 136, 0.03) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(15, 23, 42, 0.02) 0px, transparent 50%);
 }
 
-/* Faint technical grid background texture */
+/* Faint soft paper grid */
 body::before {
   content: '';
   position: fixed;
@@ -89,23 +111,9 @@ body::before {
   width: 100vw;
   height: 100vh;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Subtle amber vignette at the top */
-body::after {
-  content: '';
-  position: fixed;
-  top: -150px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 800px;
-  height: 400px;
-  background: radial-gradient(ellipse at center, rgba(245, 166, 35, 0.04) 0%, transparent 70%);
+    linear-gradient(to right, rgba(15, 23, 42, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
   pointer-events: none;
   z-index: 0;
 }
@@ -115,34 +123,34 @@ body::after {
   z-index: 1;
 }
 
-/* Custom Sleek Scrollbar */
+/* Clean Slate Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0A0A0A;
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-xs);
+  background: #CBD5E1;
+  border-radius: var(--radius-full);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-amber);
+  background: var(--accent-teal);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.15) #0A0A0A;
+  scrollbar-color: #CBD5E1 #F1F5F9;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  letter-spacing: -0.025em;
   color: var(--text-primary);
+  font-weight: 600;
   line-height: 1.25;
 }
 
@@ -151,26 +159,29 @@ a {
   text-decoration: none;
 }
 
-/* Precision Technical Cards (1px sharp border, subtle hover tint) */
-.card-glass {
+/* Elevated White Diagnostic Cards */
+.card-glass, .lab-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 1.5rem;
+  box-shadow: var(--shadow-card);
   transition: var(--transition);
 }
 
-.card-glass:hover {
+.card-glass:hover, .lab-card:hover {
   background: var(--bg-card-hover);
-  border-color: rgba(245, 166, 35, 0.25);
+  border-color: #CBD5E1;
+  box-shadow: var(--shadow-elevated);
 }
 
-/* Single Amber Highlight for headline words (NO gradient) */
-.gradient-text, .highlight-amber {
-  color: var(--accent-amber);
+/* Clinical Teal Highlight (Editorial, non-neon) */
+.gradient-text, .highlight-amber, .highlight-teal {
+  color: var(--accent-teal);
   background: none;
   -webkit-text-fill-color: initial;
-  font-weight: 700;
+  font-weight: 600;
+  font-style: italic;
 }
 
 /* Precision Tool Buttons */
@@ -179,10 +190,10 @@ a {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-family: var(--font-main);
+  font-family: var(--font-sans-display);
   font-weight: 600;
-  font-size: 0.9rem;
-  padding: 0.55rem 1.15rem;
+  font-size: 0.92rem;
+  padding: 0.62rem 1.35rem;
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: var(--transition);
@@ -192,34 +203,37 @@ a {
 }
 
 .btn:active {
-  transform: translateY(1px);
+  transform: scale(0.99);
 }
 
-/* Primary Button: Solid amber background with dark text, sharp corners, no gradient */
+/* Primary Button: Clinical Teal with White Text */
 .btn-primary {
-  background: var(--accent-amber);
-  color: #0A0A0A;
-  font-weight: 700;
-  border: 1px solid var(--accent-amber);
+  background: var(--accent-teal);
+  color: #FFFFFF;
+  font-weight: 600;
+  border: 1px solid var(--accent-teal);
+  box-shadow: 0 2px 4px rgba(13, 148, 136, 0.2);
 }
 
 .btn-primary:hover {
-  background: var(--accent-amber-hover);
-  border-color: var(--accent-amber-hover);
-  color: #0A0A0A;
+  background: var(--accent-teal-dark);
+  border-color: var(--accent-teal-dark);
+  color: #FFFFFF;
+  box-shadow: 0 4px 8px rgba(13, 148, 136, 0.28);
 }
 
-/* Secondary Button: Outlined / ghost with amber border on hover */
+/* Secondary Button: Clean Outlined Diagnostic Action */
 .btn-secondary {
-  background: transparent;
+  background: #FFFFFF;
   color: var(--text-primary);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--border-medium);
+  box-shadow: var(--shadow-subtle);
 }
 
 .btn-secondary:hover {
-  border-color: var(--accent-amber);
-  color: var(--accent-amber);
-  background: rgba(245, 166, 35, 0.05);
+  border-color: var(--accent-teal);
+  color: var(--accent-teal-dark);
+  background: var(--accent-teal-subtle);
 }
 
 .btn-ghost {
@@ -230,48 +244,41 @@ a {
 
 .btn-ghost:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(15, 23, 42, 0.05);
 }
 
-/* Monospace Badges & Technical Indicators */
+/* Diagnostic Status Badges */
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-family: var(--font-sans-display);
+  font-size: 0.74rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
-  padding: 0.25rem 0.6rem;
-  border-radius: var(--radius-xs);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
 }
 
-.badge-amber {
-  background: var(--accent-amber-subtle);
-  color: var(--accent-amber);
-  border: 1px solid var(--accent-amber-border);
-}
-
-.badge-strong {
-  background: var(--success-bg);
-  color: #34D399;
-  border: 1px solid var(--success-border);
+.badge-strong, .badge-teal {
+  background: var(--accent-teal-subtle);
+  color: var(--accent-teal-dark);
+  border: 1px solid var(--accent-teal-border);
 }
 
 .badge-moderate {
   background: var(--warning-bg);
-  color: #FBBF24;
+  color: var(--warning-text);
   border: 1px solid var(--warning-border);
 }
 
 .badge-low {
   background: var(--danger-bg);
-  color: #F87171;
+  color: var(--danger-text);
   border: 1px solid var(--danger-border);
 }
 
 .badge-pending {
-  background: rgba(255, 255, 255, 0.06);
+  background: #F8FAFC;
   color: var(--text-secondary);
   border: 1px solid var(--border-subtle);
 }
@@ -283,14 +290,9 @@ a {
   padding: 0 1.5rem;
 }
 
-/* Technical Monospace Utility */
-.font-mono {
-  font-family: var(--font-mono);
-}
-
 /* Keyframe Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -317,9 +319,9 @@ a {
 }
 
 .form-label {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -359,15 +361,16 @@ a {
 
 .form-input {
   width: 100%;
-  background: #0E0E11;
-  border: 1px solid var(--border-subtle);
+  background: #FFFFFF;
+  border: 1px solid var(--border-medium);
   border-radius: var(--radius-sm);
   padding: 0.65rem 0.9rem;
   color: var(--text-primary);
   font-family: var(--font-main);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   transition: var(--transition);
   outline: none;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 .form-input.has-icon-left {
@@ -379,8 +382,8 @@ a {
 }
 
 .form-input:focus {
-  border-color: var(--accent-amber);
-  box-shadow: 0 0 0 1px var(--accent-amber);
+  border-color: var(--accent-teal);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
 }
 
 .form-input::placeholder {
@@ -391,7 +394,7 @@ a {
 .alert-error {
   background: var(--danger-bg);
   border: 1px solid var(--danger-border);
-  color: #FCA5A5;
+  color: var(--danger-text);
   padding: 0.85rem 1rem;
   border-radius: var(--radius-sm);
   font-size: 0.88rem;
@@ -402,13 +405,13 @@ a {
   line-height: 1.4;
 }
 
-/* Technical Modal Architecture */
+/* Clinical Modal Architecture */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(5, 5, 6, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -418,10 +421,10 @@ a {
 }
 
 .modal-sheet {
-  background: #111114;
-  border: 1px solid var(--border-glass);
+  background: #FFFFFF;
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
   width: 100%;
   max-width: 680px;
   max-height: 90vh;
@@ -432,27 +435,27 @@ a {
 }
 
 .modal-header {
-  padding: 1.15rem 1.5rem;
+  padding: 1.25rem 1.65rem;
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
-  background: #0E0E11;
+  background: #FAFCFE;
 }
 
 .modal-body {
-  padding: 1.5rem;
+  padding: 1.65rem;
   overflow-y: auto;
   flex: 1;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+  scrollbar-color: #CBD5E1 #F1F5F9;
 }
 
 .modal-footer {
-  padding: 1.15rem 1.5rem;
+  padding: 1.15rem 1.65rem;
   border-top: 1px solid var(--border-subtle);
-  background: #0E0E11;
+  background: #FAFCFE;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -474,6 +477,6 @@ a {
 }
 
 .kanban-scroll-container::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-xs);
+  background: #CBD5E1;
+  border-radius: var(--radius-full);
 }

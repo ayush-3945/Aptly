@@ -31,8 +31,9 @@ const Navbar = () => {
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        backgroundColor: '#0A0A0A',
+        backgroundColor: '#FFFFFF',
         borderBottom: '1px solid var(--border-subtle)',
+        boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)',
       }}
     >
       <div
@@ -41,22 +42,23 @@ const Navbar = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          height: '68px',
+          height: '70px',
         }}
       >
-        {/* Brand Logo with Custom Geometric Mark */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-          <Logo size={32} />
+        {/* Brand Logo with Clinical Diagnostic Seal */}
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <Logo size={34} />
           <div>
             <span
               style={{
                 fontFamily: 'var(--font-heading)',
-                fontSize: '1.35rem',
-                fontWeight: 700,
-                letterSpacing: '-0.03em',
+                fontSize: '1.45rem',
+                fontWeight: 600,
+                letterSpacing: '-0.02em',
+                color: '#0F172A',
               }}
             >
-              Aptly<span style={{ color: 'var(--accent-amber)' }}>.AI</span>
+              Aptly<span style={{ color: 'var(--accent-teal)', fontStyle: 'italic' }}>.AI</span>
             </span>
           </div>
         </Link>
@@ -69,13 +71,13 @@ const Navbar = () => {
               display: 'flex',
               alignItems: 'center',
               gap: '0.45rem',
-              fontSize: '0.9rem',
+              fontSize: '0.92rem',
               fontWeight: 500,
-              color: isActive('/jobs') ? 'var(--accent-amber)' : 'var(--text-secondary)',
+              color: isActive('/jobs') ? 'var(--accent-teal)' : 'var(--text-secondary)',
               transition: 'var(--transition)',
             }}
           >
-            <Briefcase size={15} />
+            <Briefcase size={16} />
             <span>Explore Jobs</span>
           </Link>
 
@@ -85,14 +87,14 @@ const Navbar = () => {
               display: 'flex',
               alignItems: 'center',
               gap: '0.45rem',
-              fontSize: '0.9rem',
+              fontSize: '0.92rem',
               fontWeight: 500,
-              color: isActive('/dashboard') ? 'var(--accent-amber)' : 'var(--text-secondary)',
+              color: isActive('/dashboard') ? 'var(--accent-teal)' : 'var(--text-secondary)',
               transition: 'var(--transition)',
             }}
           >
-            <LayoutDashboard size={15} />
-            <span>ATS Pipeline</span>
+            <LayoutDashboard size={16} />
+            <span>Diagnostic Pipeline</span>
           </Link>
 
           {user?.role === 'recruiter' && (
@@ -102,14 +104,14 @@ const Navbar = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.45rem',
-                fontSize: '0.9rem',
+                fontSize: '0.92rem',
                 fontWeight: 600,
-                color: isActive('/jobs/post') ? 'var(--accent-amber)' : 'var(--text-secondary)',
+                color: isActive('/jobs/post') ? 'var(--accent-teal)' : 'var(--text-secondary)',
                 transition: 'var(--transition)',
               }}
             >
-              <PlusCircle size={15} />
-              <span>Post a Job</span>
+              <PlusCircle size={16} />
+              <span>Post Job Opening</span>
             </Link>
           )}
         </nav>
@@ -123,31 +125,31 @@ const Navbar = () => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.6rem',
-                  padding: '0.3rem 0.65rem',
-                  borderRadius: '4px',
-                  backgroundColor: '#111114',
+                  gap: '0.65rem',
+                  padding: '0.35rem 0.75rem',
+                  borderRadius: '8px',
+                  backgroundColor: '#F8FAFC',
                   border: '1px solid var(--border-subtle)',
                 }}
               >
                 <div
                   style={{
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '3px',
-                    background: 'rgba(245, 166, 35, 0.1)',
-                    border: '1px solid rgba(245, 166, 35, 0.3)',
+                    width: '26px',
+                    height: '26px',
+                    borderRadius: '50%',
+                    background: '#F0FDFA',
+                    border: '1px solid #99F6E4',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: 'var(--accent-amber)',
+                    color: 'var(--accent-teal)',
                   }}
                 >
-                  <User size={13} />
+                  <User size={14} />
                 </div>
                 <span
                   style={{
-                    fontSize: '0.84rem',
+                    fontSize: '0.86rem',
                     fontWeight: 600,
                     color: 'var(--text-primary)',
                     maxWidth: '130px',
@@ -161,16 +163,15 @@ const Navbar = () => {
                 {/* Role Badge */}
                 <span
                   style={{
-                    padding: '0.15rem 0.45rem',
-                    borderRadius: '2px',
+                    padding: '0.15rem 0.5rem',
+                    borderRadius: '9999px',
                     fontSize: '0.68rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.04em',
-                    fontFamily: 'var(--font-mono)',
-                    background: user.role === 'recruiter' ? 'rgba(245, 166, 35, 0.12)' : 'rgba(255, 255, 255, 0.06)',
-                    color: user.role === 'recruiter' ? 'var(--accent-amber)' : 'var(--text-muted)',
-                    border: `1px solid ${user.role === 'recruiter' ? 'rgba(245, 166, 35, 0.3)' : 'rgba(255, 255, 255, 0.1)'}`,
+                    background: user.role === 'recruiter' ? '#F0FDFA' : '#F1F5F9',
+                    color: user.role === 'recruiter' ? '#0F766E' : '#475569',
+                    border: `1px solid ${user.role === 'recruiter' ? '#CCFBF1' : '#E2E8F0'}`,
                   }}
                 >
                   {user.role}
@@ -182,8 +183,8 @@ const Navbar = () => {
                 onClick={logout}
                 className="btn btn-ghost"
                 style={{
-                  fontSize: '0.82rem',
-                  padding: '0.4rem 0.75rem',
+                  fontSize: '0.84rem',
+                  padding: '0.45rem 0.8rem',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.35rem',
@@ -197,20 +198,20 @@ const Navbar = () => {
             </div>
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <Link to="/login" className="btn btn-ghost" style={{ fontSize: '0.88rem' }}>
+              <Link to="/login" className="btn btn-ghost" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
                 Sign In
               </Link>
               <Link
                 to="/signup"
                 className="btn btn-primary"
                 style={{
-                  fontSize: '0.88rem',
-                  padding: '0.5rem 1.05rem',
-                  borderRadius: '4px',
+                  fontSize: '0.9rem',
+                  padding: '0.55rem 1.15rem',
+                  borderRadius: '8px',
                 }}
               >
                 <span>Get Started</span>
-                <ArrowRight size={14} />
+                <ArrowRight size={15} />
               </Link>
             </div>
           )}
@@ -222,8 +223,9 @@ const Navbar = () => {
           className="mobile-toggle-btn"
           aria-label={mobileOpen ? 'Close menu' : 'Open navigation menu'}
           aria-expanded={mobileOpen}
+          style={{ color: '#0F172A' }}
         >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
@@ -232,23 +234,25 @@ const Navbar = () => {
         <div
           style={{
             position: 'fixed',
-            top: '68px',
+            top: '70px',
             left: 0,
             right: 0,
             bottom: 0,
             zIndex: 99,
-            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backgroundColor: 'rgba(15, 23, 42, 0.35)',
+            backdropFilter: 'blur(4px)',
           }}
           onClick={() => setMobileOpen(false)}
         >
           <div
             style={{
-              backgroundColor: '#0E0E12',
+              backgroundColor: '#FFFFFF',
               borderBottom: '1px solid var(--border-subtle)',
-              padding: '1.25rem',
+              padding: '1.5rem',
               display: 'flex',
               flexDirection: 'column',
-              gap: '1rem',
+              gap: '1.25rem',
+              boxShadow: '0 20px 30px rgba(15, 23, 42, 0.1)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -259,46 +263,45 @@ const Navbar = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '0.65rem 0.85rem',
-                  borderRadius: '4px',
-                  background: '#141418',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '8px',
+                  background: '#F8FAFC',
                   border: '1px solid var(--border-subtle)',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                   <div
                     style={{
-                      width: '28px',
-                      height: '28px',
-                      borderRadius: '3px',
-                      background: 'rgba(245, 166, 35, 0.1)',
-                      border: '1px solid rgba(245, 166, 35, 0.3)',
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      background: '#F0FDFA',
+                      border: '1px solid #99F6E4',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: 'var(--accent-amber)',
+                      color: 'var(--accent-teal)',
                     }}
                   >
-                    <User size={14} />
+                    <User size={16} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    <div style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                       {user.name || 'User'}
                     </div>
-                    <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>{user.email}</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{user.email}</div>
                   </div>
                 </div>
 
                 <span
                   style={{
-                    padding: '0.15rem 0.45rem',
-                    borderRadius: '2px',
-                    fontSize: '0.68rem',
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '9999px',
+                    fontSize: '0.72rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
-                    fontFamily: 'var(--font-mono)',
-                    background: user.role === 'recruiter' ? 'rgba(245, 166, 35, 0.15)' : 'rgba(255, 255, 255, 0.08)',
-                    color: user.role === 'recruiter' ? 'var(--accent-amber)' : 'var(--text-muted)',
+                    background: user.role === 'recruiter' ? '#F0FDFA' : '#F1F5F9',
+                    color: user.role === 'recruiter' ? '#0F766E' : '#475569',
                     border: '1px solid var(--border-subtle)',
                   }}
                 >
@@ -308,24 +311,24 @@ const Navbar = () => {
             )}
 
             {/* Mobile Nav Links */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <Link
                 to="/jobs"
                 onClick={() => setMobileOpen(false)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.65rem',
-                  padding: '0.75rem 0.85rem',
-                  borderRadius: '4px',
-                  fontSize: '0.9rem',
+                  gap: '0.75rem',
+                  padding: '0.85rem 1rem',
+                  borderRadius: '8px',
+                  fontSize: '0.95rem',
                   fontWeight: 600,
-                  color: isActive('/jobs') ? 'var(--accent-amber)' : 'var(--text-primary)',
-                  background: isActive('/jobs') ? 'rgba(245, 166, 35, 0.08)' : 'transparent',
-                  border: `1px solid ${isActive('/jobs') ? 'rgba(245, 166, 35, 0.25)' : 'transparent'}`,
+                  color: isActive('/jobs') ? 'var(--accent-teal)' : 'var(--text-primary)',
+                  background: isActive('/jobs') ? '#F0FDFA' : 'transparent',
+                  border: `1px solid ${isActive('/jobs') ? '#CCFBF1' : 'transparent'}`,
                 }}
               >
-                <Briefcase size={16} />
+                <Briefcase size={17} />
                 <span>Explore Jobs</span>
               </Link>
 
@@ -335,18 +338,18 @@ const Navbar = () => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.65rem',
-                  padding: '0.75rem 0.85rem',
-                  borderRadius: '4px',
-                  fontSize: '0.9rem',
+                  gap: '0.75rem',
+                  padding: '0.85rem 1rem',
+                  borderRadius: '8px',
+                  fontSize: '0.95rem',
                   fontWeight: 600,
-                  color: isActive('/dashboard') ? 'var(--accent-amber)' : 'var(--text-primary)',
-                  background: isActive('/dashboard') ? 'rgba(245, 166, 35, 0.08)' : 'transparent',
-                  border: `1px solid ${isActive('/dashboard') ? 'rgba(245, 166, 35, 0.25)' : 'transparent'}`,
+                  color: isActive('/dashboard') ? 'var(--accent-teal)' : 'var(--text-primary)',
+                  background: isActive('/dashboard') ? '#F0FDFA' : 'transparent',
+                  border: `1px solid ${isActive('/dashboard') ? '#CCFBF1' : 'transparent'}`,
                 }}
               >
-                <LayoutDashboard size={16} />
-                <span>ATS Pipeline</span>
+                <LayoutDashboard size={17} />
+                <span>Diagnostic Pipeline</span>
               </Link>
 
               {user?.role === 'recruiter' && (
@@ -356,24 +359,24 @@ const Navbar = () => {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.65rem',
-                    padding: '0.75rem 0.85rem',
-                    borderRadius: '4px',
-                    fontSize: '0.9rem',
+                    gap: '0.75rem',
+                    padding: '0.85rem 1rem',
+                    borderRadius: '8px',
+                    fontSize: '0.95rem',
                     fontWeight: 600,
-                    color: isActive('/jobs/post') ? 'var(--accent-amber)' : 'var(--text-primary)',
-                    background: isActive('/jobs/post') ? 'rgba(245, 166, 35, 0.08)' : 'transparent',
-                    border: `1px solid ${isActive('/jobs/post') ? 'rgba(245, 166, 35, 0.25)' : 'transparent'}`,
+                    color: isActive('/jobs/post') ? 'var(--accent-teal)' : 'var(--text-primary)',
+                    background: isActive('/jobs/post') ? '#F0FDFA' : 'transparent',
+                    border: `1px solid ${isActive('/jobs/post') ? '#CCFBF1' : 'transparent'}`,
                   }}
                 >
-                  <PlusCircle size={16} />
-                  <span>Post a Job Opening</span>
+                  <PlusCircle size={17} />
+                  <span>Post Job Opening</span>
                 </Link>
               )}
             </div>
 
             {/* Mobile Auth Actions */}
-            <div style={{ paddingTop: '0.75rem', borderTop: '1px solid var(--border-subtle)' }}>
+            <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--border-subtle)' }}>
               {isAuthenticated && user ? (
                 <button
                   onClick={() => {
@@ -383,25 +386,26 @@ const Navbar = () => {
                   className="btn btn-secondary"
                   style={{
                     width: '100%',
-                    padding: '0.65rem',
+                    padding: '0.75rem',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '0.5rem',
-                    color: '#F87171',
-                    borderColor: 'rgba(239, 68, 68, 0.3)',
+                    color: '#E11D48',
+                    borderColor: '#FECDD3',
+                    background: '#FFF1F2',
                   }}
                 >
-                  <LogOut size={15} />
+                  <LogOut size={16} />
                   <span>Sign Out</span>
                 </button>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   <Link
                     to="/login"
                     onClick={() => setMobileOpen(false)}
                     className="btn btn-secondary"
-                    style={{ width: '100%', padding: '0.65rem', textAlign: 'center' }}
+                    style={{ width: '100%', padding: '0.75rem', textAlign: 'center' }}
                   >
                     Sign In
                   </Link>
@@ -411,7 +415,7 @@ const Navbar = () => {
                     className="btn btn-primary"
                     style={{
                       width: '100%',
-                      padding: '0.65rem',
+                      padding: '0.75rem',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -419,7 +423,7 @@ const Navbar = () => {
                     }}
                   >
                     <span>Get Started</span>
-                    <ArrowRight size={15} />
+                    <ArrowRight size={16} />
                   </Link>
                 </div>
               )}
