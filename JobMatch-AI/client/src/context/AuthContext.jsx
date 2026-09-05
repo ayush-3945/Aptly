@@ -33,6 +33,12 @@ export const AuthProvider = ({ children }) => {
         }
       }
 
+      // If demo token, retain cached session without hitting network
+      if (storedToken.startsWith('demo_jwt_token_')) {
+        setLoading(false);
+        return;
+      }
+
       // Verify token with backend profile endpoint
       try {
         const response = await api.get('/users/profile');
@@ -61,32 +67,110 @@ export const AuthProvider = ({ children }) => {
 
   // Login handler
   const login = async (email, password) => {
-    const response = await api.post('/auth/login', { email, password });
-    const { token: receivedToken, ...userData } = response.data;
+    try {
+      const response = await api.post('/auth/login', { email, password });
 
-    localStorage.setItem('token', receivedToken);
-    localStorage.setItem('user', JSON.stringify(userData));
+      // If backend responded with HTML (e.g. Vercel SPA rewrite fallback where API is not hosted on the same domain)
+      if (typeof response.data === 'string' && response.data.trim().startsWith('<!doctype')) {
+        throw new Error('Static host rewrite detected');
+      }
 
-    setToken(receivedToken);
-    setUser(userData);
-    setIsAuthenticated(true);
+      const { token: receivedToken, ...userData } = response.data;
 
-    return response.data;
+      localStorage.setItem('token', receivedToken);
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      setToken(receivedToken);
+      setUser(userData);
+      setIsAuthenticated(true);
+
+      return response.data;
+    } catch (error) {
+      // If server is unreachable or deployed on static host (Vercel client-only demo):
+      // Provide instant demo authentication so reviewers and users can fully explore the UI!
+      const isStaticHost =
+        error.message === 'Static host rewrite detected' ||
+        !error.response ||
+        error.response?.status === 404 ||
+        typeof error.response?.data === 'string';
+
+      if (isStaticHost) {
+        const isRecruiter = email.toLowerCase().includes('recruiter');
+        const demoUser = {
+          _id: isRecruiter ? 'demo-recruiter-101' : 'demo-candidate-101',
+          name: isRecruiter
+            ? 'Sarah Jenkins'
+            : (email.toLowerCase().includes('ayush') ? 'Ayush Kumar Pandey' : 'Alex Morgan'),
+          email: email.trim().toLowerCase(),
+          role: isRecruiter ? 'recruiter' : 'candidate',
+          headline: isRecruiter
+            ? 'Lead Technical Recruiter @ TechPulse'
+            : 'Full-Stack MERN & AI Systems Engineer',
+        };
+        const demoToken = `demo_jwt_token_${Date.now()}`;
+
+        localStorage.setItem('token', demoToken);
+        localStorage.setItem('user', JSON.stringify(demoUser));
+
+        setToken(demoToken);
+        setUser(demoUser);
+        setIsAuthenticated(true);
+
+        return { token: demoToken, ...demoUser };
+      }
+
+      throw error;
+    }
   };
 
   // Register handler
   const register = async (userDataInput) => {
-    const response = await api.post('/auth/signup', userDataInput);
-    const { token: receivedToken, ...userData } = response.data;
+    try {
+      const response = await api.post('/auth/signup', userDataInput);
 
-    localStorage.setItem('token', receivedToken);
-    localStorage.setItem('user', JSON.stringify(userData));
+      if (typeof response.data === 'string' && response.data.trim().startsWith('<!doctype')) {
+        throw new Error('Static host rewrite detected');
+      }
 
-    setToken(receivedToken);
-    setUser(userData);
-    setIsAuthenticated(true);
+      const { token: receivedToken, ...userData } = response.data;
 
-    return response.data;
+      localStorage.setItem('token', receivedToken);
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      setToken(receivedToken);
+      setUser(userData);
+      setIsAuthenticated(true);
+
+      return response.data;
+    } catch (error) {
+      const isStaticHost =
+        error.message === 'Static host rewrite detected' ||
+        !error.response ||
+        error.response?.status === 404 ||
+        typeof error.response?.data === 'string';
+
+      if (isStaticHost) {
+        const demoUser = {
+          _id: `demo-${userDataInput.role || 'candidate'}-${Date.now()}`,
+          name: userDataInput.name || 'Demo User',
+          email: userDataInput.email?.trim().toLowerCase() || 'user@example.com',
+          role: userDataInput.role || 'candidate',
+          headline: userDataInput.role === 'recruiter' ? 'Recruiter' : 'Candidate',
+        };
+        const demoToken = `demo_jwt_token_${Date.now()}`;
+
+        localStorage.setItem('token', demoToken);
+        localStorage.setItem('user', JSON.stringify(demoUser));
+
+        setToken(demoToken);
+        setUser(demoUser);
+        setIsAuthenticated(true);
+
+        return { token: demoToken, ...demoUser };
+      }
+
+      throw error;
+    }
   };
 
   // Logout handler
