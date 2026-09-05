@@ -55,20 +55,29 @@ async function testHealthEndpoint() {
     if (errors.length > 0) {
       console.error('\n❌ Health check verification failed with errors:');
       errors.forEach((err) => console.error(`  - ${err}`));
+      if (typeof server.closeAllConnections === 'function') {
+        server.closeAllConnections();
+      }
+      server.close();
       process.exit(1);
     }
 
     console.log('\n✅ All System Health & Telemetry assertions passed successfully!');
     console.log('------------------------------------------------------\n');
-  } catch (err) {
-    console.error('❌ Failed to test health endpoint:', err);
-    process.exit(1);
-  } finally {
     if (typeof server.closeAllConnections === 'function') {
       server.closeAllConnections();
     }
     server.close();
     process.exit(0);
+  } catch (err) {
+    console.error('❌ Failed to test health endpoint:', err);
+    if (server) {
+      if (typeof server.closeAllConnections === 'function') {
+        server.closeAllConnections();
+      }
+      server.close();
+    }
+    process.exit(1);
   }
 }
 

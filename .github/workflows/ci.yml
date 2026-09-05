@@ -1,0 +1,66 @@
+name: CI Full-Stack Verification
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-fullstack:
+    name: Validate Full-Stack & AI Pipeline
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Resolve Project Directory
+        id: resolve-dir
+        run: |
+          if [ -d "JobMatch-AI" ]; then
+            echo "PROJECT_DIR=JobMatch-AI" >> $GITHUB_ENV
+          else
+            echo "PROJECT_DIR=." >> $GITHUB_ENV
+          fi
+
+      - name: Install Backend Dependencies
+        run: |
+          cd $PROJECT_DIR
+          npm ci || npm install
+
+      - name: Run Backend Health Check Suite
+        run: |
+          cd $PROJECT_DIR
+          npm run test:health
+
+      - name: Run AI ATS Evaluation Benchmark Suite
+        run: |
+          cd $PROJECT_DIR
+          npm run test:ai
+
+      - name: Install Frontend Client Dependencies
+        run: |
+          cd $PROJECT_DIR/client
+          npm ci || npm install
+
+      - name: Build Frontend Client
+        run: |
+          cd $PROJECT_DIR/client
+          npm run build
+
+      - name: Full-Stack CI Success Summary
+        run: |
+          echo "===================================================="
+          echo "🎉 All Full-Stack CI Checks Passed Successfully!"
+          echo " - Backend Health Telemetry: PASSED (HTTP 200)"
+          echo " - AI ATS Evaluation Benchmarks: PASSED (100%)"
+          echo " - Vite Frontend Production Build: PASSED"
+          echo "===================================================="
