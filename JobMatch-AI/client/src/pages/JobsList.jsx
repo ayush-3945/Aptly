@@ -14,6 +14,7 @@ import {
   Bookmark,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import api from '../services/api';
 import ApplyModal from '../components/ApplyModal';
 import { useSavedJobs } from '../utils/savedJobs';
@@ -26,6 +27,7 @@ const LOCATIONS = ['All Locations', 'Remote', 'San Francisco, CA', 'Austin, TX',
 const JobsList = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { showToast } = useToast();
 
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,15 +41,13 @@ const JobsList = () => {
 
   // Bookmark State
   const { isSaved, toggleSave } = useSavedJobs();
-  const [bookmarkToast, setBookmarkToast] = useState(null);
 
   const handleToggleSave = (job) => {
     const isNowSaved = toggleSave(job._id);
-    setBookmarkToast({
-      message: isNowSaved ? `Saved "${job.title}" to your bookmarks!` : `Removed "${job.title}" from saved jobs.`,
-      isSaved: isNowSaved,
-    });
-    setTimeout(() => setBookmarkToast(null), 3000);
+    showToast(
+      isNowSaved ? `Saved "${job.title}" to your bookmarks!` : `Removed "${job.title}" from saved jobs.`,
+      isNowSaved ? 'success' : 'info'
+    );
   };
 
   // Fetch jobs from backend with fallback
@@ -492,37 +492,6 @@ const JobsList = () => {
         isOpen={isApplyModalOpen}
         onClose={() => setIsApplyModalOpen(false)}
       />
-
-      {/* Bookmark Toast Banner */}
-      {bookmarkToast && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.65rem',
-            padding: '0.85rem 1.25rem',
-            borderRadius: '12px',
-            background: bookmarkToast.isSaved ? 'rgba(99, 102, 241, 0.95)' : 'rgba(30, 41, 59, 0.95)',
-            color: '#FFFFFF',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
-            backdropFilter: 'blur(12px)',
-            fontSize: '0.88rem',
-            fontWeight: 600,
-            animation: 'fadeIn 0.25s ease-out',
-          }}
-        >
-          <Bookmark
-            size={17}
-            fill={bookmarkToast.isSaved ? '#F59E0B' : 'none'}
-            color={bookmarkToast.isSaved ? '#F59E0B' : '#FFFFFF'}
-          />
-          <span>{bookmarkToast.message}</span>
-        </div>
-      )}
     </div>
   );
 };

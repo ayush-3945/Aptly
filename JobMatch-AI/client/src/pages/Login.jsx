@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LogIn, Mail, Lock, Eye, EyeOff, AlertCircle, Loader2, ArrowRight, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const { showToast } = useToast();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -49,6 +51,7 @@ const Login = () => {
 
     if (!email.trim() || !password) {
       setError('Please provide both email and password.');
+      showToast('Please provide both email and password.', 'warning');
       return;
     }
 
@@ -56,6 +59,7 @@ const Login = () => {
 
     try {
       const res = await login(email.trim().toLowerCase(), password);
+      showToast(`Welcome back, ${res.name || 'User'}!`, 'success');
 
       // Resolve intended redirect destination or default based on role
       const intendedDestination = location.state?.from?.pathname;
@@ -74,6 +78,7 @@ const Login = () => {
           ? 'Invalid email or password. Please try again.'
           : 'Login failed. Please verify credentials.');
       setError(message);
+      showToast(message, 'error');
     } finally {
       setLoading(false);
     }

@@ -18,6 +18,7 @@ import {
   Bookmark,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import api from '../services/api';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
 import ApplyModal from '../components/ApplyModal';
@@ -27,13 +28,13 @@ const JobDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { showToast } = useToast();
 
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const { isSaved, toggleSave } = useSavedJobs();
-  const [bookmarkToast, setBookmarkToast] = useState(null);
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -62,6 +63,7 @@ const JobDetail = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href);
       setCopied(true);
+      showToast('Job link copied to clipboard!', 'info');
       setTimeout(() => setCopied(false), 2000);
     }
   };
@@ -214,13 +216,12 @@ const JobDetail = () => {
               type="button"
               onClick={() => {
                 const isNowSaved = toggleSave(job._id);
-                setBookmarkToast({
-                  message: isNowSaved
+                showToast(
+                  isNowSaved
                     ? `Saved "${job.title}" to bookmarks!`
                     : `Removed "${job.title}" from bookmarks.`,
-                  isSaved: isNowSaved,
-                });
-                setTimeout(() => setBookmarkToast(null), 3000);
+                  isNowSaved ? 'success' : 'info'
+                );
               }}
               className="btn btn-secondary"
               style={{
@@ -394,37 +395,6 @@ const JobDetail = () => {
         isOpen={isApplyModalOpen}
         onClose={() => setIsApplyModalOpen(false)}
       />
-
-      {/* Bookmark Toast Banner */}
-      {bookmarkToast && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.65rem',
-            padding: '0.85rem 1.25rem',
-            borderRadius: '12px',
-            background: bookmarkToast.isSaved ? 'rgba(99, 102, 241, 0.95)' : 'rgba(30, 41, 59, 0.95)',
-            color: '#FFFFFF',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
-            backdropFilter: 'blur(12px)',
-            fontSize: '0.88rem',
-            fontWeight: 600,
-            animation: 'fadeIn 0.25s ease-out',
-          }}
-        >
-          <Bookmark
-            size={17}
-            fill={bookmarkToast.isSaved ? '#F59E0B' : 'none'}
-            color={bookmarkToast.isSaved ? '#F59E0B' : '#FFFFFF'}
-          />
-          <span>{bookmarkToast.message}</span>
-        </div>
-      )}
     </div>
   );
 };

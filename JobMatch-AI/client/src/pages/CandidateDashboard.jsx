@@ -22,6 +22,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import api from '../services/api';
 import { useSavedJobs } from '../utils/savedJobs';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
@@ -68,6 +69,7 @@ const SAMPLE_APPLICATIONS = [
 const CandidateDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { showToast } = useToast();
 
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -158,12 +160,14 @@ const CandidateDashboard = () => {
     try {
       await api.delete(`/applications/${withdrawModalApp._id}`);
       setActionMessage('Application withdrawn successfully.');
+      showToast('Application withdrawn successfully.', 'info');
       setApplications((prev) => prev.filter((a) => a._id !== withdrawModalApp._id));
     } catch (err) {
       console.warn('Withdraw API fallback (local removal):', err.message);
       // Remove locally for demo resilience
       setApplications((prev) => prev.filter((a) => a._id !== withdrawModalApp._id));
       setActionMessage('Application withdrawn.');
+      showToast('Application withdrawn.', 'info');
     } finally {
       setWithdrawingId(null);
       setWithdrawModalApp(null);
@@ -791,6 +795,7 @@ const CandidateDashboard = () => {
                       onClick={() => {
                         removeSaved(job._id);
                         setActionMessage(`Removed "${job.title}" from saved jobs.`);
+                        showToast(`Removed "${job.title}" from saved jobs.`, 'info');
                         setTimeout(() => setActionMessage(''), 3000);
                       }}
                       className="btn btn-ghost"

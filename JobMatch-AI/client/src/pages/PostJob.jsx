@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useToast } from '../context/ToastContext';
 import {
   Briefcase,
   Building2,
@@ -61,6 +62,7 @@ Requirements & Qualifications:
 
 const PostJob = () => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const [title, setTitle] = useState('');
   const [company, setCompany] = useState('');
@@ -129,22 +131,27 @@ const PostJob = () => {
     // Validation
     if (!title.trim()) {
       setError('Please provide a job title.');
+      showToast('Please provide a job title.', 'warning');
       return;
     }
     if (!company.trim()) {
       setError('Please provide the hiring company name.');
+      showToast('Please provide the hiring company name.', 'warning');
       return;
     }
     if (!location.trim()) {
       setError('Please provide the job location or select Remote.');
+      showToast('Please provide the job location or select Remote.', 'warning');
       return;
     }
     if (skills.length === 0) {
       setError('Please add at least one required technical skill.');
+      showToast('Please add at least one required technical skill.', 'warning');
       return;
     }
     if (!description.trim() || description.trim().length < 40) {
       setError('Please provide a comprehensive job description (minimum 40 characters).');
+      showToast('Please provide a comprehensive job description (minimum 40 characters).', 'warning');
       return;
     }
 
@@ -162,6 +169,7 @@ const PostJob = () => {
       await api.post('/jobs', payload);
 
       setSuccessMessage(`Job requisition "${title}" was published successfully!`);
+      showToast(`Job requisition "${title}" was published successfully!`, 'success');
       setTimeout(() => {
         navigate('/dashboard');
       }, 1500);
@@ -169,6 +177,7 @@ const PostJob = () => {
       console.error('Job creation error:', err);
       const msg = err.response?.data?.message || 'Failed to publish job requisition. Please try again.';
       setError(msg);
+      showToast(msg, 'error');
       setLoading(false);
     }
   };

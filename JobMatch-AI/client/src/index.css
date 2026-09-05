@@ -306,3 +306,103 @@ a {
   line-height: 1.4;
   text-align: left;
 }
+
+/* Toast Animations */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Navigation Utilities */
+.mobile-toggle-btn {
+  display: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: 0.5rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.mobile-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-glass);
+}
+
+.desktop-nav,
+.desktop-auth {
+  display: flex;
+}
+
+@media (max-width: 768px) {
+  .desktop-nav,
+  .desktop-auth {
+    display: none !important;
+  }
+
+  .mobile-toggle-btn {
+    display: flex !important;
+  }
+
+  .container {
+    padding: 0 1rem;
+  }
+}
+
+/* Kanban Board Horizontal Scrollbar for Mobile/Tablet */
+.kanban-scroll-container {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(290px, 1fr));
+  gap: 1.25rem;
+  align-items: start;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.kanban-scroll-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.kanban-scroll-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 9999px;
+}
+
+.kanban-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.35);
+  border-radius: 9999px;
+}
+
+.kanban-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.6);
+}
+
+/* Modal Responsive Polish */
+@media (max-width: 640px) {
+  .modal-card {
+    padding: 1.25rem 1rem !important;
+    max-height: 94dvh !important;
+    border-radius: 16px !important;
+  }
+}

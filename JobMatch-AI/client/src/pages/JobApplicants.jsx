@@ -26,6 +26,7 @@ import {
 import api from '../services/api';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
 import { getDemoApplicantsForJob } from '../utils/demoApplicants';
+import { useToast } from '../context/ToastContext';
 
 const PIPELINE_COLUMNS = [
   {
@@ -82,8 +83,8 @@ const JobApplicants = () => {
   // Resume / Candidate Detail Modal
   const [selectedCandidate, setSelectedCandidate] = useState(null);
 
-  // Toast Notification
-  const [toast, setToast] = useState(null);
+  // Global Toast
+  const { showToast } = useToast();
 
   // Load Job details and Applicants
   useEffect(() => {
@@ -133,12 +134,6 @@ const JobApplicants = () => {
     fetchData();
   }, [jobId]);
 
-  // Show auto-dismissing toast
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3500);
-  };
-
   // 1-Click Status Transition Handler
   const handleTransition = async (applicationId, newStatus, candidateName) => {
     // 1. Optimistic UI update
@@ -154,7 +149,7 @@ const JobApplicants = () => {
       rejected: 'Archived / Rejected',
     };
 
-    showToast(`${candidateName || 'Candidate'} moved to ${statusLabels[newStatus] || newStatus}.`);
+    showToast(`${candidateName || 'Candidate'} moved to ${statusLabels[newStatus] || newStatus}.`, 'success');
 
     // 2. Network call to backend
     try {
@@ -238,45 +233,6 @@ const JobApplicants = () => {
 
   return (
     <div className="container" style={{ padding: '3rem 1.5rem', minHeight: '90vh' }}>
-      {/* Toast Notification */}
-      {toast && (
-        <div
-          style={{
-            position: 'fixed',
-            top: '24px',
-            right: '24px',
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            padding: '1rem 1.4rem',
-            borderRadius: '12px',
-            background: 'rgba(16, 185, 129, 0.95)',
-            color: '#FFFFFF',
-            boxShadow: '0 12px 30px rgba(0, 0, 0, 0.45)',
-            backdropFilter: 'blur(12px)',
-            animation: 'fadeIn 0.25s ease-out',
-            maxWidth: '440px',
-          }}
-        >
-          <CheckCircle2 size={20} />
-          <span style={{ fontSize: '0.92rem', fontWeight: 600 }}>{toast.message}</span>
-          <button
-            onClick={() => setToast(null)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: '#fff',
-              cursor: 'pointer',
-              marginLeft: 'auto',
-              display: 'flex',
-            }}
-          >
-            <X size={16} />
-          </button>
-        </div>
-      )}
-
       {/* Navigation Breadcrumb */}
       <div style={{ marginBottom: '1.5rem' }}>
         <Link
@@ -596,13 +552,10 @@ const JobApplicants = () => {
         </div>
       ) : (
         <>
-          {/* Kanban Board Grid (4 Columns) */}
+          {/* Kanban Board Grid (4 Columns) with Touch-Friendly Scroll */}
           <div
+            className="kanban-scroll-container"
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '1.25rem',
-              alignItems: 'start',
               marginBottom: '2.5rem',
             }}
           >

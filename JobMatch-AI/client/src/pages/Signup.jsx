@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserPlus, User, Mail, Lock, Eye, EyeOff, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 const Signup = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const { showToast } = useToast();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -43,17 +45,20 @@ const Signup = () => {
     // Form validations
     if (!name.trim()) {
       setError('Please enter your full name.');
+      showToast('Please enter your full name.', 'warning');
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       setError('Please enter a valid email address.');
+      showToast('Please enter a valid email address.', 'warning');
       return;
     }
 
     if (password.length < 6) {
       setError('Password must be at least 6 characters long.');
+      showToast('Password must be at least 6 characters long.', 'warning');
       return;
     }
 
@@ -67,6 +72,8 @@ const Signup = () => {
         role,
       });
 
+      showToast(`Welcome to Aptly AI, ${res.name || 'there'}! Account created.`, 'success');
+
       // Role-based redirection
       if (res.role === 'recruiter') {
         navigate('/dashboard');
@@ -77,6 +84,7 @@ const Signup = () => {
       console.error('Signup error:', err);
       const message = err.response?.data?.message || 'Registration failed. Please try again.';
       setError(message);
+      showToast(message, 'error');
     } finally {
       setLoading(false);
     }

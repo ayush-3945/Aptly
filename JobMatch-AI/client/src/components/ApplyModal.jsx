@@ -15,12 +15,14 @@ import {
   Zap,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import api from '../services/api';
 
 const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
+  const { showToast } = useToast();
 
   const [file, setFile] = useState(null);
   const [useDemoResume, setUseDemoResume] = useState(false);
@@ -36,11 +38,13 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess }) => {
     if (selectedFile) {
       if (selectedFile.type !== 'application/pdf' && !selectedFile.name.endsWith('.pdf')) {
         setError('Only PDF resumes are supported.');
+        showToast('Only PDF resumes are supported.', 'warning');
         setFile(null);
         return;
       }
       if (selectedFile.size > 5 * 1024 * 1024) {
         setError('Resume file size must be less than 5MB.');
+        showToast('Resume file size must be less than 5MB.', 'warning');
         setFile(null);
         return;
       }
@@ -103,6 +107,7 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess }) => {
     e.preventDefault();
     if (!file && !useDemoResume) {
       setError('Please select a PDF resume or click "Use Demo Resume".');
+      showToast('Please select a PDF resume or click "Use Demo Resume".', 'warning');
       return;
     }
 
@@ -164,12 +169,15 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess }) => {
       };
 
       setEvaluationResult(evaluation);
+      showToast('Application & AI ATS match evaluation completed!', 'success');
       if (onApplicationSuccess) {
         onApplicationSuccess(evaluation);
       }
     } catch (err) {
       console.error('Application submission error:', err);
-      setError(err.response?.data?.message || 'Failed to submit application. Please try again.');
+      const errMsg = err.response?.data?.message || 'Failed to submit application. Please try again.';
+      setError(errMsg);
+      showToast(errMsg, 'error');
     } finally {
       setSubmitting(false);
       setSubmitStep('');
@@ -188,16 +196,16 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '1.5rem',
+        padding: '1rem',
       }}
       onClick={handleClose}
     >
       <div
-        className="card-glass animate-fade-in"
+        className="card-glass animate-fade-in modal-card"
         style={{
           maxWidth: '560px',
           width: '100%',
-          maxHeight: '90vh',
+          maxHeight: '92vh',
           overflowY: 'auto',
           padding: '2rem',
           position: 'relative',
