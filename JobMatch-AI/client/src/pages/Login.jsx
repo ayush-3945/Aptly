@@ -108,21 +108,21 @@ const Login = () => {
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
           <div
             style={{
-              width: '50px',
-              height: '50px',
-              borderRadius: '14px',
-              background: 'var(--accent-gradient)',
+              width: '42px',
+              height: '42px',
+              borderRadius: '4px',
+              background: 'rgba(245, 166, 35, 0.1)',
+              border: '1px solid rgba(245, 166, 35, 0.35)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '0.85rem',
-              boxShadow: 'var(--accent-glow)',
             }}
           >
-            <LogIn size={24} color="#fff" />
+            <LogIn size={20} color="#F5A623" />
           </div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Welcome Back</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.35rem' }}>
+          <h2 style={{ fontSize: '1.65rem', fontWeight: 800 }}>Welcome Back</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginTop: '0.35rem' }}>
             Sign in to access your AI match reports and job portal
           </p>
         </div>
@@ -130,8 +130,8 @@ const Login = () => {
         {/* Demo Credentials Quick-Fill Pills */}
         <div
           style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            borderRadius: 'var(--radius-sm)',
+            background: '#0E0E12',
+            borderRadius: '4px',
             padding: '0.85rem 1rem',
             marginBottom: '1.5rem',
             border: '1px solid var(--border-subtle)',
@@ -142,15 +142,16 @@ const Login = () => {
               display: 'flex',
               alignItems: 'center',
               gap: '0.4rem',
-              fontSize: '0.78rem',
+              fontSize: '0.74rem',
               fontWeight: 700,
               textTransform: 'uppercase',
-              letterSpacing: '0.05em',
+              letterSpacing: '0.06em',
               color: 'var(--text-muted)',
+              fontFamily: 'var(--font-mono)',
               marginBottom: '0.6rem',
             }}
           >
-            <Zap size={13} color="var(--warning)" />
+            <Zap size={13} color="var(--accent-amber)" />
             <span>1-Click Test Credentials</span>
           </div>
 
@@ -160,15 +161,16 @@ const Login = () => {
               onClick={() => fillDemoCredentials('candidate')}
               className="btn btn-secondary"
               style={{
-                fontSize: '0.8rem',
+                fontSize: '0.78rem',
                 padding: '0.45rem 0.5rem',
-                borderRadius: '6px',
-                border: '1px solid rgba(6, 182, 212, 0.3)',
-                background: 'rgba(6, 182, 212, 0.08)',
-                color: '#67E8F9',
+                borderRadius: '4px',
+                border: '1px solid var(--border-subtle)',
+                background: 'rgba(255, 255, 255, 0.03)',
+                color: 'var(--text-primary)',
+                fontFamily: 'var(--font-mono)',
               }}
             >
-              🎯 Candidate
+              Candidate
             </button>
 
             <button
@@ -176,15 +178,16 @@ const Login = () => {
               onClick={() => fillDemoCredentials('recruiter')}
               className="btn btn-secondary"
               style={{
-                fontSize: '0.8rem',
+                fontSize: '0.78rem',
                 padding: '0.45rem 0.5rem',
-                borderRadius: '6px',
-                border: '1px solid rgba(138, 43, 226, 0.3)',
-                background: 'rgba(138, 43, 226, 0.08)',
-                color: '#C084FC',
+                borderRadius: '4px',
+                border: '1px solid rgba(245, 166, 35, 0.35)',
+                background: 'rgba(245, 166, 35, 0.08)',
+                color: 'var(--accent-amber)',
+                fontFamily: 'var(--font-mono)',
               }}
             >
-              🏢 Recruiter
+              Recruiter
             </button>
           </div>
         </div>

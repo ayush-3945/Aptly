@@ -132,32 +132,32 @@ const JobsList = () => {
     <div className="container animate-fade-in" style={{ padding: '3.5rem 1.5rem 5rem' }}>
       {/* Header Section */}
       <div style={{ marginBottom: '2.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.85rem' }}>
           <div
             style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
-              background: 'var(--accent-gradient)',
+              width: '32px',
+              height: '32px',
+              borderRadius: '4px',
+              background: 'rgba(245, 166, 35, 0.1)',
+              border: '1px solid rgba(245, 166, 35, 0.3)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: 'var(--accent-glow)',
             }}
           >
-            <Briefcase size={18} color="#fff" />
+            <Briefcase size={16} color="var(--accent-amber)" />
           </div>
           <span
             style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: '0.88rem',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.78rem',
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.06em',
-              color: 'var(--accent-indigo)',
+              color: 'var(--accent-amber)',
             }}
           >
-            Live Engineering Board
+            [LIVE_ENGINEERING_BOARD]
           </span>
         </div>
 
@@ -166,23 +166,24 @@ const JobsList = () => {
             <h1 style={{ fontSize: '2.4rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
               Explore Open Opportunities
             </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginTop: '0.25rem' }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.98rem', marginTop: '0.25rem' }}>
               Browse verified engineering positions and benchmark your resume against requirements with Gemini AI.
             </p>
           </div>
 
           <div
             style={{
-              padding: '0.45rem 0.95rem',
-              borderRadius: 'var(--radius-full)',
-              background: 'rgba(255, 255, 255, 0.04)',
+              padding: '0.4rem 0.85rem',
+              borderRadius: '4px',
+              background: '#111114',
               border: '1px solid var(--border-subtle)',
-              fontSize: '0.85rem',
+              fontSize: '0.82rem',
               fontWeight: 600,
+              fontFamily: 'var(--font-mono)',
               color: 'var(--text-primary)',
             }}
           >
-            Showing <strong className="gradient-text">{filteredJobs.length}</strong> Available Roles
+            SHOWING <strong style={{ color: 'var(--accent-amber)' }}>{filteredJobs.length}</strong> ACTIVE ROLES
           </div>
         </div>
       </div>
@@ -220,7 +221,7 @@ const JobsList = () => {
               style={{ cursor: 'pointer' }}
             >
               {LOCATIONS.map((loc) => (
-                <option key={loc} value={loc} style={{ background: '#0D111A', color: '#fff' }}>
+                <option key={loc} value={loc} style={{ background: '#0E0E11', color: '#EDEDED' }}>
                   {loc}
                 </option>
               ))}
@@ -242,8 +243,8 @@ const JobsList = () => {
 
         {/* Quick Skill Filter Pills */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, marginRight: '0.25rem' }}>
-            Skills:
+          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, marginRight: '0.25rem', fontFamily: 'var(--font-mono)' }}>
+            FILTER:
           </span>
           {POPULAR_SKILLS.map((skill) => {
             const isSelected = selectedSkill === skill;
@@ -252,13 +253,14 @@ const JobsList = () => {
                 key={skill}
                 onClick={() => setSelectedSkill(skill)}
                 style={{
-                  padding: '0.25rem 0.75rem',
-                  fontSize: '0.78rem',
+                  padding: '0.25rem 0.65rem',
+                  fontSize: '0.76rem',
+                  fontFamily: 'var(--font-mono)',
                   fontWeight: 600,
-                  borderRadius: '9999px',
-                  border: isSelected ? '1px solid var(--accent-indigo)' : '1px solid var(--border-subtle)',
-                  background: isSelected ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255, 255, 255, 0.03)',
-                  color: isSelected ? '#A5B4FC' : 'var(--text-secondary)',
+                  borderRadius: '3px',
+                  border: isSelected ? '1px solid var(--accent-amber)' : '1px solid var(--border-subtle)',
+                  background: isSelected ? 'rgba(245, 166, 35, 0.12)' : 'rgba(255, 255, 255, 0.03)',
+                  color: isSelected ? 'var(--accent-amber)' : 'var(--text-secondary)',
                   cursor: 'pointer',
                   transition: 'var(--transition)',
                 }}
@@ -386,7 +388,7 @@ const JobsList = () => {
                   <Link
                     to={`/jobs/${job._id}`}
                     style={{ color: 'inherit', textDecoration: 'none', transition: 'var(--transition)' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-cyan)')}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-amber)')}
                     onMouseLeave={(e) => (e.currentTarget.style.color = 'inherit')}
                   >
                     {job.title}
@@ -400,12 +402,13 @@ const JobsList = () => {
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '0.3rem',
-                      fontSize: '0.78rem',
-                      color: 'var(--accent-cyan)',
-                      background: 'rgba(6, 182, 212, 0.1)',
-                      border: '1px solid rgba(6, 182, 212, 0.25)',
+                      fontSize: '0.74rem',
+                      fontFamily: 'var(--font-mono)',
+                      color: 'var(--accent-amber)',
+                      background: 'rgba(245, 166, 35, 0.08)',
+                      border: '1px solid rgba(245, 166, 35, 0.25)',
                       padding: '0.15rem 0.55rem',
-                      borderRadius: '4px',
+                      borderRadius: '3px',
                       fontWeight: 600,
                     }}
                   >
@@ -438,9 +441,10 @@ const JobsList = () => {
                       style={{
                         padding: '0.15rem 0.55rem',
                         fontSize: '0.72rem',
+                        fontFamily: 'var(--font-mono)',
                         fontWeight: 600,
-                        borderRadius: '4px',
-                        background: 'rgba(255, 255, 255, 0.05)',
+                        borderRadius: '3px',
+                        background: 'rgba(255, 255, 255, 0.04)',
                         border: '1px solid var(--border-subtle)',
                         color: 'var(--text-primary)',
                       }}
@@ -465,7 +469,7 @@ const JobsList = () => {
                   <button
                     onClick={() => navigate('/dashboard')}
                     className="btn btn-secondary"
-                    style={{ width: '100%', fontSize: '0.88rem', padding: '0.65rem' }}
+                    style={{ width: '100%', fontSize: '0.86rem', padding: '0.6rem' }}
                   >
                     <LayoutDashboard size={15} />
                     <span>View Applicants in ATS</span>
@@ -474,9 +478,9 @@ const JobsList = () => {
                   <button
                     onClick={() => handleOpenApplyModal(job)}
                     className="btn btn-primary"
-                    style={{ width: '100%', fontSize: '0.88rem', padding: '0.65rem' }}
+                    style={{ width: '100%', fontSize: '0.86rem', padding: '0.6rem' }}
                   >
-                    <Sparkles size={15} />
+                    <ArrowRight size={15} />
                     <span>Apply & Check AI Match</span>
                   </button>
                 )}
