@@ -6,28 +6,6 @@ const Hero = () => {
   return (
     <section style={{ padding: '4.5rem 0 5.5rem', position: 'relative' }}>
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-        {/* Top Clinical Diagnostic Status Badge */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.75rem' }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.6rem',
-              padding: '0.38rem 1rem',
-              background: '#F0FDFA',
-              border: '1px solid #CCFBF1',
-              borderRadius: '9999px',
-              fontSize: '0.84rem',
-              fontWeight: 600,
-              color: '#0F766E',
-              boxShadow: '0 1px 3px rgba(13, 148, 136, 0.08)',
-            }}
-          >
-            <Activity size={15} color="#0D9488" />
-            <span>Gemini 2.5 Competence Diagnostics • Semantic Evaluation</span>
-          </div>
-        </div>
-
         {/* Hero Title & Subtitle */}
         <div style={{ textAlign: 'center', maxWidth: '880px', margin: '0 auto 3rem' }}>
           <h1
