@@ -19,9 +19,20 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: handle 401 Unauthorized globally
+// Response interceptor: handle HTML fallback and 401 Unauthorized globally
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // If the API endpoint returned an HTML document (e.g. Vercel SPA rewrite fallback), reject so client fallbacks engage
+    if (
+      typeof response.data === 'string' &&
+      (response.data.trim().startsWith('<!doctype') || response.data.trim().startsWith('<html'))
+    ) {
+      const err = new Error('HTML document received from API endpoint');
+      err.isHtmlFallback = true;
+      return Promise.reject(err);
+    }
+    return response;
+  },
   (error) => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');

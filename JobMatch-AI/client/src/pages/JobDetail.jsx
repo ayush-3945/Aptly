@@ -41,7 +41,7 @@ const JobDetail = () => {
       setLoading(true);
       try {
         const response = await api.get(`/jobs/${id}`);
-        if (response.data) {
+        if (response.data && typeof response.data === 'object' && response.data.title) {
           setJob(response.data);
         } else {
           const fallback = FALLBACK_JOBS.find((j) => j._id === id) || FALLBACK_JOBS[0];

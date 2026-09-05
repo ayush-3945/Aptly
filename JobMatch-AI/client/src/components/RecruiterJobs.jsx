@@ -39,7 +39,7 @@ const RecruiterJobs = () => {
     setLoading(true);
     try {
       const response = await api.get('/jobs');
-      const allJobs = response.data || [];
+      const allJobs = Array.isArray(response.data) ? response.data : [];
       
       // Filter jobs where postedBy matches current user
       const userJobs = allJobs.filter((job) => {

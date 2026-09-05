@@ -95,7 +95,7 @@ const JobApplicants = () => {
       let currentJob = null;
       try {
         const jobRes = await api.get(`/jobs/${jobId}`);
-        if (jobRes.data) {
+        if (jobRes.data && typeof jobRes.data === 'object' && jobRes.data.title) {
           currentJob = jobRes.data;
         }
       } catch (err) {
