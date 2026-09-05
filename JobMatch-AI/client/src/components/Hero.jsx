@@ -1,8 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle2, ArrowRight, ShieldCheck, Activity, Target, Layers, FileCheck, Check, X } from 'lucide-react';
+import { CheckCircle2, ArrowRight, ShieldCheck, Activity, Target, Layers, FileCheck, Check, X, ExternalLink, Sparkles } from 'lucide-react';
+import ApplyModal from './ApplyModal';
+import { FALLBACK_JOBS } from '../data/fallbackJobs';
+
+const SAMPLE_EVALUATION = {
+  aiMatchScore: 88,
+  recommendation: 'Strong Match',
+  fitSummary: 'Subject candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and Gemini AI SDK integration. The candidate exhibits strong alignment with TechPulse Solutions requirements.',
+  matchedSkills: ['React.js', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'REST APIs', 'Git'],
+  missingSkills: ['Docker Containerization', 'Kubernetes Orchestration'],
+  experienceFit: 'Candidate exhibits 4+ years of relevant MERN production engineering with deep LLM API integration experience. Missing containerization competencies are easily bridgeable on the job.',
+};
 
 const Hero = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalEvaluation, setModalEvaluation] = useState(null);
+
+  const openSampleReport = () => {
+    setModalEvaluation(SAMPLE_EVALUATION);
+    setIsModalOpen(true);
+  };
+
+  const openLiveBenchmark = () => {
+    setModalEvaluation(null);
+    setIsModalOpen(true);
+  };
+
   return (
     <section style={{ padding: '4.5rem 0 5.5rem', position: 'relative' }}>
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
@@ -46,13 +70,15 @@ const Hero = () => {
               <span>Explore Open Roles</span>
               <ArrowRight size={17} />
             </Link>
-            <a
-              href="#preview"
+            <button
+              type="button"
+              onClick={openSampleReport}
               className="btn btn-secondary"
-              style={{ padding: '0.75rem 1.75rem', fontSize: '0.98rem' }}
+              style={{ padding: '0.75rem 1.75rem', fontSize: '0.98rem', cursor: 'pointer' }}
             >
-              <span>View Sample Lab Report</span>
-            </a>
+              <FileCheck size={17} color="var(--accent-teal)" />
+              <span>View Sample Lab Report ↗</span>
+            </button>
           </div>
         </div>
 
@@ -81,7 +107,11 @@ const Hero = () => {
                 marginBottom: '1.5rem',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
+              <div
+                onClick={openSampleReport}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.9rem', cursor: 'pointer' }}
+                title="Click to open full interactive diagnostic scorecard"
+              >
                 <div
                   style={{
                     width: '44px',
@@ -98,7 +128,7 @@ const Hero = () => {
                 </div>
                 <div>
                   <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', fontWeight: 700 }}>
-                    DIAGNOSTIC REPORT #APT-8492
+                    DIAGNOSTIC REPORT #APT-8492 • <span style={{ color: 'var(--accent-teal)' }}>CLICK TO OPEN</span>
                   </div>
                   <h4 style={{ fontSize: '1.2rem', margin: '0.15rem 0', fontWeight: 700, color: '#0F172A', fontFamily: 'var(--font-sans-display)' }}>
                     Full-Stack MERN & AI Engineer
@@ -110,7 +140,11 @@ const Hero = () => {
               </div>
 
               {/* Match Score Diagnostic Dial / Badge */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+              <div
+                onClick={openSampleReport}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', cursor: 'pointer' }}
+                title="Click to inspect detailed match breakdown"
+              >
                 <div
                   style={{
                     display: 'flex',
@@ -137,6 +171,7 @@ const Hero = () => {
                     background: '#F0FDFA',
                     border: '1px solid #99F6E4',
                     borderRadius: '10px',
+                    boxShadow: '0 2px 6px rgba(13, 148, 136, 0.12)',
                   }}
                 >
                   <span style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F766E', fontFamily: 'var(--font-sans-display)', lineHeight: 1 }}>
@@ -264,6 +299,46 @@ const Hero = () => {
                 Clinical Diagnostic Finding:
               </span>
               Candidate demonstrates robust technical depth across modern full-stack web architectures and generative AI integrations. Identified gaps in Docker containerization represent easily bridgeable tooling rather than core conceptual deficiencies.
+            </div>
+
+            {/* Interactive Card Action Bar */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '1rem',
+                marginTop: '1.4rem',
+                paddingTop: '1.25rem',
+                borderTop: '1px solid #F1F5F9',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                <ShieldCheck size={16} color="var(--accent-teal)" />
+                <span>Verified Diagnostic Engine • 100% Deterministic Evaluation</span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={openSampleReport}
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.85rem', padding: '0.45rem 1rem' }}
+                >
+                  <ExternalLink size={15} color="var(--accent-teal)" />
+                  <span>Open Interactive Scorecard ↗</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={openLiveBenchmark}
+                  className="btn btn-primary"
+                  style={{ fontSize: '0.85rem', padding: '0.45rem 1.15rem' }}
+                >
+                  <Sparkles size={15} />
+                  <span>Run Live CV Benchmark</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -398,6 +473,14 @@ const Hero = () => {
           </div>
         </div>
       </div>
+
+      {/* Interactive Diagnostic Modal */}
+      <ApplyModal
+        job={FALLBACK_JOBS[0]}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        initialEvaluation={modalEvaluation}
+      />
     </section>
   );
 };

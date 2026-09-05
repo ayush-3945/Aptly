@@ -23,7 +23,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../services/api';
 
-const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess }) => {
+const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluation = null }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
@@ -34,8 +34,14 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess }) => {
   const [submitting, setSubmitting] = useState(false);
   const [submitStep, setSubmitStep] = useState('');
   const [error, setError] = useState('');
-  const [evaluationResult, setEvaluationResult] = useState(null);
+  const [evaluationResult, setEvaluationResult] = useState(initialEvaluation);
   const [selectedMissingSkill, setSelectedMissingSkill] = useState(null);
+
+  React.useEffect(() => {
+    if (isOpen && initialEvaluation) {
+      setEvaluationResult(initialEvaluation);
+    }
+  }, [isOpen, initialEvaluation]);
 
   if (!isOpen || !job) return null;
 
@@ -766,6 +772,14 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess }) => {
             </>
           ) : (
             <>
+              <button
+                type="button"
+                onClick={() => setEvaluationResult(null)}
+                className="btn btn-secondary"
+              >
+                <Upload size={15} />
+                <span>Upload & Benchmark Your CV</span>
+              </button>
               <button
                 type="button"
                 onClick={() => {
