@@ -207,8 +207,11 @@ npm install
 npm --prefix client install
 ```
 
-### 3. Run Verification & Test Suites
+### 3. Seed Database & Run Test Suites
 ```bash
+# Populate demo users, production jobs & Kanban applications
+npm run seed
+
 # Run system health check verifier (ephemeral test server)
 npm run test:health
 
