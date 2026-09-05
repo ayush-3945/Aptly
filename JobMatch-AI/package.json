@@ -6,8 +6,11 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "build": "npm --prefix client run build",
+    "client": "npm --prefix client run dev",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test:ai": "node scripts/verifyAIPipeline.js"
+    "test:ai": "node scripts/verifyAIPipeline.js",
+    "test:health": "node scripts/testHealth.js"
   },
   "keywords": [],
   "author": "",

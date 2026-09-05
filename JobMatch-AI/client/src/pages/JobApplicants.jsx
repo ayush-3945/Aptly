@@ -155,7 +155,7 @@ const JobApplicants = () => {
     try {
       // If it's a real MongoDB application ID (not starting with 'demo_')
       if (!applicationId.toString().startsWith('demo_')) {
-        await api.patch(`/api/applications/${applicationId}/status`, { status: newStatus });
+        await api.patch(`/applications/${applicationId}/status`, { status: newStatus });
       }
     } catch (err) {
       console.warn('Status update API call error (fallback active):', err.message);

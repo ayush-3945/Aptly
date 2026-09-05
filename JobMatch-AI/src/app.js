@@ -7,10 +7,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Basic Route for testing
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'OK', message: 'JobMatch AI API is running' });
-});
+// Public Health Check Route
+app.use('/api/health', require('./routes/healthRoutes'));
 
 // Setup routes
 app.use('/api/auth', require('./routes/authRoutes'));
