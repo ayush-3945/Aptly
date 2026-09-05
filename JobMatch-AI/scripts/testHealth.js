@@ -27,9 +27,22 @@ async function testHealthEndpoint() {
   console.log(`🌐 Ephemeral test server listening at: ${healthUrl}`);
 
   try {
-    const res = await fetch(healthUrl);
-    const status = res.status;
-    const body = await res.json();
+    const { status, body } = await new Promise((resolve, reject) => {
+      const req = http.get(healthUrl, (res) => {
+        let data = '';
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        res.on('end', () => {
+          try {
+            resolve({ status: res.statusCode, body: JSON.parse(data) });
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+      req.on('error', reject);
+    });
 
     console.log('\n📥 HTTP Response Code:', status);
     console.log('📋 Response Payload:');
@@ -55,28 +68,16 @@ async function testHealthEndpoint() {
     if (errors.length > 0) {
       console.error('\n❌ Health check verification failed with errors:');
       errors.forEach((err) => console.error(`  - ${err}`));
-      if (typeof server.closeAllConnections === 'function') {
-        server.closeAllConnections();
-      }
       server.close();
       process.exit(1);
     }
 
     console.log('\n✅ All System Health & Telemetry assertions passed successfully!');
     console.log('------------------------------------------------------\n');
-    if (typeof server.closeAllConnections === 'function') {
-      server.closeAllConnections();
-    }
     server.close();
-    process.exit(0);
   } catch (err) {
     console.error('❌ Failed to test health endpoint:', err);
-    if (server) {
-      if (typeof server.closeAllConnections === 'function') {
-        server.closeAllConnections();
-      }
-      server.close();
-    }
+    if (server) server.close();
     process.exit(1);
   }
 }
