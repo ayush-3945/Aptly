@@ -1,16 +1,30 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle2, ArrowRight, ShieldCheck, Activity, Target, Layers, FileCheck, Check, X, ExternalLink, Sparkles } from 'lucide-react';
+import {
+  CheckCircle2,
+  ShieldCheck,
+  ArrowRight,
+  Zap,
+  Target,
+  Cpu,
+  Terminal,
+  Layers,
+  ExternalLink,
+  Sparkles,
+  FileCheck,
+} from 'lucide-react';
 import ApplyModal from './ApplyModal';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
 
 const SAMPLE_EVALUATION = {
   aiMatchScore: 88,
   recommendation: 'Strong Match',
-  fitSummary: 'Subject candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and Gemini AI SDK integration. The candidate exhibits strong alignment with TechPulse Solutions requirements.',
+  fitSummary:
+    'Subject candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and Gemini AI SDK integration. The candidate exhibits strong alignment with TechPulse Solutions requirements.',
   matchedSkills: ['React.js', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'REST APIs', 'Git'],
   missingSkills: ['Docker Containerization', 'Kubernetes Orchestration'],
-  experienceFit: 'Candidate exhibits 4+ years of relevant MERN production engineering with deep LLM API integration experience. Missing containerization competencies are easily bridgeable on the job.',
+  experienceFit:
+    'Candidate exhibits 4+ years of relevant MERN production engineering with deep LLM API integration experience. Missing containerization competencies are easily bridgeable on the job.',
 };
 
 const Hero = () => {
@@ -28,36 +42,64 @@ const Hero = () => {
   };
 
   return (
-    <section style={{ padding: '4.5rem 0 5.5rem', position: 'relative' }}>
+    <section style={{ padding: '4.5rem 0 5rem', position: 'relative' }}>
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+        {/* Top Technical Status / Announcement Badge */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.75rem' }}>
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.65rem',
+              padding: '0.35rem 0.95rem',
+              background: 'rgba(245, 166, 35, 0.08)',
+              border: '1px solid rgba(245, 166, 35, 0.28)',
+              borderRadius: '4px',
+              fontSize: '0.78rem',
+              fontWeight: 600,
+              color: 'var(--accent-amber)',
+              fontFamily: 'var(--font-mono)',
+              letterSpacing: '0.04em',
+            }}
+          >
+            <span
+              style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: 'var(--accent-amber)',
+                boxShadow: '0 0 6px var(--accent-amber)',
+                display: 'inline-block',
+              }}
+            />
+            <Cpu size={13} color="#F5A623" />
+            <span>POWERED BY GOOGLE GEMINI 2.5 • SEMANTIC ATS</span>
+          </div>
+        </div>
+
         {/* Hero Title & Subtitle */}
         <div style={{ textAlign: 'center', maxWidth: '880px', margin: '0 auto 3rem' }}>
           <h1
             style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(2.6rem, 5.5vw, 4.2rem)',
-              lineHeight: 1.15,
+              fontSize: 'clamp(2.5rem, 5.5vw, 4.2rem)',
+              lineHeight: 1.12,
               marginBottom: '1.35rem',
-              color: '#0F172A',
-              fontWeight: 600,
-              letterSpacing: '-0.025em',
+              letterSpacing: '-0.035em',
             }}
           >
             Stop Losing Top Talent to <br />
-            <span style={{ fontStyle: 'italic', color: 'var(--accent-teal)', fontWeight: 600 }}>
-              Blind ATS Keyword Filters
-            </span>
+            <span style={{ color: 'var(--accent-amber)', fontWeight: 800 }}>Blind ATS Keyword Filters</span>
           </h1>
           <p
             style={{
               fontSize: 'clamp(1.05rem, 2vw, 1.25rem)',
               color: 'var(--text-secondary)',
-              maxWidth: '720px',
+              maxWidth: '700px',
               margin: '0 auto 2.2rem',
               lineHeight: 1.6,
             }}
           >
-            Aptly provides clinical diagnostic skill evaluations rather than naive keyword matching—giving candidates transparent gap reports and recruiters precision-ranked talent.
+            Aptly evaluates candidates based on actual skill competence, seniority, and conceptual depth—providing transparent skill-gap insights to candidates and precision ranking to recruiters.
           </p>
 
           {/* Primary Action Buttons */}
@@ -65,240 +107,230 @@ const Hero = () => {
             <Link
               to="/jobs"
               className="btn btn-primary"
-              style={{ padding: '0.75rem 1.75rem', fontSize: '0.98rem' }}
+              style={{
+                padding: '0.75rem 1.65rem',
+                fontSize: '0.95rem',
+                borderRadius: '4px',
+                background: '#F5A623',
+                color: '#0A0A0A',
+                border: '1px solid #F5A623',
+                fontWeight: 700,
+              }}
             >
               <span>Explore Open Roles</span>
-              <ArrowRight size={17} />
+              <ArrowRight size={16} />
             </Link>
             <button
               type="button"
               onClick={openSampleReport}
               className="btn btn-secondary"
-              style={{ padding: '0.75rem 1.75rem', fontSize: '0.98rem', cursor: 'pointer' }}
+              style={{
+                padding: '0.75rem 1.65rem',
+                fontSize: '0.95rem',
+                borderRadius: '4px',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
             >
-              <FileCheck size={17} color="var(--accent-teal)" />
-              <span>View Sample Lab Report ↗</span>
+              <FileCheck size={16} color="var(--accent-amber)" />
+              <span>View Sample Match Report ↗</span>
             </button>
           </div>
         </div>
 
-        {/* Clinical Diagnostic Evaluation Report Card Preview */}
+        {/* Interactive Live ATS Evaluation Card Preview */}
         <div id="preview" style={{ maxWidth: '940px', margin: '0 auto' }}>
           <div
-            className="lab-card"
+            className="card-glass"
             style={{
-              padding: '2.2rem',
-              background: '#FFFFFF',
-              border: '1px solid #E2E8F0',
-              borderRadius: '16px',
-              boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04)',
+              padding: '1.75rem',
+              border: '1px solid rgba(245, 166, 35, 0.28)',
+              borderRadius: '6px',
+              background: '#0E0E12',
+              boxShadow: '0 12px 36px rgba(0, 0, 0, 0.7)',
             }}
           >
-            {/* Header of diagnostic card */}
+            {/* Header of preview card */}
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 flexWrap: 'wrap',
-                gap: '1.25rem',
-                borderBottom: '1px solid #F1F5F9',
-                paddingBottom: '1.4rem',
-                marginBottom: '1.5rem',
+                gap: '1rem',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                paddingBottom: '1.15rem',
+                marginBottom: '1.35rem',
               }}
             >
               <div
                 onClick={openSampleReport}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.9rem', cursor: 'pointer' }}
-                title="Click to open full interactive diagnostic scorecard"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', cursor: 'pointer' }}
+                title="Click to open interactive evaluation scorecard"
               >
                 <div
                   style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '10px',
-                    background: '#F0FDFA',
-                    border: '1px solid #CCFBF1',
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '4px',
+                    background: 'rgba(245, 166, 35, 0.08)',
+                    border: '1px solid rgba(245, 166, 35, 0.3)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <FileCheck size={22} color="#0D9488" />
+                  <Terminal size={18} color="#F5A623" />
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', fontWeight: 700 }}>
-                    DIAGNOSTIC REPORT #APT-8492 • <span style={{ color: 'var(--accent-teal)' }}>CLICK TO OPEN</span>
-                  </div>
-                  <h4 style={{ fontSize: '1.2rem', margin: '0.15rem 0', fontWeight: 700, color: '#0F172A', fontFamily: 'var(--font-sans-display)' }}>
+                  <h4 style={{ fontSize: '1.1rem', marginBottom: '0.2rem', fontWeight: 700 }}>
                     Full-Stack MERN & AI Engineer
                   </h4>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                    Subject: <strong>Ayush Kumar Pandey</strong> • Benchmarked Against: <strong>TechPulse Solutions</strong>
+                  <div
+                    style={{
+                      fontSize: '0.78rem',
+                      color: 'var(--text-muted)',
+                      fontFamily: 'var(--font-mono)',
+                      letterSpacing: '0.02em',
+                    }}
+                  >
+                    EVALUATION: Ayush Kumar Pandey • TARGET: TechPulse Solutions • <span style={{ color: 'var(--accent-amber)' }}>CLICK TO OPEN</span>
                   </div>
                 </div>
               </div>
 
-              {/* Match Score Diagnostic Dial / Badge */}
               <div
                 onClick={openSampleReport}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', cursor: 'pointer' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}
                 title="Click to inspect detailed match breakdown"
               >
+                <span className="badge badge-strong">
+                  <CheckCircle2 size={13} />
+                  Strong Match
+                </span>
                 <div
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.65rem',
-                    padding: '0.45rem 1rem',
-                    background: '#F0FDF4',
-                    border: '1px solid #BBF7D0',
-                    borderRadius: '9999px',
+                    padding: '0.3rem 0.75rem',
+                    background: 'rgba(245, 166, 35, 0.12)',
+                    border: '1px solid rgba(245, 166, 35, 0.45)',
+                    borderRadius: '4px',
+                    fontWeight: 700,
+                    fontSize: '0.88rem',
+                    color: 'var(--accent-amber)',
+                    fontFamily: 'var(--font-mono)',
+                    letterSpacing: '0.04em',
                   }}
                 >
-                  <CheckCircle2 size={16} color="#16A34A" />
-                  <span style={{ fontSize: '0.84rem', fontWeight: 600, color: '#166534' }}>
-                    Strong Alignment
-                  </span>
-                </div>
-
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    gap: '0.2rem',
-                    padding: '0.45rem 1.15rem',
-                    background: '#F0FDFA',
-                    border: '1px solid #99F6E4',
-                    borderRadius: '10px',
-                    boxShadow: '0 2px 6px rgba(13, 148, 136, 0.12)',
-                  }}
-                >
-                  <span style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F766E', fontFamily: 'var(--font-sans-display)', lineHeight: 1 }}>
-                    88%
-                  </span>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#0D9488', textTransform: 'uppercase' }}>
-                    Score
-                  </span>
+                  88.0% ATS_MATCH
                 </div>
               </div>
             </div>
 
-            {/* Checklist-style Skill Diagnostics */}
+            {/* Grid of details inside card */}
             <div
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                gap: '1.75rem',
-                marginBottom: '1.75rem',
+                gap: '1.35rem',
+                marginBottom: '1.35rem',
               }}
             >
-              {/* Verified Competencies */}
-              <div
-                style={{
-                  background: '#FAFCFE',
-                  border: '1px solid #EDF2F7',
-                  borderRadius: '12px',
-                  padding: '1.35rem',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.9rem' }}>
-                  <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#DCFCE7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Check size={12} color="#15803D" strokeWidth={3} />
-                  </div>
-                  <span style={{ fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#15803D', fontWeight: 700 }}>
-                    Verified Competencies (7 Matched)
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div>
+                <span
+                  style={{
+                    fontSize: '0.75rem',
+                    textTransform: 'uppercase',
+                    color: 'var(--text-muted)',
+                    fontWeight: 700,
+                    letterSpacing: '0.06em',
+                    fontFamily: 'var(--font-mono)',
+                  }}
+                >
+                  [+] MATCHED CORE SKILLS
+                </span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginTop: '0.6rem' }}>
                   {['React.js', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'REST APIs', 'Git'].map((skill) => (
                     <span
                       key={skill}
                       style={{
-                        fontSize: '0.82rem',
-                        fontWeight: 500,
-                        padding: '0.3rem 0.75rem',
-                        background: '#FFFFFF',
-                        border: '1px solid #CBD5E1',
-                        borderRadius: '6px',
-                        color: '#1E293B',
-                        boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.4rem',
+                        fontSize: '0.76rem',
+                        fontFamily: 'var(--font-mono)',
+                        padding: '0.2rem 0.6rem',
+                        background: 'rgba(16, 185, 129, 0.1)',
+                        border: '1px solid rgba(16, 185, 129, 0.25)',
+                        borderRadius: '3px',
+                        color: '#6EE7B7',
                       }}
                     >
-                      <span style={{ color: '#0D9488', fontWeight: 700 }}>✓</span>
-                      <span>{skill}</span>
+                      ✓ {skill}
                     </span>
                   ))}
                 </div>
               </div>
 
-              {/* Diagnostic Skill Gaps */}
-              <div
-                style={{
-                  background: '#FFFDFD',
-                  border: '1px solid #FFE4E6',
-                  borderRadius: '12px',
-                  padding: '1.35rem',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.9rem' }}>
-                  <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <X size={12} color="#B91C1C" strokeWidth={3} />
-                  </div>
-                  <span style={{ fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#B91C1C', fontWeight: 700 }}>
-                    Identified Diagnostic Gaps (2 Detected)
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div>
+                <span
+                  style={{
+                    fontSize: '0.75rem',
+                    textTransform: 'uppercase',
+                    color: 'var(--text-muted)',
+                    fontWeight: 700,
+                    letterSpacing: '0.06em',
+                    fontFamily: 'var(--font-mono)',
+                  }}
+                >
+                  [-] IDENTIFIED SKILL GAPS
+                </span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginTop: '0.6rem' }}>
                   {['Docker Containerization', 'Kubernetes Orchestration'].map((skill) => (
                     <span
                       key={skill}
                       style={{
-                        fontSize: '0.82rem',
-                        fontWeight: 500,
-                        padding: '0.3rem 0.75rem',
-                        background: '#FFFFFF',
-                        border: '1px solid #FECDD3',
-                        borderRadius: '6px',
-                        color: '#9F1239',
-                        boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.4rem',
+                        fontSize: '0.76rem',
+                        fontFamily: 'var(--font-mono)',
+                        padding: '0.2rem 0.6rem',
+                        background: 'rgba(239, 68, 68, 0.08)',
+                        border: '1px solid rgba(239, 68, 68, 0.25)',
+                        borderRadius: '3px',
+                        color: '#FCA5A5',
                       }}
                     >
-                      <span style={{ color: '#E11D48', fontWeight: 700 }}>✕</span>
-                      <span>{skill}</span>
+                      ✕ {skill}
                     </span>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Clinical Diagnostic Evaluation Finding */}
+            {/* Recruiter Executive Summary in Terminal Quotebox */}
             <div
               style={{
-                background: '#F8FAFC',
-                borderRadius: '10px',
-                padding: '1.15rem 1.4rem',
-                borderLeft: '4px solid var(--accent-teal)',
-                borderTop: '1px solid #EDF2F7',
-                borderRight: '1px solid #EDF2F7',
-                borderBottom: '1px solid #EDF2F7',
-                fontSize: '0.92rem',
+                background: '#070709',
+                borderRadius: '4px',
+                padding: '0.9rem 1.15rem',
+                borderLeft: '3px solid var(--accent-amber)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+                borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                fontSize: '0.88rem',
                 color: 'var(--text-secondary)',
-                lineHeight: 1.6,
+                lineHeight: 1.55,
               }}
             >
-              <span style={{ color: 'var(--accent-teal-dark)', fontWeight: 700, display: 'block', marginBottom: '0.25rem', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Clinical Diagnostic Finding:
+              <span
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  color: 'var(--accent-amber)',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  display: 'block',
+                  marginBottom: '0.3rem',
+                  letterSpacing: '0.03em',
+                }}
+              >
+                // AI_RECRUITER_SYNTHESIS:
               </span>
-              Candidate demonstrates robust technical depth across modern full-stack web architectures and generative AI integrations. Identified gaps in Docker containerization represent easily bridgeable tooling rather than core conceptual deficiencies.
+              Candidate demonstrates robust competence across the full JavaScript ecosystem and vector LLM integration. Minor gap in DevOps containerization which is easily bridged with short onboarding.
             </div>
 
             {/* Interactive Card Action Bar */}
@@ -309,14 +341,23 @@ const Hero = () => {
                 alignItems: 'center',
                 flexWrap: 'wrap',
                 gap: '1rem',
-                marginTop: '1.4rem',
-                paddingTop: '1.25rem',
-                borderTop: '1px solid #F1F5F9',
+                marginTop: '1.35rem',
+                paddingTop: '1.15rem',
+                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                <ShieldCheck size={16} color="var(--accent-teal)" />
-                <span>Verified Diagnostic Engine • 100% Deterministic Evaluation</span>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontSize: '0.8rem',
+                  color: 'var(--text-muted)',
+                  fontFamily: 'var(--font-mono)',
+                }}
+              >
+                <ShieldCheck size={15} color="var(--accent-amber)" />
+                <span>VERIFIED EVALUATION ENGINE • DETERMINISTIC MATCH</span>
               </div>
 
               <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -324,69 +365,142 @@ const Hero = () => {
                   type="button"
                   onClick={openSampleReport}
                   className="btn btn-secondary"
-                  style={{ fontSize: '0.85rem', padding: '0.45rem 1rem' }}
+                  style={{ fontSize: '0.82rem', padding: '0.45rem 0.95rem' }}
                 >
-                  <ExternalLink size={15} color="var(--accent-teal)" />
-                  <span>Open Interactive Scorecard ↗</span>
+                  <ExternalLink size={14} color="var(--accent-amber)" />
+                  <span>Open Full Scorecard ↗</span>
                 </button>
                 <button
                   type="button"
                   onClick={openLiveBenchmark}
                   className="btn btn-primary"
-                  style={{ fontSize: '0.85rem', padding: '0.45rem 1.15rem' }}
+                  style={{
+                    fontSize: '0.82rem',
+                    padding: '0.45rem 1.05rem',
+                    background: '#F5A623',
+                    color: '#0A0A0A',
+                    fontWeight: 700,
+                  }}
                 >
-                  <Sparkles size={15} />
-                  <span>Run Live CV Benchmark</span>
+                  <Sparkles size={14} />
+                  <span>Benchmark Your CV</span>
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Scientific Precision Proof Metrics Strip */}
+        {/* Precision Proof Metrics Strip */}
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '1.5rem',
-            marginTop: '3.5rem',
-            padding: '1.65rem 2rem',
-            background: '#FFFFFF',
-            border: '1px solid #E2E8F0',
-            borderRadius: '16px',
-            boxShadow: 'var(--shadow-card)',
+            gap: '1.25rem',
+            marginTop: '3rem',
+            padding: '1.35rem 1.75rem',
+            background: '#0E0E12',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '6px',
           }}
         >
           <div>
-            <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--accent-teal-dark)', fontFamily: 'var(--font-sans-display)', letterSpacing: '-0.03em' }}>
+            <div
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '2rem',
+                fontWeight: 800,
+                color: 'var(--accent-amber)',
+                letterSpacing: '-0.02em',
+              }}
+            >
               99.2%
             </div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600, marginTop: '0.2rem' }}>
-              Semantic Diagnostic Accuracy
+            <div
+              style={{
+                fontSize: '0.75rem',
+                color: 'var(--text-muted)',
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 600,
+                marginTop: '0.2rem',
+                letterSpacing: '0.03em',
+              }}
+            >
+              [ATS_SEMANTIC_ACCURACY]
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#0F172A', fontFamily: 'var(--font-sans-display)', letterSpacing: '-0.03em' }}>
+            <div
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '2rem',
+                fontWeight: 800,
+                color: '#EDEDED',
+                letterSpacing: '-0.02em',
+              }}
+            >
               &lt; 1.2s
             </div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600, marginTop: '0.2rem' }}>
-              Gemini 2.5 Inference Latency
+            <div
+              style={{
+                fontSize: '0.75rem',
+                color: 'var(--text-muted)',
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 600,
+                marginTop: '0.2rem',
+                letterSpacing: '0.03em',
+              }}
+            >
+              [GEMINI_2.5_LATENCY]
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--accent-teal-dark)', fontFamily: 'var(--font-sans-display)', letterSpacing: '-0.03em' }}>
+            <div
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '2rem',
+                fontWeight: 800,
+                color: 'var(--accent-amber)',
+                letterSpacing: '-0.02em',
+              }}
+            >
               4.2x
             </div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600, marginTop: '0.2rem' }}>
-              Review Velocity Improvement
+            <div
+              style={{
+                fontSize: '0.75rem',
+                color: 'var(--text-muted)',
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 600,
+                marginTop: '0.2rem',
+                letterSpacing: '0.03em',
+              }}
+            >
+              [SHORTLIST_VELOCITY]
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#16A34A', fontFamily: 'var(--font-sans-display)', letterSpacing: '-0.03em' }}>
+            <div
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '2rem',
+                fontWeight: 800,
+                color: '#10B981',
+                letterSpacing: '-0.02em',
+              }}
+            >
               0%
             </div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600, marginTop: '0.2rem' }}>
-              Arbitrary Keyword Rejections
+            <div
+              style={{
+                fontSize: '0.75rem',
+                color: 'var(--text-muted)',
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 600,
+                marginTop: '0.2rem',
+                letterSpacing: '0.03em',
+              }}
+            >
+              [BLIND_KEYWORD_DISCARDS]
             </div>
           </div>
         </div>
@@ -396,78 +510,72 @@ const Hero = () => {
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: '1.5rem',
-            marginTop: '3.5rem',
+            gap: '1.35rem',
+            marginTop: '3rem',
           }}
         >
-          <div className="lab-card">
+          <div className="card-glass">
             <div
               style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '8px',
-                background: '#F0FDFA',
-                border: '1px solid #CCFBF1',
+                width: '36px',
+                height: '36px',
+                borderRadius: '4px',
+                background: 'rgba(245, 166, 35, 0.08)',
+                border: '1px solid rgba(245, 166, 35, 0.25)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginBottom: '1rem',
+                marginBottom: '0.9rem',
               }}
             >
-              <Activity size={20} color="#0D9488" />
+              <Zap size={18} color="#F5A623" />
             </div>
-            <h3 style={{ fontSize: '1.18rem', marginBottom: '0.4rem', color: '#0F172A', fontFamily: 'var(--font-sans-display)', fontWeight: 700 }}>
-              Semantic Diagnostics
-            </h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '0.35rem', fontWeight: 700 }}>Semantic Parsing</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
               Recognizes adjacent technologies (e.g. knowing PostgreSQL background translates easily to MySQL) rather than discarding resumes.
             </p>
           </div>
 
-          <div className="lab-card">
+          <div className="card-glass">
             <div
               style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '8px',
-                background: '#F0FDF4',
-                border: '1px solid #BBF7D0',
+                width: '36px',
+                height: '36px',
+                borderRadius: '4px',
+                background: 'rgba(16, 185, 129, 0.08)',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginBottom: '1rem',
+                marginBottom: '0.9rem',
               }}
             >
-              <Target size={20} color="#16A34A" />
+              <Target size={18} color="#10B981" />
             </div>
-            <h3 style={{ fontSize: '1.18rem', marginBottom: '0.4rem', color: '#0F172A', fontFamily: 'var(--font-sans-display)', fontWeight: 700 }}>
-              Transparent Skill Gaps
-            </h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '0.35rem', fontWeight: 700 }}>Transparent Skill Gaps</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
               Candidates see exactly why they matched or where they fell short, transforming black-box ATS rejections into constructive feedback.
             </p>
           </div>
 
-          <div className="lab-card">
+          <div className="card-glass">
             <div
               style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '8px',
-                background: '#F0FDFA',
-                border: '1px solid #CCFBF1',
+                width: '36px',
+                height: '36px',
+                borderRadius: '4px',
+                background: 'rgba(245, 166, 35, 0.08)',
+                border: '1px solid rgba(245, 166, 35, 0.25)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginBottom: '1rem',
+                marginBottom: '0.9rem',
               }}
             >
-              <ShieldCheck size={20} color="#0D9488" />
+              <ShieldCheck size={18} color="#F5A623" />
             </div>
-            <h3 style={{ fontSize: '1.18rem', marginBottom: '0.4rem', color: '#0F172A', fontFamily: 'var(--font-sans-display)', fontWeight: 700 }}>
-              Recruiter Pipeline
-            </h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '0.35rem', fontWeight: 700 }}>Recruiter Kanban Pipeline</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
               Filter by match score threshold (e.g. &gt;75%), sort top talent instantly, and transition candidates through interview stages.
             </p>
           </div>

@@ -23,7 +23,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../services/api';
 
-const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluation = null }) => {
+const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluation }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
@@ -34,7 +34,7 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
   const [submitting, setSubmitting] = useState(false);
   const [submitStep, setSubmitStep] = useState('');
   const [error, setError] = useState('');
-  const [evaluationResult, setEvaluationResult] = useState(initialEvaluation);
+  const [evaluationResult, setEvaluationResult] = useState(null);
   const [selectedMissingSkill, setSelectedMissingSkill] = useState(null);
 
   React.useEffect(() => {
@@ -211,22 +211,22 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
             <div style={{
-              width: '34px',
-              height: '34px',
-              borderRadius: '6px',
-              background: 'var(--accent-teal-subtle)',
-              border: '1px solid var(--accent-teal-border)',
+              width: '32px',
+              height: '32px',
+              borderRadius: '4px',
+              background: 'rgba(245, 166, 35, 0.1)',
+              border: '1px solid rgba(245, 166, 35, 0.3)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-              <FileText size={16} color="#0D9488" />
+              <FileText size={16} color="#F5A623" />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, fontFamily: 'var(--font-heading)' }}>
-                {evaluationResult ? 'Clinical Diagnostic Benchmark' : 'Run Clinical Skill Benchmark'}
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>
+                {evaluationResult ? 'Gemini AI Match Scorecard' : 'Apply with AI Semantic Match'}
               </h3>
-              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
                 {job.title} • {job.company}
               </span>
             </div>
@@ -261,8 +261,8 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
             <form onSubmit={handleSubmit}>
               {!isAuthenticated && (
                 <div style={{
-                  background: 'var(--accent-teal-subtle)',
-                  border: '1px solid var(--accent-teal-border)',
+                  background: 'rgba(245, 166, 35, 0.08)',
+                  border: '1px solid rgba(245, 166, 35, 0.25)',
                   borderRadius: 'var(--radius-sm)',
                   padding: '1rem 1.25rem',
                   display: 'flex',
@@ -270,7 +270,7 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                   gap: '0.85rem',
                   marginBottom: '1.5rem'
                 }}>
-                  <Lock size={18} color="var(--accent-teal)" style={{ flexShrink: 0 }} />
+                  <Lock size={18} color="var(--accent-amber)" style={{ flexShrink: 0 }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>Candidate Sign-In Required</div>
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -290,7 +290,7 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
 
               {/* Target Job Overview Pill */}
               <div style={{
-                background: 'var(--bg-secondary)',
+                background: '#0E0E12',
                 border: '1px solid var(--border-subtle)',
                 borderRadius: 'var(--radius-sm)',
                 padding: '1rem 1.25rem',
@@ -302,33 +302,27 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                 gap: '0.75rem'
               }}>
                 <div>
-                  <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.06em', fontFamily: 'var(--font-sans-display)' }}>
-                    TARGET EVALUATION ROLE
+                  <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.06em', fontFamily: 'var(--font-mono)' }}>
+                    TARGET_ROLE
                   </span>
-                  <div style={{ fontSize: '1.05rem', fontWeight: 700, marginTop: '0.15rem' }}>
-                    {job.title}
-                  </div>
+                  <h4 style={{ fontSize: '1.05rem', marginTop: '0.15rem' }}>{job.title}</h4>
                 </div>
-
-                <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-                  {job.requiredSkills?.slice(0, 4).map((sk) => (
-                    <span
-                      key={sk}
-                      style={{
-                        padding: '0.2rem 0.55rem',
-                        borderRadius: 'var(--radius-xs)',
-                        background: 'var(--bg-card)',
-                        border: '1px solid var(--border-subtle)',
-                        fontSize: '0.74rem',
-                        fontWeight: 600,
-                        color: 'var(--text-secondary)',
-                      }}
-                    >
-                      {sk}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                  {job.requiredSkills?.slice(0, 4).map((skill, i) => (
+                    <span key={i} style={{
+                      fontSize: '0.72rem',
+                      fontFamily: 'var(--font-mono)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid var(--border-subtle)',
+                      padding: '0.2rem 0.55rem',
+                      borderRadius: 'var(--radius-xs)',
+                      color: 'var(--text-secondary)'
+                    }}>
+                      {skill}
                     </span>
                   ))}
                   {job.requiredSkills?.length > 4 && (
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', alignSelf: 'center' }}>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', alignSelf: 'center', fontFamily: 'var(--font-mono)' }}>
                       +{job.requiredSkills.length - 4} more
                     </span>
                   )}
@@ -342,11 +336,11 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                 </label>
                 <div
                   style={{
-                    border: file ? '1.5px solid var(--accent-teal)' : '1.5px dashed var(--border-medium)',
+                    border: file ? '1px solid var(--accent-amber)' : '1px dashed var(--border-subtle)',
                     borderRadius: 'var(--radius-md)',
                     padding: '2rem 1.5rem',
                     textAlign: 'center',
-                    background: file ? 'var(--accent-teal-subtle)' : '#FFFFFF',
+                    background: file ? 'rgba(245, 166, 35, 0.04)' : 'rgba(255, 255, 255, 0.015)',
                     cursor: 'pointer',
                     transition: 'var(--transition)',
                     position: 'relative'
@@ -366,17 +360,17 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                       <div style={{
                         width: '40px',
                         height: '40px',
-                        borderRadius: '8px',
-                        background: 'rgba(13, 148, 136, 0.15)',
-                        border: '1px solid rgba(13, 148, 136, 0.3)',
+                        borderRadius: '4px',
+                        background: 'rgba(16, 185, 129, 0.15)',
+                        border: '1px solid rgba(16, 185, 129, 0.3)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}>
-                        <CheckCircle2 size={22} color="#0D9488" />
+                        <CheckCircle2 size={22} color="#10B981" />
                       </div>
                       <div style={{ fontWeight: 600, fontSize: '0.92rem' }}>{file.name}</div>
-                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
                         {(file.size / 1024 / 1024).toFixed(2)} MB • READY FOR EVALUATION
                       </div>
                     </div>
@@ -385,13 +379,13 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                       <div style={{
                         width: '40px',
                         height: '40px',
-                        borderRadius: '8px',
-                        background: 'var(--accent-teal-subtle)',
-                        border: '1px solid var(--accent-teal-border)',
+                        borderRadius: '4px',
+                        background: 'rgba(245, 166, 35, 0.08)',
+                        border: '1px solid rgba(245, 166, 35, 0.25)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: 'var(--accent-teal)'
+                        color: 'var(--accent-amber)'
                       }}>
                         <Upload size={20} />
                       </div>
@@ -399,7 +393,7 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                         Click to browse or drag & drop resume PDF
                       </div>
                       <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                        PDF format up to 5MB (parsed via diagnostic text extraction)
+                        PDF format up to 5MB (text or parsed layout)
                       </div>
                     </div>
                   )}
@@ -412,8 +406,8 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '0.85rem 1.15rem',
-                background: useDemoResume ? 'var(--accent-teal-subtle)' : '#FFFFFF',
-                border: useDemoResume ? '1.5px solid var(--accent-teal)' : '1px solid var(--border-subtle)',
+                background: useDemoResume ? 'rgba(245, 166, 35, 0.08)' : 'rgba(255, 255, 255, 0.02)',
+                border: useDemoResume ? '1px solid var(--accent-amber)' : '1px solid var(--border-subtle)',
                 borderRadius: 'var(--radius-sm)',
                 marginBottom: '1.5rem',
                 cursor: 'pointer',
@@ -422,7 +416,7 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
               onClick={handleSelectDemoResume}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                  <Zap size={16} color="var(--accent-teal)" />
+                  <Zap size={16} color="var(--accent-amber)" />
                   <div>
                     <div style={{ fontSize: '0.88rem', fontWeight: 600 }}>
                       Or use 1-Click Verified Demo CV
@@ -444,20 +438,20 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
               {/* Live Loading Progress Bar during Evaluation */}
               {submitting && (
                 <div style={{
-                  background: 'var(--accent-teal-subtle)',
-                  border: '1px solid var(--accent-teal-border)',
+                  background: 'rgba(245, 166, 35, 0.08)',
+                  border: '1px solid rgba(245, 166, 35, 0.3)',
                   borderRadius: 'var(--radius-sm)',
                   padding: '1.25rem',
                   textAlign: 'center',
                   marginBottom: '1rem',
                   animation: 'fadeIn 0.2s ease-out'
                 }}>
-                  <Loader2 size={24} className="spin" color="var(--accent-teal)" style={{ margin: '0 auto 0.6rem' }} />
-                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--accent-teal)' }}>
+                  <Loader2 size={24} className="spin" color="var(--accent-amber)" style={{ margin: '0 auto 0.6rem' }} />
+                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--accent-amber)', fontFamily: 'var(--font-mono)' }}>
                     {submitStep}
                   </div>
                   <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>
-                    Benchmarking verified competencies against diagnostic criteria...
+                    Comparing semantic tech alignment against job criteria...
                   </div>
                 </div>
               )}
@@ -467,17 +461,16 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
           {/* Result Step (Evaluation Scorecard) */}
           {evaluationResult && (
             <div className="animate-fade-in">
-              {/* Clinical Radial Meter Diagnostic Box */}
+              {/* Radial Meter Hero Box */}
               <div style={{
-                background: '#FAFCFE',
-                border: '1px solid #E2E8F0',
-                borderRadius: '12px',
-                padding: '2rem 1.5rem',
+                background: '#0E0E12',
+                border: '1px solid rgba(245, 166, 35, 0.25)',
+                borderRadius: '6px',
+                padding: '1.75rem 1.5rem',
                 textAlign: 'center',
                 marginBottom: '1.5rem',
                 position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)'
+                overflow: 'hidden'
               }}>
                 {/* SVG Radial Gauge */}
                 <div style={{ position: 'relative', width: '130px', height: '130px', margin: '0 auto 1rem' }}>
@@ -486,16 +479,16 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                       cx="65"
                       cy="65"
                       r="52"
-                      stroke="#E2E8F0"
-                      strokeWidth="8"
+                      stroke="rgba(255, 255, 255, 0.08)"
+                      strokeWidth="9"
                       fill="transparent"
                     />
                     <circle
                       cx="65"
                       cy="65"
                       r="52"
-                      stroke="var(--accent-teal)"
-                      strokeWidth="8"
+                      stroke="#F5A623"
+                      strokeWidth="9"
                       strokeDasharray={circumference}
                       strokeDashoffset={strokeOffset}
                       strokeLinecap="round"
@@ -510,19 +503,19 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    fontFamily: 'var(--font-mono)'
                   }}>
                     <span style={{
-                      fontSize: '2.3rem',
+                      fontSize: '2.2rem',
                       fontWeight: 800,
                       lineHeight: 1,
                       letterSpacing: '-0.02em',
-                      color: 'var(--accent-teal-dark)',
-                      fontFamily: 'var(--font-sans-display)'
+                      color: 'var(--accent-amber)'
                     }}>
                       {evaluationResult.aiMatchScore}%
                     </span>
-                    <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: '2px' }}>
-                      Diagnostic Score
+                    <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.06em' }}>
+                      ATS_SCORE
                     </span>
                   </div>
                 </div>
@@ -534,50 +527,50 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                       : evaluationResult.aiMatchScore >= 45
                       ? 'badge-moderate'
                       : 'badge-low'
-                  }`} style={{ fontSize: '0.84rem', padding: '0.35rem 1rem' }}>
+                  }`} style={{ fontSize: '0.82rem', padding: '0.35rem 0.85rem' }}>
                     {evaluationResult.recommendation}
                   </span>
                 </div>
 
                 <p style={{
                   color: 'var(--text-secondary)',
-                  fontSize: '0.94rem',
+                  fontSize: '0.92rem',
                   maxWidth: '520px',
                   margin: '1rem auto 0',
-                  lineHeight: 1.55
+                  lineHeight: 1.5
                 }}>
                   {evaluationResult.fitSummary}
                 </p>
 
-                {/* 3 Clinical KPI Pills */}
+                {/* 3 KPI Metric Pills */}
                 <div style={{
                   display: 'flex',
                   justifyContent: 'center',
-                  gap: '1.25rem',
+                  gap: '1rem',
                   flexWrap: 'wrap',
                   marginTop: '1.25rem',
                   paddingTop: '1.25rem',
-                  borderTop: '1px solid #EDF2F7'
+                  borderTop: '1px solid rgba(255, 255, 255, 0.06)'
                 }}>
-                  <div style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-                    <strong style={{ color: '#166534', fontWeight: 700 }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    <strong style={{ color: '#34D399', fontFamily: 'var(--font-mono)' }}>
                       {evaluationResult.matchedSkills?.length || 0}
-                    </strong> Verified Competencies
+                    </strong> Matched Core Skills
                   </div>
-                  <div style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-                    <strong style={{ color: '#BE123C', fontWeight: 700 }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    <strong style={{ color: '#FB7185', fontFamily: 'var(--font-mono)' }}>
                       {evaluationResult.missingSkills?.length || 0}
-                    </strong> Identified Gaps
+                    </strong> Gaps Identified
                   </div>
-                  <div style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-                    <strong style={{ color: '#0369A1', fontWeight: 700 }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    <strong style={{ color: '#38BDF8', fontFamily: 'var(--font-mono)' }}>
                       Gemini 2.5
-                    </strong> Verified
+                    </strong> Scored
                   </div>
                 </div>
               </div>
 
-              {/* Checklist-style Skills Alignment Grid */}
+              {/* Skills Alignment Grid */}
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -586,67 +579,67 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
               }}>
                 {/* Matched Skills Card */}
                 <div style={{
-                  background: '#F0FDF4',
-                  border: '1px solid #BBF7D0',
-                  borderRadius: '10px',
+                  background: 'rgba(16, 185, 129, 0.05)',
+                  border: '1px solid rgba(16, 185, 129, 0.25)',
+                  borderRadius: 'var(--radius-sm)',
                   padding: '1.25rem'
                 }}>
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.45rem',
-                    color: '#166534',
+                    color: '#34D399',
                     fontSize: '0.82rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.04em',
                     marginBottom: '0.85rem'
                   }}>
-                    <Check size={15} strokeWidth={2.5} />
-                    <span>Matched Competencies ({evaluationResult.matchedSkills?.length || 0})</span>
+                    <Check size={15} />
+                    <span>Matched Skills ({evaluationResult.matchedSkills?.length || 0})</span>
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
                     {evaluationResult.matchedSkills && evaluationResult.matchedSkills.length > 0 ? (
                       evaluationResult.matchedSkills.map((skill, idx) => (
                         <span key={idx} style={{
-                          background: '#FFFFFF',
-                          border: '1px solid #86EFAC',
-                          color: '#166534',
+                          background: 'rgba(16, 185, 129, 0.16)',
+                          border: '1px solid rgba(16, 185, 129, 0.3)',
+                          color: '#A7F3D0',
                           padding: '0.25rem 0.65rem',
-                          borderRadius: '6px',
-                          fontSize: '0.8rem',
-                          fontWeight: 500,
-                          boxShadow: '0 1px 2px rgba(15, 23, 42, 0.03)'
+                          borderRadius: 'var(--radius-xs)',
+                          fontSize: '0.78rem',
+                          fontFamily: 'var(--font-mono)',
+                          fontWeight: 500
                         }}>
                           ✓ {skill}
                         </span>
                       ))
                     ) : (
-                      <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>None detected</span>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>None detected</span>
                     )}
                   </div>
                 </div>
 
                 {/* Missing Skills Card */}
                 <div style={{
-                  background: '#FFF1F2',
-                  border: '1px solid #FECDD3',
-                  borderRadius: '10px',
+                  background: 'rgba(244, 63, 94, 0.05)',
+                  border: '1px solid rgba(244, 63, 94, 0.25)',
+                  borderRadius: 'var(--radius-sm)',
                   padding: '1.25rem'
                 }}>
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.45rem',
-                    color: '#BE123C',
+                    color: '#FB7185',
                     fontSize: '0.82rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.04em',
                     marginBottom: '0.85rem'
                   }}>
-                    <AlertTriangle size={15} strokeWidth={2.2} />
-                    <span>Identified Gaps ({evaluationResult.missingSkills?.length || 0})</span>
+                    <AlertTriangle size={15} />
+                    <span>Missing Skills ({evaluationResult.missingSkills?.length || 0})</span>
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
                     {evaluationResult.missingSkills && evaluationResult.missingSkills.length > 0 ? (
@@ -656,81 +649,81 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                           type="button"
                           onClick={() => setSelectedMissingSkill(selectedMissingSkill === skill ? null : skill)}
                           style={{
-                            background: selectedMissingSkill === skill ? '#FFE4E6' : '#FFFFFF',
-                            border: selectedMissingSkill === skill ? '1px solid #E11D48' : '1px solid #FDA4AF',
-                            color: '#BE123C',
+                            background: selectedMissingSkill === skill ? 'rgba(244, 63, 94, 0.35)' : 'rgba(244, 63, 94, 0.16)',
+                            border: selectedMissingSkill === skill ? '1px solid #FB7185' : '1px solid rgba(244, 63, 94, 0.3)',
+                            color: '#FECACA',
                             padding: '0.25rem 0.65rem',
-                            borderRadius: '6px',
-                            fontSize: '0.8rem',
-                            fontWeight: 500,
+                            borderRadius: 'var(--radius-xs)',
+                            fontSize: '0.78rem',
+                            fontFamily: 'var(--font-mono)',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '0.35rem',
-                            transition: 'var(--transition)',
-                            boxShadow: '0 1px 2px rgba(15, 23, 42, 0.03)'
+                            transition: 'var(--transition)'
                           }}
                         >
                           <span>✕ {skill}</span>
+                          <Sparkles size={11} color="#FDA4AF" />
                         </button>
                       ))
                     ) : (
-                      <span style={{ fontSize: '0.82rem', color: '#166534' }}>100% competency match!</span>
+                      <span style={{ fontSize: '0.8rem', color: '#A7F3D0' }}>100% skill match! No gaps.</span>
                     )}
                   </div>
                   {evaluationResult.missingSkills?.length > 0 && (
-                    <div style={{ fontSize: '0.74rem', color: '#9F1239', marginTop: '0.65rem' }}>
-                      💡 Tip: Click any missing skill above to generate clinical interview recovery questions.
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.6rem' }}>
+                      💡 Tip: Click any missing skill above to generate an AI interview prep recovery strategy.
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Interactive Diagnostic Interview Prep Card */}
+              {/* Interactive AI Interview Prep Card (If missing skill clicked) */}
               {selectedMissingSkill && (
                 <div style={{
-                  background: '#F0FDFA',
-                  border: '1px solid #CCFBF1',
-                  borderRadius: '10px',
-                  padding: '1.25rem',
+                  background: 'rgba(245, 166, 35, 0.06)',
+                  border: '1px solid rgba(245, 166, 35, 0.3)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '1.15rem',
                   marginBottom: '1.35rem',
                   animation: 'fadeIn 0.2s ease-out'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.65rem' }}>
-                    <BookOpen size={16} color="var(--accent-teal)" />
-                    <span style={{ fontSize: '0.86rem', fontWeight: 700, color: 'var(--accent-teal-dark)' }}>
-                      Diagnostic Recovery Strategy for: <strong>{selectedMissingSkill}</strong>
+                    <BookOpen size={15} color="var(--accent-amber)" />
+                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--accent-amber)', fontFamily: 'var(--font-mono)' }}>
+                      [AI_STRATEGY] Gap Recovery: <strong style={{ color: '#EDEDED' }}>{selectedMissingSkill}</strong>
                     </span>
                   </div>
 
-                  <div style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
+                  <div style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
                     <div>
                       <strong style={{ color: 'var(--text-primary)' }}>Expected Technical Question: </strong>
                       {getSkillInterviewStrategy(selectedMissingSkill).keyQuestion}
                     </div>
                     <div>
-                      <strong style={{ color: 'var(--text-primary)' }}>Recommended Talking Point: </strong>
+                      <strong style={{ color: 'var(--text-primary)' }}>How to Bridge the Gap: </strong>
                       {getSkillInterviewStrategy(selectedMissingSkill).talkingPoint}
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Recruiter Clinical Finding Note */}
+              {/* Recruiter Evaluation Notes */}
               <div style={{
-                background: '#F8FAFC',
-                borderLeft: '4px solid var(--accent-teal)',
-                borderTop: '1px solid #EDF2F7',
-                borderRight: '1px solid #EDF2F7',
-                borderBottom: '1px solid #EDF2F7',
-                padding: '1.1rem 1.35rem',
-                borderRadius: '8px',
-                fontSize: '0.88rem',
+                background: '#070709',
+                borderLeft: '3px solid var(--accent-amber)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+                borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                padding: '0.9rem 1.15rem',
+                borderRadius: 'var(--radius-xs)',
+                fontSize: '0.86rem',
                 color: 'var(--text-secondary)',
-                lineHeight: 1.55
+                lineHeight: 1.5
               }}>
-                <span style={{ color: 'var(--accent-teal-dark)', fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  Recruiter Diagnostic Evaluation:
+                <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-amber)', fontSize: '0.75rem', fontWeight: 700, display: 'block', marginBottom: '0.25rem' }}>
+                  // RECRUITER_TAKEAWAY:
                 </span>
                 {evaluationResult.experienceFit}
               </div>
