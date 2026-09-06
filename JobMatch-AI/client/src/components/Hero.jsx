@@ -42,36 +42,6 @@ const Hero = () => {
   return (
     <section style={{ padding: '4.5rem 0 5rem', position: 'relative', background: 'var(--bg-primary)' }}>
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-        {/* Top Diagnostic Status Badge */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.75rem' }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.35rem 0.95rem',
-              background: 'var(--accent-teal-light)',
-              border: '1px solid rgba(15, 107, 92, 0.25)',
-              borderRadius: '4px',
-              fontSize: '0.78rem',
-              fontWeight: 600,
-              color: 'var(--accent-teal)',
-              letterSpacing: '0.01em',
-            }}
-          >
-            <span
-              style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                background: 'var(--accent-teal)',
-                display: 'inline-block',
-              }}
-            />
-            <span>Powered by Google Gemini 2.5 • semantic ATS diagnostic</span>
-          </div>
-        </div>
-
         {/* Hero Title & Subtitle */}
         <div style={{ textAlign: 'center', maxWidth: '880px', margin: '0 auto 3rem' }}>
           <h1
