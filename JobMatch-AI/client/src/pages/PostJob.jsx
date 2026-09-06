@@ -248,7 +248,7 @@ const PostJob = () => {
                 ATS requisition studio
               </span>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Powered by Gemini AI Semantic Engine
+                Powered by Gemini AI semantic engine
               </span>
             </div>
             <h1

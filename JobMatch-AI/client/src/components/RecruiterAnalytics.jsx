@@ -87,7 +87,7 @@ const RecruiterAnalytics = () => {
               Telemetry & insights
             </span>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Real-time Hiring Intelligence
+              Real-time hiring intelligence
             </span>
           </div>
           <h2 style={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.02em', margin: 0, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
@@ -110,7 +110,7 @@ const RecruiterAnalytics = () => {
           }}
         >
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--semantic-green)' }} />
-          <span>Calculated across 48 Candidate Resumes</span>
+          <span>Calculated across 48 candidate resumes</span>
         </div>
       </div>
 

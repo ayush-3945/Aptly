@@ -6,7 +6,6 @@ import {
   ArrowRight,
   Zap,
   Target,
-  Cpu,
   Terminal,
   ExternalLink,
   Sparkles,
@@ -49,7 +48,7 @@ const Hero = () => {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '0.65rem',
+              gap: '0.5rem',
               padding: '0.35rem 0.95rem',
               background: 'var(--accent-teal-light)',
               border: '1px solid rgba(15, 107, 92, 0.25)',
@@ -69,8 +68,7 @@ const Hero = () => {
                 display: 'inline-block',
               }}
             />
-            <Cpu size={13} color="var(--accent-teal)" />
-            <span>Powered by Google Gemini 2.5 • Semantic ATS Diagnostic</span>
+            <span>Powered by Google Gemini 2.5 • semantic ATS diagnostic</span>
           </div>
         </div>
 
