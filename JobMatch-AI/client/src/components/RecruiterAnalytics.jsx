@@ -1,29 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   TrendingUp,
   Sparkles,
-  Users,
   Award,
   BarChart3,
-  PieChart,
   Zap,
-  Target,
   Layers,
-  ChevronRight,
-  ShieldCheck,
-  CheckCircle2,
 } from 'lucide-react';
 
 const RecruiterAnalytics = () => {
-  const [selectedMetric, setSelectedMetric] = useState('all');
-
   // Stage Distribution Data
   const stageData = [
-    { label: 'Applied', count: 18, color: '#38BDF8', bg: 'rgba(56, 189, 248, 0.15)', pct: 37.5 },
-    { label: 'Shortlisted', count: 14, color: '#818CF8', bg: 'rgba(99, 102, 241, 0.15)', pct: 29.2 },
-    { label: 'Interview', count: 10, color: '#F59E0B', bg: 'rgba(245, 158, 11, 0.15)', pct: 20.8 },
-    { label: 'Hired', count: 4, color: '#10B981', bg: 'rgba(16, 185, 129, 0.15)', pct: 8.3 },
-    { label: 'Archived', count: 2, color: '#EF4444', bg: 'rgba(239, 68, 68, 0.15)', pct: 4.2 },
+    { label: 'Applied', count: 18, color: 'var(--accent-teal)', pct: 37.5 },
+    { label: 'Shortlisted', count: 14, color: 'var(--accent-teal-mid)', pct: 29.2 },
+    { label: 'Interview', count: 10, color: 'var(--semantic-amber)', pct: 20.8 },
+    { label: 'Hired', count: 4, color: 'var(--semantic-green)', pct: 8.3 },
+    { label: 'Archived', count: 2, color: 'var(--semantic-red)', pct: 4.2 },
   ];
 
   // Quality Tier Breakdown
@@ -32,21 +24,21 @@ const RecruiterAnalytics = () => {
       label: 'Strong Match (≥ 75%)',
       count: 30,
       percentage: 62.5,
-      color: '#10B981',
+      color: 'var(--semantic-green)',
       desc: 'High technical alignment with core required skills and experience.',
     },
     {
       label: 'Moderate Match (50% – 74%)',
       count: 14,
       percentage: 29.2,
-      color: '#F59E0B',
+      color: 'var(--semantic-amber)',
       desc: 'Solid foundations with 1–2 minor gaps in specific SDK or platform tools.',
     },
     {
       label: 'Low Match (< 50%)',
       count: 4,
       percentage: 8.3,
-      color: '#EF4444',
+      color: 'var(--semantic-red)',
       desc: 'Significant divergence from required technical stack.',
     },
   ];
@@ -88,21 +80,21 @@ const RecruiterAnalytics = () => {
                 fontSize: '0.72rem',
                 fontWeight: 700,
                 textTransform: 'uppercase',
-                letterSpacing: '0.06em',
+                letterSpacing: '0.04em',
                 padding: '0.25rem 0.65rem',
-                borderRadius: '9999px',
-                background: 'rgba(6, 182, 212, 0.15)',
-                color: '#22D3EE',
-                border: '1px solid rgba(6, 182, 212, 0.3)',
+                borderRadius: '4px',
+                background: 'var(--accent-teal-light)',
+                color: 'var(--accent-teal)',
+                border: '1px solid rgba(15, 107, 92, 0.25)',
               }}
             >
-              📊 Telemetry & Insights
+              Telemetry & Insights
             </span>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               Real-time Hiring Intelligence
             </span>
           </div>
-          <h2 style={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.02em', margin: 0 }}>
+          <h2 style={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.02em', margin: 0, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
             Talent Pipeline Analytics & Conversion
           </h2>
         </div>
@@ -111,9 +103,9 @@ const RecruiterAnalytics = () => {
         <div
           style={{
             padding: '0.45rem 0.95rem',
-            borderRadius: '10px',
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '4px',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-default)',
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem',
@@ -121,7 +113,7 @@ const RecruiterAnalytics = () => {
             color: 'var(--text-secondary)',
           }}
         >
-          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981' }} />
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--semantic-green)' }} />
           <span>Calculated across 48 Candidate Resumes</span>
         </div>
       </div>
@@ -136,7 +128,7 @@ const RecruiterAnalytics = () => {
         }}
       >
         {/* Pipeline Conversion Rate */}
-        <div className="card-glass" style={{ padding: '1.6rem', borderRadius: '16px' }}>
+        <div className="paper-card" style={{ padding: '1.6rem', borderRadius: '8px', background: 'var(--bg-card)', border: '1px solid var(--border-default)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
               Pipeline Conversion Rate
@@ -145,12 +137,12 @@ const RecruiterAnalytics = () => {
               style={{
                 width: '32px',
                 height: '32px',
-                borderRadius: '8px',
-                background: 'rgba(99, 102, 241, 0.15)',
+                borderRadius: '4px',
+                background: 'var(--accent-teal-light)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#818CF8',
+                color: 'var(--accent-teal)',
               }}
             >
               <TrendingUp size={17} />
@@ -158,7 +150,7 @@ const RecruiterAnalytics = () => {
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem' }}>
             <div style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>58.3%</div>
-            <span style={{ fontSize: '0.84rem', color: '#10B981', fontWeight: 600 }}>+8.2% vs industry</span>
+            <span style={{ fontSize: '0.84rem', color: 'var(--semantic-green)', fontWeight: 600 }}>+8.2% vs industry</span>
           </div>
           <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '0.4rem', margin: 0 }}>
             Applicants reaching Shortlist or Interview stages via ATS filtering
@@ -166,7 +158,7 @@ const RecruiterAnalytics = () => {
         </div>
 
         {/* AI Match Score Health */}
-        <div className="card-glass" style={{ padding: '1.6rem', borderRadius: '16px' }}>
+        <div className="paper-card" style={{ padding: '1.6rem', borderRadius: '8px', background: 'var(--bg-card)', border: '1px solid var(--border-default)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
               AI Match Score Health
@@ -175,20 +167,20 @@ const RecruiterAnalytics = () => {
               style={{
                 width: '32px',
                 height: '32px',
-                borderRadius: '8px',
-                background: 'rgba(245, 158, 11, 0.15)',
+                borderRadius: '4px',
+                background: 'var(--accent-teal-light)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#F59E0B',
+                color: 'var(--accent-teal)',
               }}
             >
               <Sparkles size={17} />
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem' }}>
-            <div style={{ fontSize: '2.4rem', fontWeight: 800, color: '#F59E0B' }}>81.4%</div>
-            <span style={{ fontSize: '0.84rem', color: '#10B981', fontWeight: 600 }}>Optimal Range</span>
+            <div style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--accent-teal)' }}>81.4%</div>
+            <span style={{ fontSize: '0.84rem', color: 'var(--semantic-green)', fontWeight: 600 }}>Optimal Range</span>
           </div>
           <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '0.4rem', margin: 0 }}>
             Average semantic compatibility calculated by Gemini 2.5 Flash
@@ -196,7 +188,7 @@ const RecruiterAnalytics = () => {
         </div>
 
         {/* Time-to-Shortlist Velocity */}
-        <div className="card-glass" style={{ padding: '1.6rem', borderRadius: '16px' }}>
+        <div className="paper-card" style={{ padding: '1.6rem', borderRadius: '8px', background: 'var(--bg-card)', border: '1px solid var(--border-default)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
               ATS Screening Velocity
@@ -205,20 +197,20 @@ const RecruiterAnalytics = () => {
               style={{
                 width: '32px',
                 height: '32px',
-                borderRadius: '8px',
-                background: 'rgba(16, 185, 129, 0.15)',
+                borderRadius: '4px',
+                background: 'var(--accent-teal-light)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#10B981',
+                color: 'var(--accent-teal)',
               }}
             >
               <Zap size={17} />
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem' }}>
-            <div style={{ fontSize: '2.4rem', fontWeight: 800, color: '#10B981' }}>&lt; 2.5s</div>
-            <span style={{ fontSize: '0.84rem', color: '#10B981', fontWeight: 600 }}>Real-Time</span>
+            <div style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>&lt; 2.5s</div>
+            <span style={{ fontSize: '0.84rem', color: 'var(--semantic-green)', fontWeight: 600 }}>Real-Time</span>
           </div>
           <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '0.4rem', margin: 0 }}>
             Instant PDF parsing & structured AI evaluation per candidate
@@ -236,11 +228,11 @@ const RecruiterAnalytics = () => {
         }}
       >
         {/* Stage Distribution Visualizer */}
-        <div className="card-glass" style={{ padding: '2rem', borderRadius: '20px' }}>
+        <div className="paper-card" style={{ padding: '2rem', borderRadius: '8px', background: 'var(--bg-card)', border: '1px solid var(--border-default)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.25rem' }}>
-            <BarChart3 size={20} color="var(--accent-indigo)" />
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>
-              Candidate Stage Distribution Bar
+            <BarChart3 size={20} color="var(--accent-teal)" />
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
+              Candidate Stage Distribution
             </h3>
           </div>
 
@@ -251,12 +243,11 @@ const RecruiterAnalytics = () => {
           {/* Segmented Color-Coded Progress Bar */}
           <div
             style={{
-              height: '24px',
-              borderRadius: '8px',
+              height: '18px',
+              borderRadius: '4px',
               overflow: 'hidden',
               display: 'flex',
-              background: 'rgba(255, 255, 255, 0.04)',
-              boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.4)',
+              background: 'var(--bg-secondary)',
               marginBottom: '1.5rem',
             }}
           >
@@ -287,9 +278,9 @@ const RecruiterAnalytics = () => {
                 key={idx}
                 style={{
                   padding: '0.65rem 0.85rem',
-                  borderRadius: '10px',
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  borderRadius: '4px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-default)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem',
@@ -299,7 +290,7 @@ const RecruiterAnalytics = () => {
                   style={{
                     width: '10px',
                     height: '10px',
-                    borderRadius: '3px',
+                    borderRadius: '2px',
                     backgroundColor: stage.color,
                     flexShrink: 0,
                   }}
@@ -319,10 +310,10 @@ const RecruiterAnalytics = () => {
         </div>
 
         {/* Quality Tier Breakdown */}
-        <div className="card-glass" style={{ padding: '2rem', borderRadius: '20px' }}>
+        <div className="paper-card" style={{ padding: '2rem', borderRadius: '8px', background: 'var(--bg-card)', border: '1px solid var(--border-default)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.25rem' }}>
-            <Award size={20} color="#10B981" />
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>
+            <Award size={20} color="var(--semantic-green)" />
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
               AI Match Quality Tiers
             </h3>
           </div>
@@ -346,9 +337,9 @@ const RecruiterAnalytics = () => {
                 {/* Progress bar */}
                 <div
                   style={{
-                    height: '8px',
-                    borderRadius: '9999px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                    height: '6px',
+                    borderRadius: '3px',
+                    backgroundColor: 'var(--bg-secondary)',
                     overflow: 'hidden',
                   }}
                 >
@@ -357,7 +348,7 @@ const RecruiterAnalytics = () => {
                       height: '100%',
                       width: `${tier.percentage}%`,
                       backgroundColor: tier.color,
-                      borderRadius: '9999px',
+                      borderRadius: '3px',
                       transition: 'width 0.5s ease',
                     }}
                   />
@@ -372,12 +363,12 @@ const RecruiterAnalytics = () => {
       </div>
 
       {/* Applicant Skill Frequency Cloud */}
-      <div className="card-glass" style={{ padding: '2rem', borderRadius: '20px' }}>
+      <div className="paper-card" style={{ padding: '2rem', borderRadius: '8px', background: 'var(--bg-card)', border: '1px solid var(--border-default)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <Layers size={20} color="var(--accent-cyan)" />
+            <Layers size={20} color="var(--accent-teal)" />
             <div>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
                 Candidate Skill Frequency Cloud
               </h3>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
@@ -389,9 +380,9 @@ const RecruiterAnalytics = () => {
           <span
             style={{
               padding: '0.25rem 0.65rem',
-              borderRadius: '9999px',
-              background: 'rgba(99, 102, 241, 0.15)',
-              color: '#818CF8',
+              borderRadius: '4px',
+              background: 'var(--accent-teal-light)',
+              color: 'var(--accent-teal)',
               fontSize: '0.76rem',
               fontWeight: 600,
             }}
@@ -411,14 +402,14 @@ const RecruiterAnalytics = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.6rem',
-                  padding: '0.55rem 0.95rem',
-                  borderRadius: '12px',
-                  background: isHigh ? 'rgba(99, 102, 241, 0.12)' : 'rgba(255, 255, 255, 0.03)',
-                  border: isHigh ? '1px solid rgba(99, 102, 241, 0.35)' : '1px solid rgba(255, 255, 255, 0.07)',
+                  padding: '0.45rem 0.85rem',
+                  borderRadius: '4px',
+                  background: isHigh ? 'var(--accent-teal-light)' : 'var(--bg-secondary)',
+                  border: isHigh ? '1px solid rgba(15, 107, 92, 0.25)' : '1px solid var(--border-default)',
                   transition: 'var(--transition)',
                 }}
               >
-                <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                <span style={{ fontSize: '0.88rem', fontWeight: 600, color: isHigh ? 'var(--accent-teal)' : 'var(--text-primary)' }}>
                   {skill.name}
                 </span>
 
@@ -427,16 +418,17 @@ const RecruiterAnalytics = () => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.35rem',
-                    background: 'rgba(0, 0, 0, 0.3)',
+                    background: isHigh ? 'var(--bg-card)' : 'var(--bg-card)',
                     padding: '0.15rem 0.45rem',
-                    borderRadius: '6px',
+                    borderRadius: '3px',
+                    border: '1px solid var(--border-default)',
                   }}
                 >
                   <span
                     style={{
                       fontSize: '0.78rem',
-                      fontWeight: 800,
-                      color: isHigh ? 'var(--accent-cyan)' : 'var(--text-muted)',
+                      fontWeight: 700,
+                      color: isHigh ? 'var(--accent-teal)' : 'var(--text-muted)',
                     }}
                   >
                     {skill.frequency}%

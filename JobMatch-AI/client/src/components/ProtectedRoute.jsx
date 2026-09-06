@@ -28,7 +28,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
           color: 'var(--text-secondary)',
         }}
       >
-        <Loader2 className="spin" size={36} color="var(--accent-indigo)" />
+        <Loader2 className="spin" size={36} color="var(--accent-teal)" />
         <p style={{ fontSize: '0.95rem' }}>Verifying authenticated session...</p>
       </div>
     );

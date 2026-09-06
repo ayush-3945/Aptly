@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
-  Briefcase,
   Search,
   MapPin,
-  Calendar,
   RotateCcw,
   Building2,
   Bookmark,
-  ArrowRight,
   ArrowUpDown,
   Check,
   Send,

@@ -96,12 +96,15 @@ const Login = () => {
       }}
     >
       <div
-        className="card-glass"
+        className="paper-card"
         style={{
           maxWidth: '460px',
           width: '100%',
           padding: '2.5rem 2.25rem',
-          boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.6)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-default)',
+          borderRadius: '8px',
+          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.05)',
         }}
       >
         {/* Header */}
@@ -110,18 +113,20 @@ const Login = () => {
             style={{
               width: '42px',
               height: '42px',
-              borderRadius: '4px',
-              background: 'rgba(245, 166, 35, 0.1)',
-              border: '1px solid rgba(245, 166, 35, 0.35)',
+              borderRadius: '6px',
+              background: 'var(--accent-teal-light)',
+              border: '1px solid rgba(15, 107, 92, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '0.85rem',
             }}
           >
-            <LogIn size={20} color="#F5A623" />
+            <LogIn size={20} color="var(--accent-teal)" />
           </div>
-          <h2 style={{ fontSize: '1.65rem', fontWeight: 800 }}>Welcome Back</h2>
+          <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
+            Welcome Back
+          </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginTop: '0.35rem' }}>
             Sign in to access your AI match reports and job portal
           </p>
@@ -130,11 +135,11 @@ const Login = () => {
         {/* Demo Credentials Quick-Fill Pills */}
         <div
           style={{
-            background: '#0E0E12',
-            borderRadius: '4px',
+            background: 'var(--bg-secondary)',
+            borderRadius: '6px',
             padding: '0.85rem 1rem',
             marginBottom: '1.5rem',
-            border: '1px solid var(--border-subtle)',
+            border: '1px solid var(--border-default)',
           }}
         >
           <div
@@ -145,13 +150,12 @@ const Login = () => {
               fontSize: '0.74rem',
               fontWeight: 700,
               textTransform: 'uppercase',
-              letterSpacing: '0.06em',
+              letterSpacing: '0.04em',
               color: 'var(--text-muted)',
-              fontFamily: 'var(--font-mono)',
               marginBottom: '0.6rem',
             }}
           >
-            <Zap size={13} color="var(--accent-amber)" />
+            <Zap size={13} color="var(--accent-teal)" />
             <span>1-Click Test Credentials</span>
           </div>
 
@@ -164,10 +168,10 @@ const Login = () => {
                 fontSize: '0.78rem',
                 padding: '0.45rem 0.5rem',
                 borderRadius: '4px',
-                border: '1px solid var(--border-subtle)',
-                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid var(--border-default)',
+                background: 'var(--bg-card)',
                 color: 'var(--text-primary)',
-                fontFamily: 'var(--font-mono)',
+                fontWeight: 600,
               }}
             >
               Candidate
@@ -181,10 +185,10 @@ const Login = () => {
                 fontSize: '0.78rem',
                 padding: '0.45rem 0.5rem',
                 borderRadius: '4px',
-                border: '1px solid rgba(245, 166, 35, 0.35)',
-                background: 'rgba(245, 166, 35, 0.08)',
-                color: 'var(--accent-amber)',
-                fontFamily: 'var(--font-mono)',
+                border: '1px solid rgba(15, 107, 92, 0.3)',
+                background: 'var(--accent-teal-light)',
+                color: 'var(--accent-teal)',
+                fontWeight: 600,
               }}
             >
               Recruiter
@@ -256,7 +260,7 @@ const Login = () => {
           <button
             type="submit"
             className="btn btn-primary"
-            style={{ width: '100%', padding: '0.8rem', fontSize: '1rem' }}
+            style={{ width: '100%', padding: '0.8rem', fontSize: '0.98rem' }}
             disabled={loading}
           >
             {loading ? (
@@ -276,7 +280,7 @@ const Login = () => {
         {/* Footer Navigation */}
         <div style={{ textAlign: 'center', marginTop: '1.75rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
           Don't have an account?{' '}
-          <Link to="/signup" style={{ color: 'var(--accent-indigo)', fontWeight: 600 }}>
+          <Link to="/signup" style={{ color: 'var(--accent-teal)', fontWeight: 600 }}>
             Create Account
           </Link>
         </div>

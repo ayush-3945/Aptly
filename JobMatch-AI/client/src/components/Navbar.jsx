@@ -31,8 +31,9 @@ const Navbar = () => {
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        backgroundColor: '#0A0A0A',
-        borderBottom: '1px solid var(--border-subtle)',
+        backgroundColor: '#FFFFFF',
+        borderBottom: '1px solid var(--border-default)',
+        boxShadow: '0 1px 3px rgba(20, 20, 20, 0.04)',
       }}
     >
       <div
@@ -44,19 +45,20 @@ const Navbar = () => {
           height: '68px',
         }}
       >
-        {/* Brand Logo with Custom Geometric Mark */}
+        {/* Brand Logo with Clinical Geometric Mark */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
           <Logo size={32} />
           <div>
             <span
               style={{
                 fontFamily: 'var(--font-heading)',
-                fontSize: '1.35rem',
-                fontWeight: 700,
-                letterSpacing: '-0.03em',
+                fontSize: '1.4rem',
+                fontWeight: 600,
+                letterSpacing: '-0.025em',
+                color: 'var(--text-primary)',
               }}
             >
-              Aptly<span style={{ color: 'var(--accent-amber)' }}>.AI</span>
+              Aptly<span style={{ color: 'var(--accent-teal)', fontStyle: 'italic' }}>.AI</span>
             </span>
           </div>
         </Link>
@@ -71,7 +73,7 @@ const Navbar = () => {
               gap: '0.45rem',
               fontSize: '0.9rem',
               fontWeight: 500,
-              color: isActive('/jobs') ? 'var(--accent-amber)' : 'var(--text-secondary)',
+              color: isActive('/jobs') ? 'var(--accent-teal)' : 'var(--text-secondary)',
               transition: 'var(--transition)',
             }}
           >
@@ -87,7 +89,7 @@ const Navbar = () => {
               gap: '0.45rem',
               fontSize: '0.9rem',
               fontWeight: 500,
-              color: isActive('/dashboard') ? 'var(--accent-amber)' : 'var(--text-secondary)',
+              color: isActive('/dashboard') ? 'var(--accent-teal)' : 'var(--text-secondary)',
               transition: 'var(--transition)',
             }}
           >
@@ -104,7 +106,7 @@ const Navbar = () => {
                 gap: '0.45rem',
                 fontSize: '0.9rem',
                 fontWeight: 600,
-                color: isActive('/jobs/post') ? 'var(--accent-amber)' : 'var(--text-secondary)',
+                color: isActive('/jobs/post') ? 'var(--accent-teal)' : 'var(--text-secondary)',
                 transition: 'var(--transition)',
               }}
             >
@@ -125,22 +127,21 @@ const Navbar = () => {
                   alignItems: 'center',
                   gap: '0.6rem',
                   padding: '0.3rem 0.65rem',
-                  borderRadius: '4px',
-                  backgroundColor: '#111114',
-                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '6px',
+                  backgroundColor: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-default)',
                 }}
               >
                 <div
                   style={{
                     width: '24px',
                     height: '24px',
-                    borderRadius: '3px',
-                    background: 'rgba(245, 166, 35, 0.1)',
-                    border: '1px solid rgba(245, 166, 35, 0.3)',
+                    borderRadius: '4px',
+                    background: 'var(--accent-teal-light)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: 'var(--accent-amber)',
+                    color: 'var(--accent-teal)',
                   }}
                 >
                   <User size={13} />
@@ -162,15 +163,14 @@ const Navbar = () => {
                 <span
                   style={{
                     padding: '0.15rem 0.45rem',
-                    borderRadius: '2px',
+                    borderRadius: '4px',
                     fontSize: '0.68rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.04em',
-                    fontFamily: 'var(--font-mono)',
-                    background: user.role === 'recruiter' ? 'rgba(245, 166, 35, 0.12)' : 'rgba(255, 255, 255, 0.06)',
-                    color: user.role === 'recruiter' ? 'var(--accent-amber)' : 'var(--text-muted)',
-                    border: `1px solid ${user.role === 'recruiter' ? 'rgba(245, 166, 35, 0.3)' : 'rgba(255, 255, 255, 0.1)'}`,
+                    background: user.role === 'recruiter' ? 'var(--accent-teal-light)' : '#F1F5F9',
+                    color: user.role === 'recruiter' ? 'var(--accent-teal)' : 'var(--text-secondary)',
+                    border: `1px solid ${user.role === 'recruiter' ? 'rgba(15, 107, 92, 0.25)' : 'var(--border-default)'}`,
                   }}
                 >
                   {user.role}
@@ -206,7 +206,7 @@ const Navbar = () => {
                 style={{
                   fontSize: '0.88rem',
                   padding: '0.5rem 1.05rem',
-                  borderRadius: '4px',
+                  borderRadius: '6px',
                 }}
               >
                 <span>Get Started</span>
@@ -222,6 +222,13 @@ const Navbar = () => {
           className="mobile-toggle-btn"
           aria-label={mobileOpen ? 'Close menu' : 'Open navigation menu'}
           aria-expanded={mobileOpen}
+          style={{
+            display: 'none',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            color: 'var(--text-primary)',
+          }}
         >
           {mobileOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -237,14 +244,14 @@ const Navbar = () => {
             right: 0,
             bottom: 0,
             zIndex: 99,
-            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backgroundColor: 'rgba(20, 20, 20, 0.45)',
           }}
           onClick={() => setMobileOpen(false)}
         >
           <div
             style={{
-              backgroundColor: '#0E0E12',
-              borderBottom: '1px solid var(--border-subtle)',
+              backgroundColor: '#FFFFFF',
+              borderBottom: '1px solid var(--border-default)',
               padding: '1.25rem',
               display: 'flex',
               flexDirection: 'column',
@@ -260,9 +267,9 @@ const Navbar = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '0.65rem 0.85rem',
-                  borderRadius: '4px',
-                  background: '#141418',
-                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '6px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-default)',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
@@ -270,13 +277,12 @@ const Navbar = () => {
                     style={{
                       width: '28px',
                       height: '28px',
-                      borderRadius: '3px',
-                      background: 'rgba(245, 166, 35, 0.1)',
-                      border: '1px solid rgba(245, 166, 35, 0.3)',
+                      borderRadius: '4px',
+                      background: 'var(--accent-teal-light)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: 'var(--accent-amber)',
+                      color: 'var(--accent-teal)',
                     }}
                   >
                     <User size={14} />
@@ -292,14 +298,13 @@ const Navbar = () => {
                 <span
                   style={{
                     padding: '0.15rem 0.45rem',
-                    borderRadius: '2px',
+                    borderRadius: '4px',
                     fontSize: '0.68rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
-                    fontFamily: 'var(--font-mono)',
-                    background: user.role === 'recruiter' ? 'rgba(245, 166, 35, 0.15)' : 'rgba(255, 255, 255, 0.08)',
-                    color: user.role === 'recruiter' ? 'var(--accent-amber)' : 'var(--text-muted)',
-                    border: '1px solid var(--border-subtle)',
+                    background: user.role === 'recruiter' ? 'var(--accent-teal-light)' : '#F1F5F9',
+                    color: user.role === 'recruiter' ? 'var(--accent-teal)' : 'var(--text-secondary)',
+                    border: '1px solid var(--border-default)',
                   }}
                 >
                   {user.role}
@@ -317,12 +322,12 @@ const Navbar = () => {
                   alignItems: 'center',
                   gap: '0.65rem',
                   padding: '0.75rem 0.85rem',
-                  borderRadius: '4px',
+                  borderRadius: '6px',
                   fontSize: '0.9rem',
                   fontWeight: 600,
-                  color: isActive('/jobs') ? 'var(--accent-amber)' : 'var(--text-primary)',
-                  background: isActive('/jobs') ? 'rgba(245, 166, 35, 0.08)' : 'transparent',
-                  border: `1px solid ${isActive('/jobs') ? 'rgba(245, 166, 35, 0.25)' : 'transparent'}`,
+                  color: isActive('/jobs') ? 'var(--accent-teal)' : 'var(--text-primary)',
+                  background: isActive('/jobs') ? 'var(--accent-teal-light)' : 'transparent',
+                  border: `1px solid ${isActive('/jobs') ? 'rgba(15, 107, 92, 0.25)' : 'transparent'}`,
                 }}
               >
                 <Briefcase size={16} />
@@ -337,12 +342,12 @@ const Navbar = () => {
                   alignItems: 'center',
                   gap: '0.65rem',
                   padding: '0.75rem 0.85rem',
-                  borderRadius: '4px',
+                  borderRadius: '6px',
                   fontSize: '0.9rem',
                   fontWeight: 600,
-                  color: isActive('/dashboard') ? 'var(--accent-amber)' : 'var(--text-primary)',
-                  background: isActive('/dashboard') ? 'rgba(245, 166, 35, 0.08)' : 'transparent',
-                  border: `1px solid ${isActive('/dashboard') ? 'rgba(245, 166, 35, 0.25)' : 'transparent'}`,
+                  color: isActive('/dashboard') ? 'var(--accent-teal)' : 'var(--text-primary)',
+                  background: isActive('/dashboard') ? 'var(--accent-teal-light)' : 'transparent',
+                  border: `1px solid ${isActive('/dashboard') ? 'rgba(15, 107, 92, 0.25)' : 'transparent'}`,
                 }}
               >
                 <LayoutDashboard size={16} />
@@ -358,12 +363,12 @@ const Navbar = () => {
                     alignItems: 'center',
                     gap: '0.65rem',
                     padding: '0.75rem 0.85rem',
-                    borderRadius: '4px',
+                    borderRadius: '6px',
                     fontSize: '0.9rem',
                     fontWeight: 600,
-                    color: isActive('/jobs/post') ? 'var(--accent-amber)' : 'var(--text-primary)',
-                    background: isActive('/jobs/post') ? 'rgba(245, 166, 35, 0.08)' : 'transparent',
-                    border: `1px solid ${isActive('/jobs/post') ? 'rgba(245, 166, 35, 0.25)' : 'transparent'}`,
+                    color: isActive('/jobs/post') ? 'var(--accent-teal)' : 'var(--text-primary)',
+                    background: isActive('/jobs/post') ? 'var(--accent-teal-light)' : 'transparent',
+                    border: `1px solid ${isActive('/jobs/post') ? 'rgba(15, 107, 92, 0.25)' : 'transparent'}`,
                   }}
                 >
                   <PlusCircle size={16} />
@@ -373,7 +378,7 @@ const Navbar = () => {
             </div>
 
             {/* Mobile Auth Actions */}
-            <div style={{ paddingTop: '0.75rem', borderTop: '1px solid var(--border-subtle)' }}>
+            <div style={{ paddingTop: '0.75rem', borderTop: '1px solid var(--border-default)' }}>
               {isAuthenticated && user ? (
                 <button
                   onClick={() => {
@@ -388,8 +393,8 @@ const Navbar = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '0.5rem',
-                    color: '#F87171',
-                    borderColor: 'rgba(239, 68, 68, 0.3)',
+                    color: 'var(--semantic-red)',
+                    borderColor: 'rgba(185, 28, 28, 0.3)',
                   }}
                 >
                   <LogOut size={15} />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Briefcase,
   Plus,
@@ -15,8 +15,6 @@ import {
   Loader2,
   X,
   Search,
-  ArrowRight,
-  ShieldCheck,
   TrendingUp,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -24,7 +22,6 @@ import api from '../services/api';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
 
 const RecruiterJobs = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [jobs, setJobs] = useState([]);
@@ -40,7 +37,7 @@ const RecruiterJobs = () => {
     try {
       const response = await api.get('/jobs');
       const allJobs = Array.isArray(response.data) ? response.data : [];
-      
+
       // Filter jobs where postedBy matches current user
       const userJobs = allJobs.filter((job) => {
         const postedById = typeof job.postedBy === 'object' ? job.postedBy?._id : job.postedBy;
@@ -50,8 +47,6 @@ const RecruiterJobs = () => {
       if (userJobs.length > 0) {
         setJobs(userJobs);
       } else {
-        // If recruiter hasn't posted any jobs in DB yet, provide curated recruiter demo postings
-        // so the recruiter immediately sees the active management hub
         const demoRecruiterPostings = FALLBACK_JOBS.slice(0, 3).map((job) => ({
           ...job,
           applicantCount: Math.floor(Math.random() * 12) + 4,
@@ -112,12 +107,10 @@ const RecruiterJobs = () => {
     setIsDeleting(true);
 
     try {
-      // If it's a real MongoDB job ID, call API
       if (!jobToDelete.isDemo && !jobToDelete._id.startsWith('job_fallback_')) {
         await api.delete(`/jobs/${jobToDelete._id}`);
       }
 
-      // Optimistic UI removal
       setJobs((prev) => prev.filter((j) => j._id !== jobToDelete._id));
       setNotification({
         type: 'success',
@@ -126,7 +119,6 @@ const RecruiterJobs = () => {
       setTimeout(() => setNotification(null), 4000);
     } catch (err) {
       console.error('Failed to delete job:', err);
-      // Even if network fails or mock id, remove optimistically for smooth demo
       setJobs((prev) => prev.filter((j) => j._id !== jobToDelete._id));
       setNotification({
         type: 'success',
@@ -153,11 +145,10 @@ const RecruiterJobs = () => {
             alignItems: 'center',
             gap: '0.75rem',
             padding: '1rem 1.4rem',
-            borderRadius: '12px',
-            background: 'rgba(16, 185, 129, 0.92)',
+            borderRadius: '6px',
+            background: 'var(--accent-teal)',
             color: '#FFFFFF',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
-            backdropFilter: 'blur(10px)',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
             animation: 'fadeIn 0.3s ease-out',
             maxWidth: '420px',
           }}
@@ -201,21 +192,30 @@ const RecruiterJobs = () => {
                 fontSize: '0.72rem',
                 fontWeight: 700,
                 textTransform: 'uppercase',
-                letterSpacing: '0.06em',
+                letterSpacing: '0.04em',
                 padding: '0.28rem 0.7rem',
-                borderRadius: '9999px',
-                background: 'rgba(138, 43, 226, 0.18)',
-                color: '#C084FC',
-                border: '1px solid rgba(138, 43, 226, 0.35)',
+                borderRadius: '4px',
+                background: 'var(--accent-teal-light)',
+                color: 'var(--accent-teal)',
+                border: '1px solid rgba(15, 107, 92, 0.25)',
               }}
             >
-              🏢 Recruiter Command Center
+              Recruiter Command Center
             </span>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               Logged in as <strong style={{ color: 'var(--text-primary)' }}>{user?.name}</strong>
             </span>
           </div>
-          <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '0.4rem' }}>
+          <h1
+            style={{
+              fontFamily: "'Newsreader', Georgia, serif",
+              fontSize: '2.2rem',
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              marginBottom: '0.4rem',
+              color: 'var(--text-primary)',
+            }}
+          >
             Active Requisitions & ATS Pipeline
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', maxWidth: '650px', lineHeight: 1.5 }}>
@@ -227,7 +227,7 @@ const RecruiterJobs = () => {
         <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap' }}>
           <Link
             to="/jobs"
-            className="btn btn-outline"
+            className="btn btn-secondary"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -246,7 +246,6 @@ const RecruiterJobs = () => {
               alignItems: 'center',
               gap: '0.55rem',
               padding: '0.75rem 1.4rem',
-              boxShadow: '0 4px 18px rgba(138, 43, 226, 0.45)',
             }}
           >
             <Plus size={18} />
@@ -264,23 +263,23 @@ const RecruiterJobs = () => {
           marginBottom: '2.5rem',
         }}
       >
-        <div className="card-glass" style={{ padding: '1.5rem', borderRadius: '16px' }}>
+        <div className="paper-card" style={{ padding: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
             <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Total Jobs Posted</span>
-            <Briefcase size={18} color="var(--accent-indigo)" />
+            <Briefcase size={18} color="var(--accent-teal)" />
           </div>
           <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
             {metrics.totalJobs}
           </div>
-          <div style={{ fontSize: '0.78rem', color: '#10b981', marginTop: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+          <div style={{ fontSize: '0.78rem', color: 'var(--semantic-green)', marginTop: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
             <TrendingUp size={13} /> Active & accepting applications
           </div>
         </div>
 
-        <div className="card-glass" style={{ padding: '1.5rem', borderRadius: '16px' }}>
+        <div className="paper-card" style={{ padding: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
             <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Total Applicant Pool</span>
-            <Users size={18} color="var(--accent-cyan)" />
+            <Users size={18} color="var(--accent-teal)" />
           </div>
           <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
             {metrics.totalApplicants}
@@ -290,12 +289,12 @@ const RecruiterJobs = () => {
           </div>
         </div>
 
-        <div className="card-glass" style={{ padding: '1.5rem', borderRadius: '16px' }}>
+        <div className="paper-card" style={{ padding: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
             <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Shortlisted Candidates</span>
-            <CheckCircle2 size={18} color="#10b981" />
+            <CheckCircle2 size={18} color="var(--semantic-green)" />
           </div>
-          <div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#10b981' }}>
+          <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--semantic-green)' }}>
             {metrics.totalShortlisted}
           </div>
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
@@ -303,12 +302,12 @@ const RecruiterJobs = () => {
           </div>
         </div>
 
-        <div className="card-glass" style={{ padding: '1.5rem', borderRadius: '16px' }}>
+        <div className="paper-card" style={{ padding: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
             <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Avg Gemini ATS Match</span>
-            <Sparkles size={18} color="#f59e0b" />
+            <Sparkles size={18} color="var(--accent-teal)" />
           </div>
-          <div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#f59e0b' }}>
+          <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--accent-teal)' }}>
             {metrics.avgScore}%
           </div>
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
@@ -328,73 +327,23 @@ const RecruiterJobs = () => {
           marginBottom: '1.5rem',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 700 }}>Your Active Postings</h2>
-          <span
-            style={{
-              padding: '0.2rem 0.6rem',
-              borderRadius: '9999px',
-              background: 'rgba(255, 255, 255, 0.08)',
-              fontSize: '0.78rem',
-              fontWeight: 700,
-              color: 'var(--text-secondary)',
-            }}
-          >
-            {filteredJobs.length} {filteredJobs.length === 1 ? 'Role' : 'Roles'}
-          </span>
-        </div>
-
-        {/* Search input */}
-        <div style={{ position: 'relative', width: '300px', maxWidth: '100%' }}>
-          <Search
-            size={16}
-            style={{
-              position: 'absolute',
-              left: '0.85rem',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: 'var(--text-muted)',
-              pointerEvents: 'none',
-            }}
-          />
+        <div style={{ position: 'relative', minWidth: '280px', flex: 1, maxWidth: '480px' }}>
+          <Search size={16} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="Search postings by role, skill..."
+            placeholder="Search requisitions by title, company, or skills..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="form-input"
-            style={{
-              paddingLeft: '2.4rem',
-              paddingRight: searchTerm ? '2.2rem' : '1rem',
-              fontSize: '0.88rem',
-              borderRadius: '10px',
-            }}
+            style={{ paddingLeft: '2.6rem', fontSize: '0.9rem' }}
           />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm('')}
-              style={{
-                position: 'absolute',
-                right: '0.75rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
-                display: 'flex',
-              }}
-            >
-              <X size={14} />
-            </button>
-          )}
         </div>
       </div>
 
       {/* Loading State */}
       {loading ? (
         <div
-          className="card-glass"
+          className="paper-card"
           style={{
             padding: '4rem 2rem',
             textAlign: 'center',
@@ -402,10 +351,12 @@ const RecruiterJobs = () => {
             flexDirection: 'column',
             alignItems: 'center',
             gap: '1rem',
-            borderRadius: '16px',
+            borderRadius: '8px',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-default)',
           }}
         >
-          <Loader2 className="spin" size={36} color="var(--accent-indigo)" />
+          <Loader2 className="spin" size={36} color="var(--accent-teal)" />
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
             Fetching your active job postings...
           </p>
@@ -413,34 +364,35 @@ const RecruiterJobs = () => {
       ) : filteredJobs.length === 0 ? (
         /* Empty State */
         <div
-          className="card-glass"
+          className="paper-card"
           style={{
             padding: '4rem 2rem',
             textAlign: 'center',
-            borderRadius: '20px',
+            borderRadius: '8px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             gap: '1.25rem',
-            border: '1px dashed rgba(255, 255, 255, 0.15)',
+            background: 'var(--bg-card)',
+            border: '1px dashed var(--border-default)',
           }}
         >
           <div
             style={{
               width: '64px',
               height: '64px',
-              borderRadius: '16px',
-              background: 'rgba(138, 43, 226, 0.15)',
+              borderRadius: '8px',
+              background: 'var(--accent-teal-light)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#C084FC',
+              color: 'var(--accent-teal)',
             }}
           >
             <Briefcase size={32} />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '0.4rem' }}>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
               {searchTerm ? 'No postings match your search filter' : 'No active job requisitions found'}
             </h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', maxWidth: '480px', margin: '0 auto' }}>
@@ -450,7 +402,7 @@ const RecruiterJobs = () => {
             </p>
           </div>
           {searchTerm ? (
-            <button onClick={() => setSearchTerm('')} className="btn btn-outline" style={{ padding: '0.65rem 1.4rem' }}>
+            <button onClick={() => setSearchTerm('')} className="btn btn-secondary" style={{ padding: '0.65rem 1.4rem' }}>
               Clear Search
             </button>
           ) : (
@@ -484,15 +436,16 @@ const RecruiterJobs = () => {
             return (
               <div
                 key={job._id}
-                className="card-glass"
+                className="paper-card"
                 style={{
                   padding: '1.75rem',
-                  borderRadius: '16px',
+                  borderRadius: '8px',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '1.25rem',
-                  position: 'relative',
-                  overflow: 'hidden',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-default)',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
                 }}
               >
                 {/* Header info */}
@@ -514,9 +467,8 @@ const RecruiterJobs = () => {
                           fontWeight: 700,
                           color: 'var(--text-primary)',
                           transition: 'var(--transition)',
+                          fontFamily: "'Newsreader', Georgia, serif",
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-cyan)')}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
                       >
                         {job.title}
                       </Link>
@@ -525,10 +477,10 @@ const RecruiterJobs = () => {
                           style={{
                             fontSize: '0.68rem',
                             padding: '0.15rem 0.5rem',
-                            borderRadius: '9999px',
-                            background: 'rgba(99, 102, 241, 0.18)',
-                            color: '#818cf8',
-                            border: '1px solid rgba(99, 102, 241, 0.3)',
+                            borderRadius: '4px',
+                            background: 'var(--accent-teal-light)',
+                            color: 'var(--accent-teal)',
+                            border: '1px solid rgba(15, 107, 92, 0.25)',
                             fontWeight: 600,
                           }}
                         >
@@ -548,11 +500,11 @@ const RecruiterJobs = () => {
                       }}
                     >
                       <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                        <Building2 size={15} color="var(--accent-indigo)" />
+                        <Building2 size={15} color="var(--accent-teal)" />
                         {job.company}
                       </span>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                        <MapPin size={15} color="var(--accent-cyan)" />
+                        <MapPin size={15} color="var(--accent-teal)" />
                         {job.location}
                       </span>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -572,10 +524,10 @@ const RecruiterJobs = () => {
                         fontSize: '0.75rem',
                         fontWeight: 700,
                         padding: '0.3rem 0.75rem',
-                        borderRadius: '9999px',
-                        background: 'rgba(16, 185, 129, 0.15)',
-                        color: '#10b981',
-                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                        borderRadius: '4px',
+                        background: 'rgba(45, 122, 58, 0.1)',
+                        color: 'var(--semantic-green)',
+                        border: '1px solid rgba(45, 122, 58, 0.25)',
                       }}
                     >
                       <span
@@ -583,7 +535,7 @@ const RecruiterJobs = () => {
                           width: '6px',
                           height: '6px',
                           borderRadius: '50%',
-                          background: '#10b981',
+                          background: 'var(--semantic-green)',
                         }}
                       />
                       Active & Receiving Resumes
@@ -620,11 +572,11 @@ const RecruiterJobs = () => {
                         key={idx}
                         style={{
                           padding: '0.2rem 0.65rem',
-                          borderRadius: '6px',
-                          background: 'rgba(255, 255, 255, 0.04)',
-                          border: '1px solid rgba(255, 255, 255, 0.08)',
+                          borderRadius: '4px',
+                          background: 'var(--accent-teal-light)',
+                          border: '1px solid rgba(15, 107, 92, 0.2)',
                           fontSize: '0.76rem',
-                          color: 'var(--text-secondary)',
+                          color: 'var(--accent-teal)',
                           fontWeight: 500,
                         }}
                       >
@@ -643,17 +595,17 @@ const RecruiterJobs = () => {
                     flexWrap: 'wrap',
                     gap: '1rem',
                     paddingTop: '1rem',
-                    borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+                    borderTop: '1px solid var(--border-default)',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
-                      <Users size={16} color="var(--accent-cyan)" />
+                      <Users size={16} color="var(--accent-teal)" />
                       <strong style={{ color: 'var(--text-primary)' }}>{job.applicantCount || 7}</strong>
                       <span style={{ color: 'var(--text-muted)' }}>Applicants</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
-                      <Sparkles size={16} color="#f59e0b" />
+                      <Sparkles size={16} color="var(--accent-teal)" />
                       <strong style={{ color: 'var(--text-primary)' }}>{job.avgAiScore || 82}%</strong>
                       <span style={{ color: 'var(--text-muted)' }}>Avg AI Match</span>
                     </div>
@@ -680,16 +632,15 @@ const RecruiterJobs = () => {
                     {/* View Applicants in ATS Pipeline */}
                     <Link
                       to={`/dashboard/pipeline/${job._id}`}
-                      className="btn btn-outline"
+                      className="btn btn-secondary"
                       style={{
                         padding: '0.5rem 1rem',
                         fontSize: '0.84rem',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '0.45rem',
-                        background: 'rgba(99, 102, 241, 0.08)',
-                        borderColor: 'rgba(99, 102, 241, 0.3)',
-                        color: '#818cf8',
+                        borderColor: 'rgba(15, 107, 92, 0.3)',
+                        color: 'var(--accent-teal)',
                       }}
                     >
                       <Users size={14} />
@@ -706,14 +657,8 @@ const RecruiterJobs = () => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '0.35rem',
-                        color: '#f87171',
-                        borderRadius: '8px',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
+                        color: 'var(--semantic-red)',
+                        borderRadius: '4px',
                       }}
                       title="Delete this listing"
                     >
@@ -730,30 +675,17 @@ const RecruiterJobs = () => {
 
       {/* Delete Confirmation Modal */}
       {jobToDelete && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.75)',
-            backdropFilter: 'blur(8px)',
-            padding: '1.5rem',
-          }}
-          onClick={() => !isDeleting && setJobToDelete(null)}
-        >
+        <div className="modal-overlay" onClick={() => !isDeleting && setJobToDelete(null)}>
           <div
-            className="card-glass"
+            className="paper-card"
             style={{
               width: '100%',
               maxWidth: '500px',
               padding: '2rem',
-              borderRadius: '20px',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              backgroundColor: 'rgba(15, 23, 42, 0.95)',
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6)',
+              borderRadius: '8px',
+              border: '1px solid var(--border-default)',
+              backgroundColor: 'var(--bg-card)',
+              boxShadow: '0 12px 36px rgba(0, 0, 0, 0.15)',
               animation: 'fadeIn 0.25s ease-out',
             }}
             onClick={(e) => e.stopPropagation()}
@@ -763,18 +695,18 @@ const RecruiterJobs = () => {
                 style={{
                   width: '42px',
                   height: '42px',
-                  borderRadius: '12px',
-                  background: 'rgba(239, 68, 68, 0.15)',
+                  borderRadius: '6px',
+                  background: 'rgba(185, 28, 28, 0.1)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#EF4444',
+                  color: 'var(--semantic-red)',
                 }}
               >
                 <AlertTriangle size={22} />
               </div>
               <div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
                   Delete Job Listing?
                 </h3>
                 <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
@@ -806,13 +738,14 @@ const RecruiterJobs = () => {
                 style={{
                   padding: '0.65rem 1.35rem',
                   fontSize: '0.9rem',
-                  backgroundColor: '#EF4444',
+                  backgroundColor: 'var(--semantic-red)',
                   color: '#FFFFFF',
                   fontWeight: 600,
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.45rem',
-                  boxShadow: '0 4px 14px rgba(239, 68, 68, 0.4)',
+                  borderRadius: '4px',
+                  border: 'none',
                 }}
               >
                 {isDeleting ? (

@@ -102,12 +102,15 @@ const Signup = () => {
       }}
     >
       <div
-        className="card-glass"
+        className="paper-card"
         style={{
           maxWidth: '480px',
           width: '100%',
           padding: '2.5rem 2.25rem',
-          boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.6)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-default)',
+          borderRadius: '8px',
+          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.05)',
         }}
       >
         {/* Header */}
@@ -116,18 +119,20 @@ const Signup = () => {
             style={{
               width: '42px',
               height: '42px',
-              borderRadius: '4px',
-              background: 'rgba(245, 166, 35, 0.1)',
-              border: '1px solid rgba(245, 166, 35, 0.35)',
+              borderRadius: '6px',
+              background: 'var(--accent-teal-light)',
+              border: '1px solid rgba(15, 107, 92, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '0.85rem',
             }}
           >
-            <UserPlus size={20} color="#F5A623" />
+            <UserPlus size={20} color="var(--accent-teal)" />
           </div>
-          <h2 style={{ fontSize: '1.65rem', fontWeight: 800 }}>Create Your Account</h2>
+          <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
+            Create Your Account
+          </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginTop: '0.35rem' }}>
             Get started with AI-driven job matching and ATS resume intelligence
           </p>
@@ -143,10 +148,10 @@ const Signup = () => {
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
               gap: '0.65rem',
-              background: '#0E0E12',
+              background: 'var(--bg-secondary)',
               padding: '0.35rem',
-              borderRadius: '4px',
-              border: '1px solid var(--border-subtle)',
+              borderRadius: '6px',
+              border: '1px solid var(--border-default)',
             }}
           >
             {/* Candidate Option */}
@@ -160,15 +165,21 @@ const Signup = () => {
                 justifyContent: 'center',
                 padding: '0.75rem 0.5rem',
                 borderRadius: '4px',
-                border: role === 'candidate' ? '1px solid var(--accent-amber)' : '1px solid transparent',
-                background: role === 'candidate' ? 'rgba(245, 166, 35, 0.12)' : 'transparent',
-                color: role === 'candidate' ? '#EDEDED' : 'var(--text-secondary)',
+                border: role === 'candidate' ? '1px solid var(--accent-teal)' : '1px solid transparent',
+                background: role === 'candidate' ? 'var(--accent-teal-light)' : 'transparent',
+                color: role === 'candidate' ? 'var(--accent-teal)' : 'var(--text-secondary)',
                 cursor: 'pointer',
                 transition: 'var(--transition)',
               }}
             >
               <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>🎯 Candidate</span>
-              <span style={{ fontSize: '0.74rem', color: role === 'candidate' ? 'var(--accent-amber)' : 'var(--text-muted)', marginTop: '2px', fontFamily: 'var(--font-mono)' }}>
+              <span
+                style={{
+                  fontSize: '0.74rem',
+                  color: role === 'candidate' ? 'var(--accent-teal)' : 'var(--text-muted)',
+                  marginTop: '2px',
+                }}
+              >
                 Seek roles & match resume
               </span>
             </button>
@@ -184,15 +195,21 @@ const Signup = () => {
                 justifyContent: 'center',
                 padding: '0.75rem 0.5rem',
                 borderRadius: '4px',
-                border: role === 'recruiter' ? '1px solid var(--accent-amber)' : '1px solid transparent',
-                background: role === 'recruiter' ? 'rgba(245, 166, 35, 0.12)' : 'transparent',
-                color: role === 'recruiter' ? '#EDEDED' : 'var(--text-secondary)',
+                border: role === 'recruiter' ? '1px solid var(--accent-teal)' : '1px solid transparent',
+                background: role === 'recruiter' ? 'var(--accent-teal-light)' : 'transparent',
+                color: role === 'recruiter' ? 'var(--accent-teal)' : 'var(--text-secondary)',
                 cursor: 'pointer',
                 transition: 'var(--transition)',
               }}
             >
               <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>🏢 Recruiter</span>
-              <span style={{ fontSize: '0.74rem', color: role === 'recruiter' ? 'var(--accent-amber)' : 'var(--text-muted)', marginTop: '2px', fontFamily: 'var(--font-mono)' }}>
+              <span
+                style={{
+                  fontSize: '0.74rem',
+                  color: role === 'recruiter' ? 'var(--accent-teal)' : 'var(--text-muted)',
+                  marginTop: '2px',
+                }}
+              >
                 Post jobs & screen candidates
               </span>
             </button>
@@ -284,7 +301,7 @@ const Signup = () => {
           <button
             type="submit"
             className="btn btn-primary"
-            style={{ width: '100%', padding: '0.8rem', fontSize: '1rem' }}
+            style={{ width: '100%', padding: '0.8rem', fontSize: '0.98rem' }}
             disabled={loading}
           >
             {loading ? (
@@ -304,7 +321,7 @@ const Signup = () => {
         {/* Footer Navigation */}
         <div style={{ textAlign: 'center', marginTop: '1.75rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
           Already have an account?{' '}
-          <Link to="/login" style={{ color: 'var(--accent-indigo)', fontWeight: 600 }}>
+          <Link to="/login" style={{ color: 'var(--accent-teal)', fontWeight: 600 }}>
             Sign In
           </Link>
         </div>

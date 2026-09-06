@@ -20,8 +20,6 @@ import {
   RotateCcw,
   Search,
   ExternalLink,
-  Target,
-  Award,
 } from 'lucide-react';
 import api from '../services/api';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
@@ -34,36 +32,36 @@ const PIPELINE_COLUMNS = [
     title: 'Applied',
     subtitle: 'New Submissions',
     icon: Users,
-    color: '#38BDF8',
-    accentBg: 'rgba(56, 189, 248, 0.12)',
-    borderTop: '#38BDF8',
+    color: 'var(--accent-teal)',
+    accentBg: 'var(--accent-teal-light)',
+    borderTop: 'var(--accent-teal)',
   },
   {
     id: 'shortlisted',
     title: 'Shortlisted',
     subtitle: 'High AI Alignment',
     icon: Star,
-    color: '#818CF8',
-    accentBg: 'rgba(99, 102, 241, 0.12)',
-    borderTop: '#818CF8',
+    color: 'var(--accent-teal-mid)',
+    accentBg: 'var(--accent-teal-light)',
+    borderTop: 'var(--accent-teal-mid)',
   },
   {
     id: 'interview',
     title: 'Interview',
     subtitle: 'Rounds in Progress',
     icon: MessageSquare,
-    color: '#F59E0B',
-    accentBg: 'rgba(245, 158, 11, 0.12)',
-    borderTop: '#F59E0B',
+    color: 'var(--semantic-amber)',
+    accentBg: 'rgba(180, 83, 9, 0.1)',
+    borderTop: 'var(--semantic-amber)',
   },
   {
     id: 'hired',
     title: 'Hired',
     subtitle: 'Offers Extended',
     icon: CheckCircle2,
-    color: '#10B981',
-    accentBg: 'rgba(16, 185, 129, 0.12)',
-    borderTop: '#10B981',
+    color: 'var(--semantic-green)',
+    accentBg: 'rgba(45, 122, 58, 0.1)',
+    borderTop: 'var(--semantic-green)',
   },
 ];
 
@@ -120,7 +118,6 @@ const JobApplicants = () => {
         if (Array.isArray(appRes.data) && appRes.data.length > 0) {
           setApplicants(appRes.data);
         } else {
-          // Use realistic demo archetypes
           setApplicants(getDemoApplicantsForJob(jobId));
         }
       } catch (err) {
@@ -136,7 +133,6 @@ const JobApplicants = () => {
 
   // 1-Click Status Transition Handler
   const handleTransition = async (applicationId, newStatus, candidateName) => {
-    // 1. Optimistic UI update
     setApplicants((prev) =>
       prev.map((app) => (app._id === applicationId ? { ...app, status: newStatus } : app))
     );
@@ -151,9 +147,7 @@ const JobApplicants = () => {
 
     showToast(`${candidateName || 'Candidate'} moved to ${statusLabels[newStatus] || newStatus}.`, 'success');
 
-    // 2. Network call to backend
     try {
-      // If it's a real MongoDB application ID (not starting with 'demo_')
       if (!applicationId.toString().startsWith('demo_')) {
         await api.patch(`/applications/${applicationId}/status`, { status: newStatus });
       }
@@ -166,14 +160,12 @@ const JobApplicants = () => {
   const processedApplicants = useMemo(() => {
     let list = [...applicants];
 
-    // Filter by score threshold
     if (scoreFilter === '75') {
       list = list.filter((a) => (a.aiMatchScore || 0) >= 75);
     } else if (scoreFilter === '50') {
       list = list.filter((a) => (a.aiMatchScore || 0) >= 50);
     }
 
-    // Filter by search query
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
@@ -184,7 +176,6 @@ const JobApplicants = () => {
       );
     }
 
-    // Sort
     if (sortBy === 'score') {
       list.sort((a, b) => (b.aiMatchScore || 0) - (a.aiMatchScore || 0));
     } else if (sortBy === 'date') {
@@ -241,12 +232,11 @@ const JobApplicants = () => {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.45rem',
-            color: 'var(--text-secondary)',
+            color: 'var(--accent-teal)',
             fontSize: '0.9rem',
+            fontWeight: 600,
             transition: 'var(--transition)',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
         >
           <ArrowLeft size={16} />
           <span>Back to My Postings</span>
@@ -255,13 +245,13 @@ const JobApplicants = () => {
 
       {/* Header Banner */}
       <div
-        className="card-glass"
+        className="paper-card"
         style={{
           padding: '2.25rem',
-          borderRadius: '20px',
+          borderRadius: '8px',
           marginBottom: '2rem',
-          position: 'relative',
-          overflow: 'hidden',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-default)',
         }}
       >
         <div
@@ -283,23 +273,32 @@ const JobApplicants = () => {
                   fontSize: '0.72rem',
                   fontWeight: 700,
                   textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
+                  letterSpacing: '0.04em',
                   padding: '0.25rem 0.65rem',
-                  borderRadius: '9999px',
-                  background: 'rgba(99, 102, 241, 0.18)',
-                  color: '#818CF8',
-                  border: '1px solid rgba(99, 102, 241, 0.35)',
+                  borderRadius: '4px',
+                  background: 'var(--accent-teal-light)',
+                  color: 'var(--accent-teal)',
+                  border: '1px solid rgba(15, 107, 92, 0.25)',
                 }}
               >
-                ⭐ ATS Recruiter Pipeline
+                ATS Candidate Pipeline
               </span>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Automated 1-Click State Transitions
+                Powered by Gemini 2.5 Flash
               </span>
             </div>
 
-            <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '0.4rem' }}>
-              {job ? job.title : 'Loading Job Requisition...'}
+            <h1
+              style={{
+                fontFamily: "'Newsreader', Georgia, serif",
+                fontSize: '2.2rem',
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                marginBottom: '0.4rem',
+                color: 'var(--text-primary)',
+              }}
+            >
+              {job?.title || 'Engineering Role'}
             </h1>
 
             <div
@@ -308,58 +307,70 @@ const JobApplicants = () => {
                 alignItems: 'center',
                 flexWrap: 'wrap',
                 gap: '1.25rem',
-                fontSize: '0.9rem',
+                fontSize: '0.88rem',
                 color: 'var(--text-secondary)',
               }}
             >
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <Building2 size={15} color="var(--accent-indigo)" />
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Building2 size={15} color="var(--accent-teal)" />
                 {job?.company || 'Company'}
               </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <Briefcase size={15} color="var(--accent-cyan)" />
-                {job?.location || 'Remote'}
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <Users size={15} color="#F59E0B" />
-                <strong style={{ color: 'var(--text-primary)' }}>{metrics.total}</strong> Total Candidates
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <Sparkles size={15} color="#10B981" />
-                Avg Score: <strong style={{ color: '#10B981' }}>{metrics.avgScore}%</strong>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Briefcase size={15} color="var(--accent-teal)" />
+                {job?.location || 'Location'}
               </span>
             </div>
           </div>
 
-          {/* Quick Metrics Badge Summary */}
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {/* Quick Metrics Strip */}
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <div
               style={{
                 padding: '0.75rem 1.25rem',
-                borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '6px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-default)',
                 textAlign: 'center',
+                minWidth: '100px',
               }}
             >
-              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#10B981' }}>
-                {metrics.strongMatches}
+              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                {metrics.total}
               </div>
               <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                Strong Matches
+                Total Resumes
               </div>
             </div>
 
             <div
               style={{
                 padding: '0.75rem 1.25rem',
-                borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '6px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-default)',
                 textAlign: 'center',
+                minWidth: '100px',
               }}
             >
-              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--accent-indigo)' }}>
+              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--semantic-green)' }}>
+                {metrics.strongMatches}
+              </div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                Strong Fit (≥75%)
+              </div>
+            </div>
+
+            <div
+              style={{
+                padding: '0.75rem 1.25rem',
+                borderRadius: '6px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-default)',
+                textAlign: 'center',
+                minWidth: '100px',
+              }}
+            >
+              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--accent-teal)' }}>
                 {metrics.inPipeline}
               </div>
               <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
@@ -372,16 +383,18 @@ const JobApplicants = () => {
 
       {/* AI Controls & Filter Bar */}
       <div
-        className="card-glass"
+        className="paper-card"
         style={{
           padding: '1.25rem 1.75rem',
-          borderRadius: '16px',
+          borderRadius: '8px',
           marginBottom: '2rem',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '1.25rem',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-default)',
         }}
       >
         {/* Left: AI Score Filtering Pills */}
@@ -400,124 +413,98 @@ const JobApplicants = () => {
             AI Filter:
           </span>
 
-          {[
-            { id: 'all', label: 'All Candidates' },
-            { id: '75', label: '⭐ 75%+ Strong Match' },
-            { id: '50', label: '⚡ 50%+ Moderate' },
-          ].map((pill) => {
-            const active = scoreFilter === pill.id;
-            return (
-              <button
-                key={pill.id}
-                onClick={() => setScoreFilter(pill.id)}
-                style={{
-                  padding: '0.4rem 0.85rem',
-                  borderRadius: '9999px',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'var(--transition)',
-                  border: active
-                    ? '1px solid var(--accent-indigo)'
-                    : '1px solid rgba(255, 255, 255, 0.08)',
-                  background: active ? 'rgba(99, 102, 241, 0.25)' : 'rgba(255, 255, 255, 0.03)',
-                  color: active ? '#FFFFFF' : 'var(--text-secondary)',
-                }}
-              >
-                {pill.label}
-              </button>
-            );
-          })}
+          <button
+            onClick={() => setScoreFilter('all')}
+            className={scoreFilter === 'all' ? 'btn btn-primary' : 'btn btn-secondary'}
+            style={{ fontSize: '0.78rem', padding: '0.35rem 0.85rem' }}
+          >
+            All ({applicants.length})
+          </button>
+
+          <button
+            onClick={() => setScoreFilter('75')}
+            className={scoreFilter === '75' ? 'btn btn-primary' : 'btn btn-secondary'}
+            style={{ fontSize: '0.78rem', padding: '0.35rem 0.85rem' }}
+          >
+            Strong Match ≥ 75% ({applicants.filter((a) => (a.aiMatchScore || 0) >= 75).length})
+          </button>
+
+          <button
+            onClick={() => setScoreFilter('50')}
+            className={scoreFilter === '50' ? 'btn btn-primary' : 'btn btn-secondary'}
+            style={{ fontSize: '0.78rem', padding: '0.35rem 0.85rem' }}
+          >
+            Moderate ≥ 50% ({applicants.filter((a) => (a.aiMatchScore || 0) >= 50).length})
+          </button>
         </div>
 
-        {/* Right: Search & Sort Toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.85rem' }}>
-          {/* Live Search */}
-          <div style={{ position: 'relative', width: '220px' }}>
+        {/* Right: Search Input & Sort Selector */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', minWidth: '220px' }}>
             <Search
               size={15}
               style={{
                 position: 'absolute',
-                left: '0.75rem',
+                left: '0.85rem',
                 top: '50%',
                 transform: 'translateY(-50%)',
                 color: 'var(--text-muted)',
-                pointerEvents: 'none',
               }}
             />
             <input
               type="text"
-              placeholder="Search candidate or skill..."
+              placeholder="Filter by candidate or skill..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="form-input"
               style={{
-                paddingLeft: '2.2rem',
-                paddingRight: searchQuery ? '2rem' : '0.85rem',
-                fontSize: '0.82rem',
+                paddingLeft: '2.4rem',
                 paddingTop: '0.45rem',
                 paddingBottom: '0.45rem',
-                borderRadius: '8px',
+                fontSize: '0.82rem',
               }}
             />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                style={{
-                  position: 'absolute',
-                  right: '0.65rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--text-muted)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                }}
-              >
-                <X size={13} />
-              </button>
-            )}
           </div>
 
-          {/* Sort Toggle */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              borderRadius: '8px',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              overflow: 'hidden',
-              background: 'rgba(255, 255, 255, 0.03)',
+              background: 'var(--bg-secondary)',
+              borderRadius: '6px',
+              padding: '0.2rem',
+              border: '1px solid var(--border-default)',
             }}
           >
             <button
               onClick={() => setSortBy('score')}
               style={{
-                padding: '0.45rem 0.85rem',
-                fontSize: '0.8rem',
-                fontWeight: 600,
+                padding: '0.35rem 0.75rem',
+                borderRadius: '4px',
                 border: 'none',
+                fontSize: '0.78rem',
+                fontWeight: 600,
                 cursor: 'pointer',
-                background: sortBy === 'score' ? 'rgba(99, 102, 241, 0.3)' : 'transparent',
+                background: sortBy === 'score' ? 'var(--accent-teal)' : 'transparent',
                 color: sortBy === 'score' ? '#FFFFFF' : 'var(--text-muted)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.3rem',
               }}
             >
-              <Sparkles size={13} color={sortBy === 'score' ? '#F59E0B' : 'currentColor'} />
-              Score
+              <Sparkles size={13} />
+              AI Fit
             </button>
             <button
               onClick={() => setSortBy('date')}
               style={{
-                padding: '0.45rem 0.85rem',
-                fontSize: '0.8rem',
-                fontWeight: 600,
+                padding: '0.35rem 0.75rem',
+                borderRadius: '4px',
                 border: 'none',
+                fontSize: '0.78rem',
+                fontWeight: 600,
                 cursor: 'pointer',
-                background: sortBy === 'date' ? 'rgba(99, 102, 241, 0.3)' : 'transparent',
+                background: sortBy === 'date' ? 'var(--accent-teal)' : 'transparent',
                 color: sortBy === 'date' ? '#FFFFFF' : 'var(--text-muted)',
                 display: 'flex',
                 alignItems: 'center',
@@ -534,18 +521,20 @@ const JobApplicants = () => {
       {/* Loading State */}
       {loading ? (
         <div
-          className="card-glass"
+          className="paper-card"
           style={{
             padding: '4rem 2rem',
             textAlign: 'center',
-            borderRadius: '20px',
+            borderRadius: '8px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             gap: '1rem',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-default)',
           }}
         >
-          <Loader2 className="spin" size={36} color="var(--accent-indigo)" />
+          <Loader2 className="spin" size={36} color="var(--accent-teal)" />
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
             Assembling ATS Kanban Board & Scoring Pipelines...
           </p>
@@ -556,6 +545,9 @@ const JobApplicants = () => {
           <div
             className="kanban-scroll-container"
             style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '1.25rem',
               marginBottom: '2.5rem',
             }}
           >
@@ -567,9 +559,9 @@ const JobApplicants = () => {
                 <div
                   key={col.id}
                   style={{
-                    borderRadius: '16px',
-                    background: 'rgba(15, 23, 42, 0.55)',
-                    border: '1px solid rgba(255, 255, 255, 0.07)',
+                    borderRadius: '8px',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-default)',
                     borderTop: `4px solid ${col.borderTop}`,
                     display: 'flex',
                     flexDirection: 'column',
@@ -581,8 +573,8 @@ const JobApplicants = () => {
                   <div
                     style={{
                       padding: '1.2rem 1.25rem',
-                      background: 'rgba(255, 255, 255, 0.02)',
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                      background: 'var(--bg-card)',
+                      borderBottom: '1px solid var(--border-default)',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
@@ -593,7 +585,7 @@ const JobApplicants = () => {
                         style={{
                           width: '32px',
                           height: '32px',
-                          borderRadius: '8px',
+                          borderRadius: '6px',
                           background: col.accentBg,
                           display: 'flex',
                           alignItems: 'center',
@@ -604,7 +596,7 @@ const JobApplicants = () => {
                         <IconComponent size={17} />
                       </div>
                       <div>
-                        <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: '#FFFFFF' }}>
+                        <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
                           {col.title}
                         </h3>
                         <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
@@ -616,8 +608,9 @@ const JobApplicants = () => {
                     <span
                       style={{
                         padding: '0.2rem 0.65rem',
-                        borderRadius: '9999px',
-                        background: 'rgba(255, 255, 255, 0.08)',
+                        borderRadius: '4px',
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-default)',
                         fontSize: '0.76rem',
                         fontWeight: 700,
                         color: col.color,
@@ -642,8 +635,8 @@ const JobApplicants = () => {
                         style={{
                           padding: '2.5rem 1rem',
                           textAlign: 'center',
-                          borderRadius: '12px',
-                          border: '1px dashed rgba(255, 255, 255, 0.08)',
+                          borderRadius: '6px',
+                          border: '1px dashed var(--border-default)',
                           color: 'var(--text-muted)',
                           fontSize: '0.82rem',
                         }}
@@ -668,11 +661,12 @@ const JobApplicants = () => {
 
           {/* Collapsible Rejected / Archived Tray */}
           <div
-            className="card-glass"
+            className="paper-card"
             style={{
-              borderRadius: '16px',
-              border: '1px solid rgba(239, 68, 68, 0.25)',
+              borderRadius: '8px',
+              border: '1px solid var(--border-default)',
               overflow: 'hidden',
+              background: 'var(--bg-card)',
             }}
           >
             <button
@@ -694,58 +688,61 @@ const JobApplicants = () => {
                   style={{
                     width: '32px',
                     height: '32px',
-                    borderRadius: '8px',
-                    background: 'rgba(239, 68, 68, 0.15)',
+                    borderRadius: '6px',
+                    background: 'rgba(185, 28, 28, 0.1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#EF4444',
+                    color: 'var(--semantic-red)',
                   }}
                 >
                   <XCircle size={18} />
                 </div>
                 <div>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: '#FCA5A5' }}>
-                    Archived & Rejected Candidates ({columnApplicants.rejected.length})
+                  <h4 style={{ fontSize: '0.98rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
+                    Archived / Rejected Candidates ({columnApplicants.rejected?.length || 0})
                   </h4>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    Applicants that did not meet minimum criteria or were passed over
+                  <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+                    Stored with transparent feedback for talent pool re-engagement
                   </span>
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
-                <span style={{ fontSize: '0.8rem' }}>
-                  {showRejectedTray ? 'Hide Archive' : 'View Archive'}
-                </span>
-                {showRejectedTray ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                {showRejectedTray ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
               </div>
             </button>
 
             {showRejectedTray && (
               <div
                 style={{
-                  padding: '1.25rem 1.5rem 1.75rem',
-                  borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                  gap: '1rem',
+                  padding: '1rem 1.5rem 1.5rem',
+                  borderTop: '1px solid var(--border-default)',
+                  background: 'var(--bg-secondary)',
                 }}
               >
-                {columnApplicants.rejected.length === 0 ? (
+                {columnApplicants.rejected?.length === 0 ? (
                   <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
-                    No candidates currently in the rejected archive.
+                    No candidates are currently archived or rejected.
                   </p>
                 ) : (
-                  columnApplicants.rejected.map((app) => (
-                    <CandidateCard
-                      key={app._id}
-                      application={app}
-                      onTransition={handleTransition}
-                      onViewResume={() => setSelectedCandidate(app)}
-                      isRejectedColumn
-                    />
-                  ))
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                      gap: '1rem',
+                    }}
+                  >
+                    {columnApplicants.rejected.map((app) => (
+                      <CandidateCard
+                        key={app._id}
+                        application={app}
+                        onTransition={handleTransition}
+                        onViewResume={() => setSelectedCandidate(app)}
+                        isRejectedColumn
+                      />
+                    ))}
+                  </div>
                 )}
               </div>
             )}
@@ -753,7 +750,7 @@ const JobApplicants = () => {
         </>
       )}
 
-      {/* Candidate Resume & AI Scorecard Modal */}
+      {/* Candidate Scorecard Modal */}
       {selectedCandidate && (
         <ResumeDetailModal
           candidateApp={selectedCandidate}
@@ -765,21 +762,17 @@ const JobApplicants = () => {
   );
 };
 
-/**
- * Individual Candidate Kanban Card Component
- */
-const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColumn }) => {
+const CandidateCard = ({ application, onTransition, onViewResume, _isRejectedColumn }) => {
   const candidate = application.candidate || {};
   const score = application.aiMatchScore || 0;
 
-  // Score badge coloring
-  const getScoreColor = (sc) => {
-    if (sc >= 80) return { bg: 'rgba(16, 185, 129, 0.15)', text: '#10B981', border: 'rgba(16, 185, 129, 0.35)' };
-    if (sc >= 65) return { bg: 'rgba(245, 158, 11, 0.15)', text: '#F59E0B', border: 'rgba(245, 158, 11, 0.35)' };
-    return { bg: 'rgba(239, 68, 68, 0.15)', text: '#EF4444', border: 'rgba(239, 68, 68, 0.35)' };
-  };
+  const scoreTheme =
+    score >= 75
+      ? { bg: 'rgba(45, 122, 58, 0.1)', text: 'var(--semantic-green)', border: 'rgba(45, 122, 58, 0.25)' }
+      : score >= 50
+      ? { bg: 'rgba(180, 83, 9, 0.1)', text: 'var(--semantic-amber)', border: 'rgba(180, 83, 9, 0.25)' }
+      : { bg: 'rgba(185, 28, 28, 0.1)', text: 'var(--semantic-red)', border: 'rgba(185, 28, 28, 0.25)' };
 
-  const scoreTheme = getScoreColor(score);
   const initials = candidate.name
     ? candidate.name
         .split(' ')
@@ -791,16 +784,16 @@ const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColu
 
   return (
     <div
-      className="card-glass"
+      className="paper-card"
       style={{
         padding: '1.25rem',
-        borderRadius: '14px',
+        borderRadius: '6px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '0.9rem',
-        background: 'rgba(17, 24, 39, 0.85)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.35)',
+        gap: '0.85rem',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-default)',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
         transition: 'transform 0.2s ease, border-color 0.2s ease',
       }}
     >
@@ -811,15 +804,15 @@ const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColu
             style={{
               width: '36px',
               height: '36px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(6, 182, 212, 0.35))',
+              borderRadius: '6px',
+              background: 'var(--accent-teal-light)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 700,
               fontSize: '0.85rem',
-              color: '#FFFFFF',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              color: 'var(--accent-teal)',
+              border: '1px solid rgba(15, 107, 92, 0.25)',
               flexShrink: 0,
             }}
           >
@@ -847,7 +840,7 @@ const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColu
         <div
           style={{
             padding: '0.25rem 0.6rem',
-            borderRadius: '9999px',
+            borderRadius: '4px',
             background: scoreTheme.bg,
             border: `1px solid ${scoreTheme.border}`,
             color: scoreTheme.text,
@@ -861,13 +854,13 @@ const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColu
           title={`Gemini AI Match Score: ${score}%`}
         >
           <Sparkles size={12} />
-          <span>{score}% Match</span>
+          <span>{score}% Fit</span>
         </div>
       </div>
 
       {/* Target role / Location if available */}
       {candidate.profile?.targetRole && (
-        <div style={{ fontSize: '0.78rem', color: 'var(--accent-cyan)', fontWeight: 500 }}>
+        <div style={{ fontSize: '0.78rem', color: 'var(--accent-teal)', fontWeight: 500 }}>
           {candidate.profile.targetRole}
         </div>
       )}
@@ -882,11 +875,11 @@ const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColu
                 key={idx}
                 style={{
                   padding: '0.15rem 0.5rem',
-                  borderRadius: '6px',
-                  background: 'rgba(16, 185, 129, 0.12)',
-                  border: '1px solid rgba(16, 185, 129, 0.25)',
+                  borderRadius: '3px',
+                  background: 'var(--accent-teal-light)',
+                  border: '1px solid rgba(15, 107, 92, 0.25)',
                   fontSize: '0.7rem',
-                  color: '#A7F3D0',
+                  color: 'var(--accent-teal)',
                   fontWeight: 600,
                 }}
               >
@@ -909,11 +902,11 @@ const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColu
                 key={idx}
                 style={{
                   padding: '0.15rem 0.5rem',
-                  borderRadius: '6px',
-                  background: 'rgba(239, 68, 68, 0.1)',
-                  border: '1px solid rgba(239, 68, 68, 0.2)',
+                  borderRadius: '3px',
+                  background: 'rgba(185, 28, 28, 0.08)',
+                  border: '1px solid rgba(185, 28, 28, 0.22)',
                   fontSize: '0.7rem',
-                  color: '#FCA5A5',
+                  color: 'var(--semantic-red)',
                 }}
               >
                 ✕ {skill}
@@ -935,10 +928,10 @@ const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColu
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
-            background: 'rgba(255, 255, 255, 0.02)',
+            background: 'var(--bg-primary)',
             padding: '0.5rem 0.65rem',
-            borderRadius: '8px',
-            borderLeft: '2px solid var(--accent-indigo)',
+            borderRadius: '4px',
+            borderLeft: '2px solid var(--accent-teal)',
           }}
         >
           "{application.fitSummary}"
@@ -953,7 +946,7 @@ const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColu
           alignItems: 'center',
           gap: '0.5rem',
           paddingTop: '0.65rem',
-          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+          borderTop: '1px solid var(--border-default)',
         }}
       >
         <button
@@ -966,7 +959,7 @@ const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColu
             display: 'flex',
             alignItems: 'center',
             gap: '0.3rem',
-            color: 'var(--accent-cyan)',
+            color: 'var(--accent-teal)',
           }}
         >
           <FileText size={13} />
@@ -980,10 +973,10 @@ const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColu
               onClick={() => onTransition(application._id, 'shortlisted', candidate.name)}
               style={{
                 padding: '0.35rem 0.55rem',
-                borderRadius: '6px',
-                background: 'rgba(99, 102, 241, 0.15)',
-                border: '1px solid rgba(99, 102, 241, 0.3)',
-                color: '#A5B4FC',
+                borderRadius: '4px',
+                background: 'var(--accent-teal-light)',
+                border: '1px solid rgba(15, 107, 92, 0.25)',
+                color: 'var(--accent-teal)',
                 fontSize: '0.72rem',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -1003,10 +996,10 @@ const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColu
               onClick={() => onTransition(application._id, 'interview', candidate.name)}
               style={{
                 padding: '0.35rem 0.55rem',
-                borderRadius: '6px',
-                background: 'rgba(245, 158, 11, 0.15)',
-                border: '1px solid rgba(245, 158, 11, 0.3)',
-                color: '#FCD34D',
+                borderRadius: '4px',
+                background: 'rgba(180, 83, 9, 0.1)',
+                border: '1px solid rgba(180, 83, 9, 0.25)',
+                color: 'var(--semantic-amber)',
                 fontSize: '0.72rem',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -1026,10 +1019,10 @@ const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColu
               onClick={() => onTransition(application._id, 'hired', candidate.name)}
               style={{
                 padding: '0.35rem 0.55rem',
-                borderRadius: '6px',
-                background: 'rgba(16, 185, 129, 0.15)',
-                border: '1px solid rgba(16, 185, 129, 0.3)',
-                color: '#6EE7B7',
+                borderRadius: '4px',
+                background: 'rgba(45, 122, 58, 0.1)',
+                border: '1px solid rgba(45, 122, 58, 0.25)',
+                color: 'var(--semantic-green)',
                 fontSize: '0.72rem',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -1049,10 +1042,10 @@ const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColu
               onClick={() => onTransition(application._id, 'rejected', candidate.name)}
               style={{
                 padding: '0.35rem 0.5rem',
-                borderRadius: '6px',
-                background: 'rgba(239, 68, 68, 0.12)',
-                border: '1px solid rgba(239, 68, 68, 0.25)',
-                color: '#FCA5A5',
+                borderRadius: '4px',
+                background: 'rgba(185, 28, 28, 0.08)',
+                border: '1px solid rgba(185, 28, 28, 0.22)',
+                color: 'var(--semantic-red)',
                 fontSize: '0.72rem',
                 cursor: 'pointer',
                 display: 'flex',
@@ -1067,10 +1060,10 @@ const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColu
               onClick={() => onTransition(application._id, 'applied', candidate.name)}
               style={{
                 padding: '0.35rem 0.55rem',
-                borderRadius: '6px',
-                background: 'rgba(56, 189, 248, 0.15)',
-                border: '1px solid rgba(56, 189, 248, 0.3)',
-                color: '#7DD3FC',
+                borderRadius: '4px',
+                background: 'var(--accent-teal-light)',
+                border: '1px solid rgba(15, 107, 92, 0.25)',
+                color: 'var(--accent-teal)',
                 fontSize: '0.72rem',
                 cursor: 'pointer',
                 display: 'flex',
@@ -1089,40 +1082,31 @@ const CandidateCard = ({ application, onTransition, onViewResume, isRejectedColu
   );
 };
 
-/**
- * Full Resume & ATS AI Scorecard Modal
- */
 const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
   const candidate = candidateApp.candidate || {};
   const score = candidateApp.aiMatchScore || 0;
 
+  const scoreColor =
+    score >= 75
+      ? 'var(--semantic-green)'
+      : score >= 45
+      ? 'var(--semantic-amber)'
+      : 'var(--semantic-red)';
+
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 10000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        backdropFilter: 'blur(10px)',
-        padding: '1.5rem',
-      }}
-      onClick={onClose}
-    >
+    <div className="modal-overlay" onClick={onClose}>
       <div
-        className="card-glass"
+        className="paper-card"
         style={{
           width: '100%',
           maxWidth: '680px',
           maxHeight: '90vh',
           overflowY: 'auto',
           padding: '2.5rem',
-          borderRadius: '24px',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          backgroundColor: 'rgba(13, 17, 26, 0.98)',
-          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.7)',
+          borderRadius: '8px',
+          border: '1px solid var(--border-default)',
+          backgroundColor: 'var(--bg-card)',
+          boxShadow: '0 16px 48px rgba(0, 0, 0, 0.12)',
           animation: 'fadeIn 0.25s ease-out',
         }}
         onClick={(e) => e.stopPropagation()}
@@ -1135,20 +1119,20 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
             alignItems: 'flex-start',
             marginBottom: '1.5rem',
             paddingBottom: '1.25rem',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            borderBottom: '1px solid var(--border-default)',
           }}
         >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
                 {candidate.name || 'Candidate Profile'}
               </h2>
               <span
                 style={{
                   padding: '0.2rem 0.6rem',
-                  borderRadius: '9999px',
-                  background: 'rgba(99, 102, 241, 0.2)',
-                  color: '#818CF8',
+                  borderRadius: '4px',
+                  background: 'var(--accent-teal-light)',
+                  color: 'var(--accent-teal)',
                   fontSize: '0.75rem',
                   fontWeight: 700,
                   textTransform: 'uppercase',
@@ -1165,9 +1149,9 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
           <button
             onClick={onClose}
             style={{
-              background: 'rgba(255, 255, 255, 0.05)',
+              background: 'transparent',
               border: 'none',
-              borderRadius: '8px',
+              borderRadius: '4px',
               color: 'var(--text-muted)',
               cursor: 'pointer',
               padding: '0.4rem',
@@ -1182,9 +1166,9 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
         <div
           style={{
             padding: '1.5rem',
-            borderRadius: '16px',
-            background: 'linear-gradient(135deg, rgba(138, 43, 226, 0.12), rgba(6, 182, 212, 0.12))',
-            border: '1px solid rgba(138, 43, 226, 0.3)',
+            borderRadius: '6px',
+            background: 'var(--bg-primary)',
+            border: '1px solid var(--border-default)',
             marginBottom: '1.75rem',
             display: 'flex',
             justifyContent: 'space-between',
@@ -1195,16 +1179,16 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
         >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.3rem' }}>
-              <Sparkles size={16} color="#F59E0B" />
-              <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', color: '#FCD34D' }}>
+              <Sparkles size={16} color="var(--accent-teal)" />
+              <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--accent-teal)' }}>
                 Gemini ATS Evaluation
               </span>
             </div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#FFFFFF' }}>
+            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
               {score}% Match Score
             </div>
             <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-              Recommendation Tier: <strong style={{ color: '#10B981' }}>{candidateApp.recommendation || 'Strong Match'}</strong>
+              Recommendation Tier: <strong style={{ color: scoreColor }}>{candidateApp.recommendation || 'Strong Match'}</strong>
             </span>
           </div>
 
@@ -1213,14 +1197,14 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
               width: '70px',
               height: '70px',
               borderRadius: '50%',
-              border: `4px solid ${score >= 80 ? '#10B981' : score >= 60 ? '#F59E0B' : '#EF4444'}`,
+              border: `4px solid ${scoreColor}`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 800,
               fontSize: '1.25rem',
-              color: '#FFFFFF',
-              background: 'rgba(0, 0, 0, 0.3)',
+              color: scoreColor,
+              background: 'var(--bg-card)',
             }}
           >
             {score}%
@@ -1229,7 +1213,7 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
 
         {/* Matched Skills */}
         <div style={{ marginBottom: '1.5rem' }}>
-          <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.6rem', color: '#A7F3D0' }}>
+          <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.6rem', color: 'var(--semantic-green)' }}>
             ✓ Verified Matched Skills ({candidateApp.matchedSkills?.length || 0})
           </h4>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
@@ -1239,10 +1223,10 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
                   key={idx}
                   style={{
                     padding: '0.3rem 0.75rem',
-                    borderRadius: '8px',
-                    background: 'rgba(16, 185, 129, 0.15)',
-                    border: '1px solid rgba(16, 185, 129, 0.3)',
-                    color: '#A7F3D0',
+                    borderRadius: '4px',
+                    background: 'var(--accent-teal-light)',
+                    border: '1px solid rgba(15, 107, 92, 0.25)',
+                    color: 'var(--accent-teal)',
                     fontSize: '0.8rem',
                     fontWeight: 600,
                   }}
@@ -1258,7 +1242,7 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
 
         {/* Missing / Gap Skills */}
         <div style={{ marginBottom: '1.5rem' }}>
-          <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.6rem', color: '#FCA5A5' }}>
+          <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.6rem', color: 'var(--semantic-red)' }}>
             ✕ Identified Skill Gaps ({candidateApp.missingSkills?.length || 0})
           </h4>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
@@ -1268,10 +1252,10 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
                   key={idx}
                   style={{
                     padding: '0.3rem 0.75rem',
-                    borderRadius: '8px',
-                    background: 'rgba(239, 68, 68, 0.12)',
-                    border: '1px solid rgba(239, 68, 68, 0.28)',
-                    color: '#FCA5A5',
+                    borderRadius: '4px',
+                    background: 'rgba(185, 28, 28, 0.08)',
+                    border: '1px solid rgba(185, 28, 28, 0.22)',
+                    color: 'var(--semantic-red)',
                     fontSize: '0.8rem',
                   }}
                 >
@@ -1279,7 +1263,7 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
                 </span>
               ))
             ) : (
-              <span style={{ fontSize: '0.82rem', color: '#10B981' }}>
+              <span style={{ fontSize: '0.82rem', color: 'var(--semantic-green)' }}>
                 Zero skill gaps detected! Complete technical coverage.
               </span>
             )}
@@ -1289,7 +1273,7 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
         {/* Experience Fit Evaluation */}
         {candidateApp.experienceFit && (
           <div style={{ marginBottom: '1.5rem' }}>
-            <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.45rem', color: '#93C5FD' }}>
+            <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.45rem', color: 'var(--accent-teal)' }}>
               Seniority & Experience Alignment
             </h4>
             <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', lineHeight: 1.55, margin: 0 }}>
@@ -1301,15 +1285,16 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
         {/* Recruiter Fit Summary */}
         {candidateApp.fitSummary && (
           <div style={{ marginBottom: '2rem' }}>
-            <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.45rem', color: '#FCD34D' }}>
+            <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.45rem', color: 'var(--accent-teal)' }}>
               ATS Recruiter Executive Synthesis
             </h4>
             <div
               style={{
                 padding: '1rem 1.25rem',
-                borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.06)',
+                borderRadius: '6px',
+                background: 'var(--bg-primary)',
+                border: '1px solid var(--border-default)',
+                borderLeft: '3px solid var(--accent-teal)',
                 fontSize: '0.88rem',
                 color: 'var(--text-primary)',
                 lineHeight: 1.6,
@@ -1329,7 +1314,7 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
             flexWrap: 'wrap',
             gap: '1rem',
             paddingTop: '1.25rem',
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            borderTop: '1px solid var(--border-default)',
           }}
         >
           {candidateApp.resumeUrl ? (
@@ -1337,7 +1322,7 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
               href={candidateApp.resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-outline"
+              className="btn btn-secondary"
               style={{
                 padding: '0.65rem 1.2rem',
                 fontSize: '0.85rem',
@@ -1359,13 +1344,12 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
                 onTransition(candidateApp._id, 'shortlisted', candidate.name);
                 onClose();
               }}
-              className="btn"
+              className="btn btn-secondary"
               style={{
                 padding: '0.65rem 1.15rem',
                 fontSize: '0.85rem',
-                background: 'rgba(99, 102, 241, 0.25)',
-                color: '#C7D2FE',
-                border: '1px solid rgba(99, 102, 241, 0.4)',
+                borderColor: 'rgba(15, 107, 92, 0.3)',
+                color: 'var(--accent-teal)',
               }}
             >
               ⭐ Shortlist
@@ -1375,13 +1359,12 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
                 onTransition(candidateApp._id, 'interview', candidate.name);
                 onClose();
               }}
-              className="btn"
+              className="btn btn-secondary"
               style={{
                 padding: '0.65rem 1.15rem',
                 fontSize: '0.85rem',
-                background: 'rgba(245, 158, 11, 0.25)',
-                color: '#FDE68A',
-                border: '1px solid rgba(245, 158, 11, 0.4)',
+                borderColor: 'rgba(180, 83, 9, 0.3)',
+                color: 'var(--semantic-amber)',
               }}
             >
               💬 Interview

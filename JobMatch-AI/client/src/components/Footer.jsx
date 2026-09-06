@@ -6,8 +6,8 @@ const Footer = () => {
   return (
     <footer
       style={{
-        borderTop: '1px solid var(--border-subtle)',
-        backgroundColor: '#0A0A0A',
+        borderTop: '1px solid var(--border-default)',
+        backgroundColor: 'var(--bg-secondary)',
         padding: '2.5rem 0 2rem',
         marginTop: 'auto',
       }}
@@ -32,16 +32,16 @@ const Footer = () => {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', marginBottom: '0.4rem' }}>
               <Logo size={24} />
-              <span style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '1.1rem' }}>
-                Aptly<span style={{ color: 'var(--accent-amber)' }}>.AI</span>
+              <span style={{ fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: '1.15rem', color: 'var(--text-primary)' }}>
+                Aptly<span style={{ color: 'var(--accent-teal)', fontStyle: 'italic' }}>.AI</span>
               </span>
             </div>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', maxWidth: '380px' }}>
-              Intelligent applicant tracking system powered by Google Gemini AI, replacing blind keyword filters with deep semantic resume matching.
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem', maxWidth: '420px', lineHeight: 1.55 }}>
+              Clinical talent intelligence and diagnostic ATS powered by Google Gemini AI, replacing blind keyword filters with structured semantic competency evaluations.
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <a
               href="https://github.com/ayush-3945/Aptly"
               target="_blank"
@@ -50,14 +50,14 @@ const Footer = () => {
               style={{ fontSize: '0.82rem', padding: '0.45rem 0.85rem' }}
             >
               <GitBranch size={15} />
-              <span>GitHub Repo</span>
+              <span>GitHub Repository</span>
             </a>
           </div>
         </div>
 
         <div
           style={{
-            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+            borderTop: '1px solid var(--border-default)',
             paddingTop: '1.25rem',
             display: 'flex',
             justifyContent: 'space-between',
@@ -66,13 +66,12 @@ const Footer = () => {
             gap: '1rem',
             fontSize: '0.8rem',
             color: 'var(--text-muted)',
-            fontFamily: 'var(--font-mono)',
           }}
         >
           <div>
-            © {new Date().getFullYear()} Aptly AI. Engineered by <strong style={{ color: 'var(--text-secondary)' }}>Ayush Kumar Pandey</strong>.
+            © {new Date().getFullYear()} Aptly AI. Engineered by <strong style={{ color: 'var(--text-primary)' }}>Ayush Kumar Pandey</strong>.
           </div>
-          <div style={{ display: 'flex', gap: '1rem', color: 'var(--text-muted)' }}>
+          <div style={{ display: 'flex', gap: '0.85rem', color: 'var(--text-muted)', fontSize: '0.78rem' }}>
             <span>React 19</span>
             <span>•</span>
             <span>Vite</span>

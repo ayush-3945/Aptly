@@ -24,17 +24,20 @@ const Dashboard = () => {
 
       {/* Recruiter Lifecycle Overview Section */}
       <div
-        className="card-glass"
+        className="paper-card"
         style={{
           marginTop: '3rem',
           padding: '2.5rem',
-          borderRadius: '20px',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '8px',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-default)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
-          <ShieldCheck size={24} color="var(--accent-indigo)" />
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 700 }}>ATS Candidate Evaluation Lifecycle</h2>
+          <ShieldCheck size={24} color="var(--accent-teal)" />
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
+            ATS Candidate Evaluation Lifecycle
+          </h2>
         </div>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2rem', maxWidth: '800px' }}>
           JobMatch AI uses the Gemini 2.5 Flash semantic engine to analyze incoming resumes against technical requirements, providing recruiters with instant multi-point scorecards, skill gap breakdowns, and automated status transitions.
@@ -49,19 +52,19 @@ const Dashboard = () => {
           }}
         >
           {[
-            { stage: 'Applied', count: 18, color: '#38bdf8', desc: 'Fresh submissions awaiting recruiter review' },
-            { stage: 'Shortlisted', count: 14, color: '#818cf8', desc: 'Passed automated Gemini AI match criteria' },
-            { stage: 'Interview', count: 10, color: '#f59e0b', desc: 'Technical & behavioral rounds in progress' },
-            { stage: 'Hired', count: 4, color: '#10b981', desc: 'Offer extended and accepted' },
-            { stage: 'Rejected', count: 2, color: '#ef4444', desc: 'Candidate archived with constructive feedback' },
+            { stage: 'Applied', count: 18, color: 'var(--accent-teal)', desc: 'Fresh submissions awaiting recruiter review' },
+            { stage: 'Shortlisted', count: 14, color: 'var(--accent-teal-mid)', desc: 'Passed automated Gemini AI match criteria' },
+            { stage: 'Interview', count: 10, color: 'var(--semantic-amber)', desc: 'Technical & behavioral rounds in progress' },
+            { stage: 'Hired', count: 4, color: 'var(--semantic-green)', desc: 'Offer extended and accepted' },
+            { stage: 'Rejected', count: 2, color: 'var(--semantic-red)', desc: 'Candidate archived with constructive feedback' },
           ].map((item, idx) => (
             <div
               key={idx}
               style={{
                 padding: '1.25rem',
-                borderRadius: '14px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.06)',
+                borderRadius: '6px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-default)',
                 borderTop: `3px solid ${item.color}`,
               }}
             >

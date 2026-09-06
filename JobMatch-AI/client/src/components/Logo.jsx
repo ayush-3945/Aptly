@@ -9,9 +9,9 @@ const Logo = ({ size = 30 }) => {
         justifyContent: 'center',
         width: `${size}px`,
         height: `${size}px`,
-        border: '1px solid rgba(245, 166, 35, 0.45)',
-        background: 'rgba(245, 166, 35, 0.08)',
-        borderRadius: '4px',
+        border: '1px solid rgba(15, 107, 92, 0.3)',
+        background: 'var(--accent-teal-light)',
+        borderRadius: '6px',
         flexShrink: 0,
       }}
       aria-label="Aptly.AI"
@@ -21,7 +21,7 @@ const Logo = ({ size = 30 }) => {
         height={Math.round(size * 0.62)}
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#F5A623"
+        stroke="#0F6B5C"
         strokeWidth="2.2"
         strokeLinecap="round"
         strokeLinejoin="round"

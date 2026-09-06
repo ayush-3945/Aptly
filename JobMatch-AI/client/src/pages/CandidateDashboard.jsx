@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Briefcase,
   Sparkles,
@@ -15,9 +15,7 @@ import {
   FileText,
   Building2,
   Calendar,
-  AlertCircle,
   Loader2,
-  X,
   Bookmark,
   MapPin,
 } from 'lucide-react';
@@ -67,8 +65,6 @@ const SAMPLE_APPLICATIONS = [
 ];
 
 const CandidateDashboard = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
   const { showToast } = useToast();
 
   const [applications, setApplications] = useState([]);
@@ -93,7 +89,6 @@ const CandidateDashboard = () => {
       if (Array.isArray(res.data) && res.data.length > 0) {
         setApplications(res.data);
       } else {
-        // Fallback to demo applications if fresh database
         setApplications(SAMPLE_APPLICATIONS);
       }
     } catch (err) {
@@ -107,14 +102,13 @@ const CandidateDashboard = () => {
   useEffect(() => {
     fetchApplications();
 
-    // Fetch all jobs to resolve saved job references
     const fetchAllJobs = async () => {
       try {
         const res = await api.get('/jobs');
         if (Array.isArray(res.data) && res.data.length > 0) {
           setAllJobs(res.data);
         }
-      } catch (err) {
+      } catch (_err) {
         // fallback active
       }
     };
@@ -164,7 +158,6 @@ const CandidateDashboard = () => {
       setApplications((prev) => prev.filter((a) => a._id !== withdrawModalApp._id));
     } catch (err) {
       console.warn('Withdraw API fallback (local removal):', err.message);
-      // Remove locally for demo resilience
       setApplications((prev) => prev.filter((a) => a._id !== withdrawModalApp._id));
       setActionMessage('Application withdrawn.');
       showToast('Application withdrawn.', 'info');
@@ -181,37 +174,37 @@ const CandidateDashboard = () => {
       case 'shortlisted':
         return {
           label: 'Shortlisted',
-          color: '#34D399',
-          bg: 'rgba(16, 185, 129, 0.15)',
-          border: 'rgba(16, 185, 129, 0.35)',
+          color: 'var(--semantic-green)',
+          bg: 'rgba(45, 122, 58, 0.1)',
+          border: 'rgba(45, 122, 58, 0.25)',
         };
       case 'interview':
         return {
           label: 'Interviewing',
-          color: '#C084FC',
-          bg: 'rgba(138, 43, 226, 0.15)',
-          border: 'rgba(138, 43, 226, 0.35)',
+          color: 'var(--semantic-amber)',
+          bg: 'rgba(180, 83, 9, 0.1)',
+          border: 'rgba(180, 83, 9, 0.25)',
         };
       case 'rejected':
         return {
           label: 'Not Selected',
-          color: '#F87171',
-          bg: 'rgba(239, 68, 68, 0.15)',
-          border: 'rgba(239, 68, 68, 0.35)',
+          color: 'var(--semantic-red)',
+          bg: 'rgba(185, 28, 28, 0.1)',
+          border: 'rgba(185, 28, 28, 0.25)',
         };
       case 'hired':
         return {
           label: 'Offer Extended',
-          color: '#FBBF24',
-          bg: 'rgba(245, 158, 11, 0.15)',
-          border: 'rgba(245, 158, 11, 0.35)',
+          color: 'var(--semantic-green)',
+          bg: 'rgba(45, 122, 58, 0.15)',
+          border: 'rgba(45, 122, 58, 0.3)',
         };
       default:
         return {
           label: 'Applied',
-          color: '#38BDF8',
-          bg: 'rgba(56, 189, 248, 0.15)',
-          border: 'rgba(56, 189, 248, 0.35)',
+          color: 'var(--accent-teal)',
+          bg: 'var(--accent-teal-light)',
+          border: 'rgba(15, 107, 92, 0.25)',
         };
     }
   };
@@ -231,24 +224,23 @@ const CandidateDashboard = () => {
             style={{
               width: '36px',
               height: '36px',
-              borderRadius: '10px',
-              background: 'var(--accent-gradient)',
+              borderRadius: '6px',
+              background: 'var(--accent-teal-light)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: 'var(--accent-glow)',
+              border: '1px solid rgba(15, 107, 92, 0.25)',
             }}
           >
-            <Briefcase size={18} color="#fff" />
+            <Briefcase size={18} color="var(--accent-teal)" />
           </div>
           <span
             style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: '0.88rem',
+              fontSize: '0.82rem',
               fontWeight: 700,
               textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              color: 'var(--accent-cyan)',
+              letterSpacing: '0.04em',
+              color: 'var(--accent-teal)',
             }}
           >
             Candidate Portal
@@ -257,7 +249,15 @@ const CandidateDashboard = () => {
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <h1 style={{ fontSize: '2.3rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
+            <h1
+              style={{
+                fontFamily: "'Newsreader', Georgia, serif",
+                fontSize: '2.3rem',
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                color: 'var(--text-primary)',
+              }}
+            >
               My Applications & AI Match Tracker
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginTop: '0.25rem' }}>
@@ -278,10 +278,10 @@ const CandidateDashboard = () => {
           className="animate-fade-in"
           style={{
             padding: '0.75rem 1.25rem',
-            borderRadius: 'var(--radius-sm)',
-            background: 'rgba(16, 185, 129, 0.15)',
-            border: '1px solid rgba(16, 185, 129, 0.4)',
-            color: 'var(--success)',
+            borderRadius: '4px',
+            background: 'var(--accent-teal-light)',
+            border: '1px solid rgba(15, 107, 92, 0.25)',
+            color: 'var(--accent-teal)',
             fontSize: '0.88rem',
             marginBottom: '1.5rem',
             display: 'flex',
@@ -304,14 +304,14 @@ const CandidateDashboard = () => {
         }}
       >
         {/* Total Applications */}
-        <div className="card-glass" style={{ padding: '1.5rem' }}>
+        <div className="paper-card" style={{ padding: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Total Applied
             </span>
-            <FileText size={18} color="var(--accent-indigo)" />
+            <FileText size={18} color="var(--accent-teal)" />
           </div>
-          <div style={{ fontSize: '2.4rem', fontWeight: 800, marginTop: '0.5rem' }} className="gradient-text">
+          <div style={{ fontSize: '2.4rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--text-primary)' }}>
             {metrics.total}
           </div>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
@@ -320,14 +320,14 @@ const CandidateDashboard = () => {
         </div>
 
         {/* Shortlisted Count */}
-        <div className="card-glass" style={{ padding: '1.5rem' }}>
+        <div className="paper-card" style={{ padding: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               In Pipeline
             </span>
-            <Target size={18} color="var(--success)" />
+            <Target size={18} color="var(--semantic-green)" />
           </div>
-          <div style={{ fontSize: '2.4rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--success)' }}>
+          <div style={{ fontSize: '2.4rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--semantic-green)' }}>
             {metrics.shortlisted}
           </div>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
@@ -336,14 +336,14 @@ const CandidateDashboard = () => {
         </div>
 
         {/* Average AI Match Score */}
-        <div className="card-glass" style={{ padding: '1.5rem' }}>
+        <div className="paper-card" style={{ padding: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Avg AI Match
             </span>
-            <TrendingUp size={18} color="var(--accent-cyan)" />
+            <TrendingUp size={18} color="var(--accent-teal)" />
           </div>
-          <div style={{ fontSize: '2.4rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--accent-cyan)' }}>
+          <div style={{ fontSize: '2.4rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--accent-teal)' }}>
             {metrics.avgScore}%
           </div>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
@@ -357,7 +357,7 @@ const CandidateDashboard = () => {
         style={{
           display: 'flex',
           gap: '0.85rem',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          borderBottom: '1px solid var(--border-default)',
           marginBottom: '2rem',
           paddingBottom: '0.75rem',
         }}
@@ -367,26 +367,26 @@ const CandidateDashboard = () => {
           onClick={() => setActiveTab('applications')}
           style={{
             padding: '0.65rem 1.35rem',
-            borderRadius: '10px',
+            borderRadius: '6px',
             fontSize: '0.92rem',
             fontWeight: 700,
             cursor: 'pointer',
             border:
               activeTab === 'applications'
-                ? '1px solid var(--accent-indigo)'
-                : '1px solid rgba(255, 255, 255, 0.06)',
+                ? '1px solid var(--accent-teal)'
+                : '1px solid var(--border-default)',
             background:
               activeTab === 'applications'
-                ? 'rgba(99, 102, 241, 0.22)'
-                : 'rgba(255, 255, 255, 0.02)',
-            color: activeTab === 'applications' ? '#FFFFFF' : 'var(--text-secondary)',
+                ? 'var(--accent-teal-light)'
+                : 'var(--bg-card)',
+            color: activeTab === 'applications' ? 'var(--accent-teal)' : 'var(--text-secondary)',
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem',
             transition: 'var(--transition)',
           }}
         >
-          <FileText size={17} color={activeTab === 'applications' ? '#818CF8' : 'currentColor'} />
+          <FileText size={17} color={activeTab === 'applications' ? 'var(--accent-teal)' : 'currentColor'} />
           <span>My Applications ({applications.length})</span>
         </button>
 
@@ -395,19 +395,19 @@ const CandidateDashboard = () => {
           onClick={() => setActiveTab('saved')}
           style={{
             padding: '0.65rem 1.35rem',
-            borderRadius: '10px',
+            borderRadius: '6px',
             fontSize: '0.92rem',
             fontWeight: 700,
             cursor: 'pointer',
             border:
               activeTab === 'saved'
-                ? '1px solid #F59E0B'
-                : '1px solid rgba(255, 255, 255, 0.06)',
+                ? '1px solid var(--semantic-amber)'
+                : '1px solid var(--border-default)',
             background:
               activeTab === 'saved'
-                ? 'rgba(245, 158, 11, 0.18)'
-                : 'rgba(255, 255, 255, 0.02)',
-            color: activeTab === 'saved' ? '#FFFFFF' : 'var(--text-secondary)',
+                ? 'rgba(180, 83, 9, 0.1)'
+                : 'var(--bg-card)',
+            color: activeTab === 'saved' ? 'var(--semantic-amber)' : 'var(--text-secondary)',
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem',
@@ -416,8 +416,8 @@ const CandidateDashboard = () => {
         >
           <Bookmark
             size={17}
-            fill={activeTab === 'saved' ? '#F59E0B' : 'none'}
-            color={activeTab === 'saved' ? '#F59E0B' : 'currentColor'}
+            fill={activeTab === 'saved' ? 'var(--semantic-amber)' : 'none'}
+            color={activeTab === 'saved' ? 'var(--semantic-amber)' : 'currentColor'}
           />
           <span>Saved Jobs ({savedJobs.length})</span>
         </button>
@@ -426,295 +426,300 @@ const CandidateDashboard = () => {
       {activeTab === 'applications' ? (
         /* Applications List */
         <div>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '1.25rem' }}>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '1.25rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
             Tracked Submissions ({applications.length})
           </h2>
 
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '4rem 1.5rem', color: 'var(--text-secondary)' }}>
-            <Loader2 size={36} className="spin" style={{ margin: '0 auto 1rem', color: 'var(--accent-indigo)' }} />
-            <p>Loading your application pipeline...</p>
-          </div>
-        ) : applications.length === 0 ? (
-          <div className="card-glass" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-            <Briefcase size={40} color="var(--text-muted)" style={{ margin: '0 auto 1rem' }} />
-            <h3 style={{ fontSize: '1.35rem', marginBottom: '0.5rem' }}>No Applications Yet</h3>
-            <p style={{ color: 'var(--text-secondary)', maxWidth: '420px', margin: '0 auto 1.75rem', fontSize: '0.92rem' }}>
-              You haven't applied to any roles yet. Explore our open positions and benchmark your resume against hiring requirements with Gemini AI.
-            </p>
-            <Link to="/jobs" className="btn btn-primary">
-              <Sparkles size={16} />
-              <span>Explore Jobs & Apply</span>
-            </Link>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            {applications.map((app) => {
-              const isExpanded = expandedAppId === app._id;
-              const statusBadge = getStatusBadge(app.status);
-              const jobTitle = app.job?.title || 'Engineering Position';
-              const companyName = app.job?.company || 'Technology Company';
-              const matchScore = app.aiMatchScore ?? 75;
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '4rem 1.5rem', color: 'var(--text-secondary)' }}>
+              <Loader2 size={36} className="spin" style={{ margin: '0 auto 1rem', color: 'var(--accent-teal)' }} />
+              <p>Loading your application pipeline...</p>
+            </div>
+          ) : applications.length === 0 ? (
+            <div className="paper-card" style={{ textAlign: 'center', padding: '4rem 2rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
+              <Briefcase size={40} color="var(--text-muted)" style={{ margin: '0 auto 1rem' }} />
+              <h3 style={{ fontSize: '1.35rem', marginBottom: '0.5rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>No Applications Yet</h3>
+              <p style={{ color: 'var(--text-secondary)', maxWidth: '420px', margin: '0 auto 1.75rem', fontSize: '0.92rem' }}>
+                You haven't applied to any roles yet. Explore our open positions and benchmark your resume against hiring requirements with Gemini AI.
+              </p>
+              <Link to="/jobs" className="btn btn-primary">
+                <Sparkles size={16} />
+                <span>Explore Jobs & Apply</span>
+              </Link>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              {applications.map((app) => {
+                const isExpanded = expandedAppId === app._id;
+                const statusBadge = getStatusBadge(app.status);
+                const jobTitle = app.job?.title || 'Engineering Position';
+                const companyName = app.job?.company || 'Technology Company';
+                const matchScore = app.aiMatchScore ?? 75;
 
-              return (
-                <div
-                  key={app._id}
-                  className="card-glass"
-                  style={{
-                    padding: '1.75rem',
-                    transition: 'var(--transition)',
-                  }}
-                >
-                  {/* Top Card Row */}
+                return (
                   <div
+                    key={app._id}
+                    className="paper-card"
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      flexWrap: 'wrap',
-                      gap: '1rem',
-                      marginBottom: '1rem',
+                      padding: '1.75rem',
+                      background: 'var(--bg-card)',
+                      border: '1px solid var(--border-default)',
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
                     }}
                   >
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                        <Building2 size={15} color="var(--accent-indigo)" />
-                        <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                          {companyName}
-                        </span>
-                        <span style={{ color: 'var(--border-subtle)' }}>•</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                          <Calendar size={12} />
-                          <span>Applied on {formatDate(app.appliedAt)}</span>
-                        </div>
-                      </div>
-
-                      <h3 style={{ fontSize: '1.3rem', fontWeight: 700 }}>
-                        {app.job?._id ? (
-                          <Link
-                            to={`/jobs/${app.job._id}`}
-                            style={{ color: 'inherit', textDecoration: 'none' }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-cyan)')}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = 'inherit')}
-                          >
-                            {jobTitle}
-                          </Link>
-                        ) : (
-                          jobTitle
-                        )}
-                      </h3>
-                    </div>
-
-                    {/* Status Pill & AI Score Badge */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-                      {/* Application Status */}
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.35rem',
-                          padding: '0.3rem 0.85rem',
-                          borderRadius: 'var(--radius-full)',
-                          fontSize: '0.78rem',
-                          fontWeight: 700,
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.04em',
-                          color: statusBadge.color,
-                          backgroundColor: statusBadge.bg,
-                          border: `1px solid ${statusBadge.border}`,
-                        }}
-                      >
-                        <Clock size={12} />
-                        <span>{statusBadge.label}</span>
-                      </span>
-
-                      {/* AI Match Gauge */}
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.45rem',
-                          background: 'rgba(255, 255, 255, 0.04)',
-                          border: '1px solid var(--border-subtle)',
-                          padding: '0.3rem 0.75rem',
-                          borderRadius: 'var(--radius-full)',
-                        }}
-                      >
-                        <Sparkles size={14} color="var(--accent-cyan)" />
-                        <span style={{ fontSize: '0.85rem', fontWeight: 800 }} className="gradient-text">
-                          {matchScore}% Match
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Quick Summary Preview */}
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.25rem', lineHeight: 1.5 }}>
-                    {app.fitSummary || 'Resume processed through Gemini ATS semantic evaluation engine.'}
-                  </p>
-
-                  {/* Card Bottom Controls */}
-                  <div
-                    style={{
-                      borderTop: '1px solid var(--border-subtle)',
-                      paddingTop: '0.95rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      flexWrap: 'wrap',
-                      gap: '0.75rem',
-                    }}
-                  >
-                    {/* Toggle Details Accordion */}
-                    <button
-                      onClick={() => toggleAccordion(app._id)}
-                      className="btn btn-ghost"
-                      style={{
-                        padding: '0.35rem 0.65rem',
-                        fontSize: '0.85rem',
-                        color: isExpanded ? 'var(--accent-cyan)' : 'var(--text-secondary)',
-                      }}
-                    >
-                      <span>{isExpanded ? 'Hide AI Match Breakdown' : 'View AI Match Details'}</span>
-                      {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-                    </button>
-
-                    {/* Withdraw Application */}
-                    <button
-                      onClick={() => setWithdrawModalApp(app)}
-                      className="btn btn-ghost"
-                      style={{
-                        padding: '0.35rem 0.65rem',
-                        fontSize: '0.82rem',
-                        color: 'var(--danger)',
-                      }}
-                    >
-                      <Trash2 size={14} />
-                      <span>Withdraw Application</span>
-                    </button>
-                  </div>
-
-                  {/* Expandable Accordion: Full AI Scorecard */}
-                  {isExpanded && (
+                    {/* Top Card Row */}
                     <div
-                      className="animate-fade-in"
                       style={{
-                        marginTop: '1.25rem',
-                        padding: '1.25rem',
-                        borderRadius: 'var(--radius-sm)',
-                        backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                        border: '1px solid var(--border-subtle)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: '1rem',
+                        marginBottom: '1rem',
                       }}
                     >
-                      {/* Recommendation & Seniority Fit */}
-                      <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                        <span
-                          className={`badge ${
-                            matchScore >= 75
-                              ? 'badge-strong'
-                              : matchScore >= 45
-                              ? 'badge-moderate'
-                              : 'badge-low'
-                          }`}
-                        >
-                          {app.recommendation || (matchScore >= 75 ? 'Strong Match' : 'Moderate Match')}
-                        </span>
-                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                          {app.experienceFit || 'Candidate experience verified against job requirements.'}
-                        </span>
-                      </div>
-
-                      {/* Skills Grid */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                        {/* Matched Skills */}
-                        <div style={{ background: 'rgba(16, 185, 129, 0.05)', padding: '0.85rem', borderRadius: '6px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-                          <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--success)', marginBottom: '0.45rem', textTransform: 'uppercase' }}>
-                            Matched Skills ({app.matchedSkills?.length || 0})
-                          </div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
-                            {app.matchedSkills && app.matchedSkills.length > 0 ? (
-                              app.matchedSkills.map((s, idx) => (
-                                <span
-                                  key={idx}
-                                  style={{
-                                    padding: '0.15rem 0.5rem',
-                                    borderRadius: '4px',
-                                    fontSize: '0.72rem',
-                                    fontWeight: 600,
-                                    background: 'rgba(16, 185, 129, 0.2)',
-                                    color: '#A7F3D0',
-                                  }}
-                                >
-                                  {s}
-                                </span>
-                              ))
-                            ) : (
-                              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>None extracted</span>
-                            )}
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                          <Building2 size={15} color="var(--accent-teal)" />
+                          <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                            {companyName}
+                          </span>
+                          <span style={{ color: 'var(--border-default)' }}>•</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                            <Calendar size={12} />
+                            <span>Applied on {formatDate(app.appliedAt)}</span>
                           </div>
                         </div>
 
-                        {/* Missing Skills */}
-                        <div style={{ background: 'rgba(239, 68, 68, 0.05)', padding: '0.85rem', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-                          <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--danger)', marginBottom: '0.45rem', textTransform: 'uppercase' }}>
-                            Missing / Desired Skills ({app.missingSkills?.length || 0})
-                          </div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
-                            {app.missingSkills && app.missingSkills.length > 0 ? (
-                              app.missingSkills.map((s, idx) => (
-                                <span
-                                  key={idx}
-                                  style={{
-                                    padding: '0.15rem 0.5rem',
-                                    borderRadius: '4px',
-                                    fontSize: '0.72rem',
-                                    fontWeight: 600,
-                                    background: 'rgba(239, 68, 68, 0.2)',
-                                    color: '#FECACA',
-                                  }}
-                                >
-                                  {s}
-                                </span>
-                              ))
-                            ) : (
-                              <span style={{ fontSize: '0.78rem', color: '#A7F3D0' }}>100% skill alignment</span>
-                            )}
-                          </div>
+                        <h3 style={{ fontSize: '1.3rem', fontWeight: 700, fontFamily: "'Newsreader', Georgia, serif" }}>
+                          {app.job?._id ? (
+                            <Link
+                              to={`/jobs/${app.job._id}`}
+                              style={{ color: 'var(--text-primary)', textDecoration: 'none' }}
+                            >
+                              {jobTitle}
+                            </Link>
+                          ) : (
+                            jobTitle
+                          )}
+                        </h3>
+                      </div>
+
+                      {/* Status Pill & AI Score Badge */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                        {/* Application Status */}
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.35rem',
+                            padding: '0.3rem 0.85rem',
+                            borderRadius: '4px',
+                            fontSize: '0.78rem',
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.04em',
+                            color: statusBadge.color,
+                            backgroundColor: statusBadge.bg,
+                            border: `1px solid ${statusBadge.border}`,
+                          }}
+                        >
+                          <Clock size={12} />
+                          <span>{statusBadge.label}</span>
+                        </span>
+
+                        {/* AI Match Gauge */}
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.45rem',
+                            background: 'var(--accent-teal-light)',
+                            border: '1px solid rgba(15, 107, 92, 0.25)',
+                            padding: '0.3rem 0.75rem',
+                            borderRadius: '4px',
+                          }}
+                        >
+                          <Sparkles size={14} color="var(--accent-teal)" />
+                          <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--accent-teal)' }}>
+                            {matchScore}% Fit
+                          </span>
                         </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+
+                    {/* Quick Summary Preview */}
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+                      {app.fitSummary || 'Resume processed through Gemini ATS semantic evaluation engine.'}
+                    </p>
+
+                    {/* Card Bottom Controls */}
+                    <div
+                      style={{
+                        borderTop: '1px solid var(--border-default)',
+                        paddingTop: '0.95rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: '0.75rem',
+                      }}
+                    >
+                      {/* Toggle Details Accordion */}
+                      <button
+                        onClick={() => toggleAccordion(app._id)}
+                        className="btn btn-ghost"
+                        style={{
+                          padding: '0.35rem 0.65rem',
+                          fontSize: '0.85rem',
+                          color: isExpanded ? 'var(--accent-teal)' : 'var(--text-secondary)',
+                        }}
+                      >
+                        <span>{isExpanded ? 'Hide AI Match Breakdown' : 'View AI Match Details'}</span>
+                        {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+                      </button>
+
+                      {/* Withdraw Application */}
+                      <button
+                        onClick={() => setWithdrawModalApp(app)}
+                        className="btn btn-ghost"
+                        style={{
+                          padding: '0.35rem 0.65rem',
+                          fontSize: '0.82rem',
+                          color: 'var(--semantic-red)',
+                        }}
+                      >
+                        <Trash2 size={14} />
+                        <span>Withdraw Application</span>
+                      </button>
+                    </div>
+
+                    {/* Expandable Accordion: Full AI Scorecard */}
+                    {isExpanded && (
+                      <div
+                        className="animate-fade-in"
+                        style={{
+                          marginTop: '1.25rem',
+                          padding: '1.25rem',
+                          borderRadius: '6px',
+                          backgroundColor: 'var(--bg-primary)',
+                          border: '1px solid var(--border-default)',
+                        }}
+                      >
+                        {/* Recommendation & Seniority Fit */}
+                        <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                          <span
+                            style={{
+                              fontSize: '0.78rem',
+                              fontWeight: 700,
+                              padding: '0.2rem 0.6rem',
+                              borderRadius: '4px',
+                              background: matchScore >= 75 ? 'rgba(45, 122, 58, 0.1)' : 'rgba(180, 83, 9, 0.1)',
+                              color: matchScore >= 75 ? 'var(--semantic-green)' : 'var(--semantic-amber)',
+                              border: `1px solid ${matchScore >= 75 ? 'rgba(45, 122, 58, 0.25)' : 'rgba(180, 83, 9, 0.25)'}`,
+                            }}
+                          >
+                            {app.recommendation || (matchScore >= 75 ? 'Strong Match' : 'Moderate Match')}
+                          </span>
+                          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                            {app.experienceFit || 'Candidate experience verified against job requirements.'}
+                          </span>
+                        </div>
+
+                        {/* Skills Grid */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+                          {/* Matched Skills */}
+                          <div style={{ background: 'var(--bg-card)', padding: '0.85rem', borderRadius: '6px', border: '1px solid var(--border-default)' }}>
+                            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--semantic-green)', marginBottom: '0.45rem', textTransform: 'uppercase' }}>
+                              Matched Skills ({app.matchedSkills?.length || 0})
+                            </div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
+                              {app.matchedSkills && app.matchedSkills.length > 0 ? (
+                                app.matchedSkills.map((s, idx) => (
+                                  <span
+                                    key={idx}
+                                    style={{
+                                      padding: '0.15rem 0.5rem',
+                                      borderRadius: '3px',
+                                      fontSize: '0.72rem',
+                                      fontWeight: 500,
+                                      background: 'var(--accent-teal-light)',
+                                      color: 'var(--accent-teal)',
+                                      border: '1px solid rgba(15, 107, 92, 0.2)',
+                                    }}
+                                  >
+                                    ✓ {s}
+                                  </span>
+                                ))
+                              ) : (
+                                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>None extracted</span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Missing Skills */}
+                          <div style={{ background: 'var(--bg-card)', padding: '0.85rem', borderRadius: '6px', border: '1px solid var(--border-default)' }}>
+                            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--semantic-red)', marginBottom: '0.45rem', textTransform: 'uppercase' }}>
+                              Missing / Desired Skills ({app.missingSkills?.length || 0})
+                            </div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
+                              {app.missingSkills && app.missingSkills.length > 0 ? (
+                                app.missingSkills.map((s, idx) => (
+                                  <span
+                                    key={idx}
+                                    style={{
+                                      padding: '0.15rem 0.5rem',
+                                      borderRadius: '3px',
+                                      fontSize: '0.72rem',
+                                      fontWeight: 500,
+                                      background: 'rgba(185, 28, 28, 0.08)',
+                                      color: 'var(--semantic-red)',
+                                      border: '1px solid rgba(185, 28, 28, 0.2)',
+                                    }}
+                                  >
+                                    ✕ {s}
+                                  </span>
+                                ))
+                              ) : (
+                                <span style={{ fontSize: '0.78rem', color: 'var(--semantic-green)' }}>100% skill alignment</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       ) : (
         /* Saved Jobs View */
         <div>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '1.25rem' }}>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '1.25rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
             Saved Opportunities ({savedJobs.length})
           </h2>
 
           {savedJobs.length === 0 ? (
-            <div className="card-glass" style={{ textAlign: 'center', padding: '4rem 2rem', borderRadius: '16px' }}>
+            <div className="paper-card" style={{ textAlign: 'center', padding: '4rem 2rem', borderRadius: '8px', background: 'var(--bg-card)', border: '1px solid var(--border-default)' }}>
               <div
                 style={{
                   width: '56px',
                   height: '56px',
-                  borderRadius: '16px',
-                  background: 'rgba(245, 158, 11, 0.12)',
+                  borderRadius: '8px',
+                  background: 'rgba(180, 83, 9, 0.1)',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#F59E0B',
+                  color: 'var(--semantic-amber)',
                   marginBottom: '1rem',
                 }}
               >
                 <Bookmark size={28} />
               </div>
-              <h3 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
                 No Bookmarked Positions Yet
               </h3>
               <p style={{ color: 'var(--text-secondary)', maxWidth: '440px', margin: '0 auto 1.5rem', fontSize: '0.92rem' }}>
@@ -730,13 +735,16 @@ const CandidateDashboard = () => {
               {savedJobs.map((job) => (
                 <div
                   key={job._id}
-                  className="card-glass"
+                  className="paper-card"
                   style={{
                     padding: '1.75rem',
-                    borderRadius: '16px',
+                    borderRadius: '8px',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '1rem',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-default)',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
                   }}
                 >
                   <div
@@ -756,10 +764,8 @@ const CandidateDashboard = () => {
                             fontSize: '1.25rem',
                             fontWeight: 700,
                             color: 'var(--text-primary)',
-                            transition: 'var(--transition)',
+                            fontFamily: "'Newsreader', Georgia, serif",
                           }}
-                          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-cyan)')}
-                          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
                         >
                           {job.title}
                         </Link>
@@ -775,11 +781,11 @@ const CandidateDashboard = () => {
                         }}
                       >
                         <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                          <Building2 size={14} color="var(--accent-indigo)" />
+                          <Building2 size={14} color="var(--accent-teal)" />
                           {job.company}
                         </span>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                          <MapPin size={14} color="var(--accent-cyan)" />
+                          <MapPin size={14} color="var(--accent-teal)" />
                           {job.location}
                         </span>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
@@ -805,12 +811,12 @@ const CandidateDashboard = () => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '0.35rem',
-                        color: '#F59E0B',
-                        borderRadius: '8px',
+                        color: 'var(--semantic-amber)',
+                        borderRadius: '4px',
                       }}
                       title="Remove from saved jobs"
                     >
-                      <Bookmark size={15} fill="#F59E0B" />
+                      <Bookmark size={15} fill="var(--semantic-amber)" />
                       <span>Bookmarked</span>
                     </button>
                   </div>
@@ -842,11 +848,11 @@ const CandidateDashboard = () => {
                           key={idx}
                           style={{
                             padding: '0.15rem 0.55rem',
-                            borderRadius: '6px',
-                            background: 'rgba(255, 255, 255, 0.04)',
-                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            borderRadius: '4px',
+                            background: 'var(--accent-teal-light)',
+                            border: '1px solid rgba(15, 107, 92, 0.2)',
                             fontSize: '0.75rem',
-                            color: 'var(--text-secondary)',
+                            color: 'var(--accent-teal)',
                             fontWeight: 500,
                           }}
                         >
@@ -864,7 +870,7 @@ const CandidateDashboard = () => {
                       flexWrap: 'wrap',
                       gap: '0.75rem',
                       paddingTop: '0.85rem',
-                      borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+                      borderTop: '1px solid var(--border-default)',
                     }}
                   >
                     <Link
@@ -909,27 +915,17 @@ const CandidateDashboard = () => {
 
       {/* Confirmation Modal for Application Withdrawal */}
       {withdrawModalApp && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 999,
-            backgroundColor: 'rgba(3, 7, 18, 0.82)',
-            backdropFilter: 'blur(10px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '1.5rem',
-          }}
-          onClick={() => setWithdrawModalApp(null)}
-        >
+        <div className="modal-overlay" onClick={() => setWithdrawModalApp(null)}>
           <div
-            className="card-glass animate-fade-in"
+            className="paper-card animate-fade-in"
             style={{
               maxWidth: '440px',
               width: '100%',
               padding: '2rem',
-              backgroundColor: 'var(--bg-secondary)',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-default)',
+              borderRadius: '8px',
+              boxShadow: '0 16px 48px rgba(0, 0, 0, 0.12)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -938,9 +934,9 @@ const CandidateDashboard = () => {
                 style={{
                   width: '48px',
                   height: '48px',
-                  borderRadius: '12px',
-                  background: 'rgba(239, 68, 68, 0.15)',
-                  color: 'var(--danger)',
+                  borderRadius: '6px',
+                  background: 'rgba(185, 28, 28, 0.1)',
+                  color: 'var(--semantic-red)',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -949,7 +945,9 @@ const CandidateDashboard = () => {
               >
                 <AlertTriangle size={24} />
               </div>
-              <h3 style={{ fontSize: '1.3rem', fontWeight: 700 }}>Withdraw Application?</h3>
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
+                Withdraw Application?
+              </h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginTop: '0.35rem', lineHeight: 1.5 }}>
                 Are you sure you want to withdraw your application for <strong>{withdrawModalApp.job?.title}</strong>? This action cannot be undone.
               </p>
@@ -970,9 +968,13 @@ const CandidateDashboard = () => {
                 onClick={handleConfirmWithdraw}
                 className="btn"
                 style={{
-                  backgroundColor: 'var(--danger)',
+                  backgroundColor: 'var(--semantic-red)',
                   color: '#fff',
                   fontSize: '0.9rem',
+                  border: 'none',
+                  borderRadius: '4px',
+                  padding: '0.5rem 1rem',
+                  fontWeight: 600,
                 }}
                 disabled={Boolean(withdrawingId)}
               >

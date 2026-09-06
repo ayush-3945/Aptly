@@ -48,7 +48,7 @@ CloudPulse AI Systems is building next-generation intelligent HR and hiring plat
 Key Responsibilities:
 • Design and build scalable Node.js microservices and RESTful APIs connecting to MongoDB clusters.
 • Integrate Google Gemini foundation models (Gemini 2.5 Flash) for automated resume analysis, skill gap detection, and ATS compatibility scoring.
-• Develop reactive, high-performance user interfaces using React 19, modern CSS Glassmorphism, and Vite.
+• Develop reactive, high-performance user interfaces using React 19 and modern CSS.
 • Architect background job processing and secure multipart PDF parsing pipelines using Multer and pdf-parse.
 • Partner with product and engineering leaders to uphold 99.9% uptime, write automated tests, and optimize database aggregations.
 
@@ -149,9 +149,9 @@ const PostJob = () => {
       showToast('Please add at least one required technical skill.', 'warning');
       return;
     }
-    if (!description.trim() || description.trim().length < 40) {
-      setError('Please provide a comprehensive job description (minimum 40 characters).');
-      showToast('Please provide a comprehensive job description (minimum 40 characters).', 'warning');
+    if (!description.trim() || description.trim().length < 30) {
+      setError('Please provide a descriptive job overview (at least 30 characters).');
+      showToast('Please provide a descriptive job overview.', 'warning');
       return;
     }
 
@@ -164,40 +164,44 @@ const PostJob = () => {
         location: location.trim(),
         requiredSkills: skills,
         description: description.trim(),
+        workplaceType,
       };
 
-      await api.post('/jobs', payload);
+      const response = await api.post('/jobs', payload);
 
-      setSuccessMessage(`Job requisition "${title}" was published successfully!`);
-      showToast(`Job requisition "${title}" was published successfully!`, 'success');
+      setSuccessMessage(`Opening created successfully for "${response.data.title || title}"!`);
+      showToast('Job requisition published successfully!', 'success');
+
       setTimeout(() => {
         navigate('/dashboard');
-      }, 1500);
+      }, 1200);
     } catch (err) {
       console.error('Job creation error:', err);
-      const msg = err.response?.data?.message || 'Failed to publish job requisition. Please try again.';
+      const msg =
+        err.response?.data?.message ||
+        'Failed to publish job opening. Please check your connection and try again.';
       setError(msg);
       showToast(msg, 'error');
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container" style={{ padding: '3.5rem 1.5rem', minHeight: '85vh', maxWidth: '900px' }}>
-      {/* Navigation Breadcrumb */}
-      <div style={{ marginBottom: '1.5rem' }}>
+    <div className="container animate-fade-in" style={{ padding: '3.5rem 1.5rem 5rem', maxWidth: '860px' }}>
+      {/* Back to Dashboard Link */}
+      <div style={{ marginBottom: '1.75rem' }}>
         <Link
           to="/dashboard"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '0.45rem',
-            color: 'var(--text-secondary)',
-            fontSize: '0.9rem',
+            gap: '0.4rem',
+            color: 'var(--accent-teal)',
+            fontSize: '0.92rem',
+            fontWeight: 600,
             transition: 'var(--transition)',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
         >
           <ArrowLeft size={16} />
           <span>Back to Recruiter Dashboard</span>
@@ -206,13 +210,13 @@ const PostJob = () => {
 
       {/* Header Banner */}
       <div
-        className="card-glass"
+        className="paper-card"
         style={{
           padding: '2.25rem',
-          borderRadius: '20px',
+          borderRadius: '8px',
           marginBottom: '2rem',
-          position: 'relative',
-          overflow: 'hidden',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-default)',
         }}
       >
         <div
@@ -234,21 +238,30 @@ const PostJob = () => {
                   fontSize: '0.72rem',
                   fontWeight: 700,
                   textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
+                  letterSpacing: '0.04em',
                   padding: '0.25rem 0.65rem',
-                  borderRadius: '9999px',
-                  background: 'rgba(138, 43, 226, 0.2)',
-                  color: '#C084FC',
-                  border: '1px solid rgba(138, 43, 226, 0.35)',
+                  borderRadius: '4px',
+                  background: 'var(--accent-teal-light)',
+                  color: 'var(--accent-teal)',
+                  border: '1px solid rgba(15, 107, 92, 0.25)',
                 }}
               >
-                🏢 ATS Requisition Studio
+                ATS Requisition Studio
               </span>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                 Powered by Gemini AI Semantic Engine
               </span>
             </div>
-            <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '0.4rem' }}>
+            <h1
+              style={{
+                fontFamily: "'Newsreader', Georgia, serif",
+                fontSize: '2.2rem',
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                marginBottom: '0.4rem',
+                color: 'var(--text-primary)',
+              }}
+            >
               Create New Job Opening
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', maxWidth: '600px', lineHeight: 1.5 }}>
@@ -267,13 +280,10 @@ const PostJob = () => {
               gap: '0.5rem',
               padding: '0.65rem 1.15rem',
               fontSize: '0.88rem',
-              background: 'rgba(99, 102, 241, 0.15)',
-              borderColor: 'rgba(99, 102, 241, 0.35)',
-              color: '#A5B4FC',
             }}
             title="Populate form with a complete AI engineer job requisition"
           >
-            <Wand2 size={16} color="#818CF8" />
+            <Wand2 size={16} color="var(--accent-teal)" />
             <span>Pre-fill Sample Job</span>
           </button>
         </div>
@@ -287,17 +297,16 @@ const PostJob = () => {
             alignItems: 'center',
             gap: '0.75rem',
             padding: '1.25rem 1.5rem',
-            borderRadius: '14px',
-            backgroundColor: 'rgba(16, 185, 129, 0.15)',
-            border: '1px solid rgba(16, 185, 129, 0.35)',
-            color: '#A7F3D0',
+            borderRadius: '6px',
+            backgroundColor: 'rgba(45, 122, 58, 0.1)',
+            border: '1px solid rgba(45, 122, 58, 0.3)',
+            color: 'var(--semantic-green)',
             marginBottom: '2rem',
-            animation: 'fadeIn 0.3s ease-out',
           }}
         >
-          <CheckCircle2 size={22} color="#10B981" />
+          <CheckCircle2 size={22} color="var(--semantic-green)" />
           <div>
-            <strong style={{ display: 'block', fontSize: '1rem', color: '#10B981' }}>
+            <strong style={{ display: 'block', fontSize: '1rem', color: 'var(--semantic-green)' }}>
               Requisition Published!
             </strong>
             <span style={{ fontSize: '0.88rem' }}>{successMessage} Redirecting to your dashboard...</span>
@@ -313,26 +322,34 @@ const PostJob = () => {
             alignItems: 'center',
             gap: '0.75rem',
             padding: '1rem 1.25rem',
-            borderRadius: '12px',
-            backgroundColor: 'rgba(239, 68, 68, 0.15)',
-            border: '1px solid rgba(239, 68, 68, 0.35)',
-            color: '#FCA5A5',
+            borderRadius: '6px',
+            backgroundColor: 'rgba(185, 28, 28, 0.1)',
+            border: '1px solid rgba(185, 28, 28, 0.3)',
+            color: 'var(--semantic-red)',
             marginBottom: '1.75rem',
-            animation: 'fadeIn 0.3s ease-out',
           }}
         >
-          <AlertCircle size={20} color="#EF4444" />
+          <AlertCircle size={20} color="var(--semantic-red)" />
           <span style={{ fontSize: '0.9rem' }}>{error}</span>
         </div>
       )}
 
       {/* Job Creation Form */}
-      <form onSubmit={handleSubmit} className="card-glass" style={{ padding: '2.5rem', borderRadius: '20px' }}>
+      <form
+        onSubmit={handleSubmit}
+        className="paper-card"
+        style={{
+          padding: '2.5rem',
+          borderRadius: '8px',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-default)',
+        }}
+      >
         {/* Row 1: Job Title */}
         <div className="form-group" style={{ marginBottom: '1.75rem' }}>
           <label className="form-label" style={{ fontSize: '0.92rem', marginBottom: '0.4rem' }}>
-            <Briefcase size={16} color="var(--accent-indigo)" />
-            Job Title <span style={{ color: '#EF4444' }}>*</span>
+            <Briefcase size={16} color="var(--accent-teal)" />
+            Job Title <span style={{ color: 'var(--semantic-red)' }}>*</span>
           </label>
           <input
             type="text"
@@ -357,8 +374,8 @@ const PostJob = () => {
         >
           <div className="form-group" style={{ margin: 0 }}>
             <label className="form-label" style={{ fontSize: '0.92rem', marginBottom: '0.4rem' }}>
-              <Building2 size={16} color="var(--accent-indigo)" />
-              Hiring Company / Organization <span style={{ color: '#EF4444' }}>*</span>
+              <Building2 size={16} color="var(--accent-teal)" />
+              Hiring Company / Organization <span style={{ color: 'var(--semantic-red)' }}>*</span>
             </label>
             <input
               type="text"
@@ -374,7 +391,7 @@ const PostJob = () => {
 
           <div className="form-group" style={{ margin: 0 }}>
             <label className="form-label" style={{ fontSize: '0.92rem', marginBottom: '0.4rem' }}>
-              <Globe size={16} color="var(--accent-cyan)" />
+              <Globe size={16} color="var(--accent-teal)" />
               Workplace Arrangement
             </label>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -388,18 +405,18 @@ const PostJob = () => {
                     style={{
                       flex: 1,
                       padding: '0.75rem 0.5rem',
-                      borderRadius: '10px',
+                      borderRadius: '6px',
                       fontSize: '0.86rem',
                       fontWeight: 600,
                       cursor: 'pointer',
                       transition: 'var(--transition)',
                       border: isSelected
-                        ? '1px solid var(--accent-indigo)'
-                        : '1px solid rgba(255, 255, 255, 0.08)',
+                        ? '1px solid var(--accent-teal)'
+                        : '1px solid var(--border-default)',
                       background: isSelected
-                        ? 'rgba(99, 102, 241, 0.25)'
-                        : 'rgba(255, 255, 255, 0.03)',
-                      color: isSelected ? '#FFFFFF' : 'var(--text-secondary)',
+                        ? 'var(--accent-teal-light)'
+                        : 'var(--bg-card)',
+                      color: isSelected ? 'var(--accent-teal)' : 'var(--text-secondary)',
                     }}
                   >
                     {type}
@@ -413,8 +430,8 @@ const PostJob = () => {
         {/* Row 3: Location */}
         <div className="form-group" style={{ marginBottom: '1.75rem' }}>
           <label className="form-label" style={{ fontSize: '0.92rem', marginBottom: '0.4rem' }}>
-            <MapPin size={16} color="var(--accent-cyan)" />
-            Location Details <span style={{ color: '#EF4444' }}>*</span>
+            <MapPin size={16} color="var(--accent-teal)" />
+            Location Details <span style={{ color: 'var(--semantic-red)' }}>*</span>
           </label>
           <input
             type="text"
@@ -434,8 +451,8 @@ const PostJob = () => {
         {/* Row 4: Dynamic Required Skills Tagging */}
         <div className="form-group" style={{ marginBottom: '1.75rem' }}>
           <label className="form-label" style={{ fontSize: '0.92rem', marginBottom: '0.4rem' }}>
-            <Layers size={16} color="#F59E0B" />
-            Required Skills & Tech Stack <span style={{ color: '#EF4444' }}>*</span>
+            <Layers size={16} color="var(--accent-teal)" />
+            Required Skills & Tech Stack <span style={{ color: 'var(--semantic-red)' }}>*</span>
           </label>
 
           {/* Skills Input Bar */}
@@ -471,9 +488,9 @@ const PostJob = () => {
                 gap: '0.5rem',
                 marginTop: '0.75rem',
                 padding: '0.85rem',
-                borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.02)',
-                border: '1px solid rgba(255, 255, 255, 0.06)',
+                borderRadius: '6px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-default)',
               }}
             >
               {skills.map((skill, index) => (
@@ -484,10 +501,10 @@ const PostJob = () => {
                     alignItems: 'center',
                     gap: '0.35rem',
                     padding: '0.35rem 0.75rem',
-                    borderRadius: '8px',
-                    background: 'rgba(99, 102, 241, 0.2)',
-                    border: '1px solid rgba(99, 102, 241, 0.4)',
-                    color: '#E0E7FF',
+                    borderRadius: '4px',
+                    background: 'var(--accent-teal-light)',
+                    border: '1px solid rgba(15, 107, 92, 0.25)',
+                    color: 'var(--accent-teal)',
                     fontSize: '0.84rem',
                     fontWeight: 600,
                   }}
@@ -499,7 +516,7 @@ const PostJob = () => {
                     style={{
                       background: 'transparent',
                       border: 'none',
-                      color: 'rgba(255, 255, 255, 0.6)',
+                      color: 'var(--accent-teal)',
                       cursor: 'pointer',
                       padding: 0,
                       display: 'flex',
@@ -531,9 +548,9 @@ const PostJob = () => {
                     style={{
                       fontSize: '0.75rem',
                       padding: '0.2rem 0.55rem',
-                      borderRadius: '6px',
-                      background: isAdded ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 255, 255, 0.06)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '4px',
+                      background: isAdded ? 'var(--bg-secondary)' : 'var(--bg-card)',
+                      border: '1px solid var(--border-default)',
                       color: isAdded ? 'var(--text-muted)' : 'var(--text-secondary)',
                       cursor: isAdded ? 'default' : 'pointer',
                       transition: 'var(--transition)',
@@ -551,8 +568,8 @@ const PostJob = () => {
         <div className="form-group" style={{ marginBottom: '2rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <label className="form-label" style={{ fontSize: '0.92rem', marginBottom: '0.4rem' }}>
-              <FileText size={16} color="var(--accent-indigo)" />
-              Job Description & Responsibilities <span style={{ color: '#EF4444' }}>*</span>
+              <FileText size={16} color="var(--accent-teal)" />
+              Job Description & Responsibilities <span style={{ color: 'var(--semantic-red)' }}>*</span>
             </label>
             <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
               {description.length} characters
@@ -587,7 +604,7 @@ const PostJob = () => {
             alignItems: 'center',
             gap: '1rem',
             paddingTop: '1.5rem',
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            borderTop: '1px solid var(--border-default)',
           }}
         >
           <Link
@@ -605,7 +622,6 @@ const PostJob = () => {
             style={{
               padding: '0.75rem 1.85rem',
               fontSize: '0.95rem',
-              boxShadow: '0 4px 18px rgba(138, 43, 226, 0.4)',
             }}
           >
             {loading ? (

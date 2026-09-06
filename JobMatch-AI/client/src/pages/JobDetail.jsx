@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
-  Briefcase,
   Building2,
   MapPin,
   Calendar,
@@ -77,7 +76,7 @@ const JobDetail = () => {
   if (loading) {
     return (
       <div className="container" style={{ padding: '6rem 1.5rem', textAlign: 'center', minHeight: '60vh' }}>
-        <Loader2 size={36} className="spin" style={{ margin: '0 auto 1rem', color: 'var(--accent-indigo)' }} />
+        <Loader2 size={36} className="spin" style={{ margin: '0 auto 1rem', color: 'var(--accent-teal)' }} />
         <p style={{ color: 'var(--text-secondary)' }}>Loading job details...</p>
       </div>
     );
@@ -86,7 +85,7 @@ const JobDetail = () => {
   if (!job) {
     return (
       <div className="container" style={{ padding: '5rem 1.5rem', textAlign: 'center', minHeight: '50vh' }}>
-        <h2>Job Position Not Found</h2>
+        <h2 style={{ fontFamily: "'Newsreader', Georgia, serif" }}>Job Position Not Found</h2>
         <p style={{ color: 'var(--text-secondary)', margin: '1rem 0 1.5rem' }}>
           The role you are looking for may have been closed or relocated.
         </p>
@@ -123,7 +122,7 @@ const JobDetail = () => {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.4rem',
-            color: 'var(--accent-indigo)',
+            color: 'var(--accent-teal)',
             fontSize: '0.92rem',
             fontWeight: 600,
             transition: 'var(--transition)',
@@ -136,28 +135,40 @@ const JobDetail = () => {
 
       {/* Header Card */}
       <div
-        className="card-glass"
+        className="paper-card"
         style={{
           padding: '2.25rem',
           marginBottom: '2rem',
           position: 'relative',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-default)',
+          borderRadius: '8px',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.5rem' }}>
-              <Building2 size={18} color="var(--accent-indigo)" />
+              <Building2 size={18} color="var(--accent-teal)" />
               <span style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
                 {job.company}
               </span>
-              <span style={{ color: 'var(--border-subtle)' }}>•</span>
+              <span style={{ color: 'var(--border-default)' }}>•</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                 <Calendar size={14} />
                 <span>Posted on {formatDate(job.createdAt)}</span>
               </div>
             </div>
 
-            <h1 style={{ fontSize: '2.2rem', fontWeight: 800, lineHeight: 1.25, marginBottom: '0.85rem' }}>
+            <h1
+              style={{
+                fontFamily: "'Newsreader', Georgia, serif",
+                fontSize: '2.2rem',
+                fontWeight: 800,
+                lineHeight: 1.25,
+                marginBottom: '0.85rem',
+                color: 'var(--text-primary)',
+              }}
+            >
               {job.title}
             </h1>
 
@@ -168,9 +179,9 @@ const JobDetail = () => {
                   alignItems: 'center',
                   gap: '0.35rem',
                   fontSize: '0.82rem',
-                  color: 'var(--accent-cyan)',
-                  background: 'rgba(6, 182, 212, 0.12)',
-                  border: '1px solid rgba(6, 182, 212, 0.3)',
+                  color: 'var(--accent-teal)',
+                  background: 'var(--accent-teal-light)',
+                  border: '1px solid rgba(15, 107, 92, 0.25)',
                   padding: '0.25rem 0.75rem',
                   borderRadius: 'var(--radius-full)',
                   fontWeight: 600,
@@ -186,9 +197,9 @@ const JobDetail = () => {
                   alignItems: 'center',
                   gap: '0.35rem',
                   fontSize: '0.82rem',
-                  color: '#A7F3D0',
-                  background: 'rgba(16, 185, 129, 0.12)',
-                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  color: 'var(--semantic-green)',
+                  background: 'rgba(45, 122, 58, 0.1)',
+                  border: '1px solid rgba(45, 122, 58, 0.25)',
                   padding: '0.25rem 0.75rem',
                   borderRadius: 'var(--radius-full)',
                   fontWeight: 600,
@@ -230,15 +241,15 @@ const JobDetail = () => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.4rem',
-                color: isSaved(job._id) ? '#F59E0B' : 'var(--text-secondary)',
-                borderColor: isSaved(job._id) ? 'rgba(245, 158, 11, 0.4)' : 'var(--border-subtle)',
+                color: isSaved(job._id) ? 'var(--semantic-amber)' : 'var(--text-secondary)',
+                borderColor: isSaved(job._id) ? 'rgba(180, 83, 9, 0.4)' : 'var(--border-default)',
               }}
               title={isSaved(job._id) ? 'Remove bookmark' : 'Bookmark this job'}
             >
               <Bookmark
                 size={16}
-                fill={isSaved(job._id) ? '#F59E0B' : 'none'}
-                color={isSaved(job._id) ? '#F59E0B' : 'currentColor'}
+                fill={isSaved(job._id) ? 'var(--semantic-amber)' : 'none'}
+                color={isSaved(job._id) ? 'var(--semantic-amber)' : 'currentColor'}
               />
               <span>{isSaved(job._id) ? 'Saved' : 'Save'}</span>
             </button>
@@ -271,20 +282,40 @@ const JobDetail = () => {
         {/* Left Column: Job Description, Responsibilities & Requirements */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
           {/* Overview */}
-          <div className="card-glass" style={{ padding: '2rem' }}>
-            <h3 style={{ fontSize: '1.3rem', marginBottom: '1rem' }}>Role Overview</h3>
+          <div
+            className="paper-card"
+            style={{
+              padding: '2rem',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-default)',
+              borderRadius: '8px',
+            }}
+          >
+            <h3 style={{ fontSize: '1.3rem', marginBottom: '1rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
+              Role Overview
+            </h3>
             <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7, fontSize: '0.96rem' }}>
               {job.description}
             </p>
           </div>
 
           {/* Responsibilities */}
-          <div className="card-glass" style={{ padding: '2rem' }}>
-            <h3 style={{ fontSize: '1.3rem', marginBottom: '1.25rem' }}>Key Responsibilities</h3>
+          <div
+            className="paper-card"
+            style={{
+              padding: '2rem',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-default)',
+              borderRadius: '8px',
+            }}
+          >
+            <h3 style={{ fontSize: '1.3rem', marginBottom: '1.25rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
+              Key Responsibilities
+            </h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               {responsibilities.map((resp, idx) => (
                 <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', fontSize: '0.94rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-                  <span style={{ color: 'var(--accent-cyan)', flexShrink: 0, marginTop: '2px' }}>
+                  <span style={{ color: 'var(--accent-teal)', flexShrink: 0, marginTop: '2px' }}>
                     <CheckCircle2 size={16} />
                   </span>
                   <span>{resp}</span>
@@ -294,12 +325,22 @@ const JobDetail = () => {
           </div>
 
           {/* Technical Requirements */}
-          <div className="card-glass" style={{ padding: '2rem' }}>
-            <h3 style={{ fontSize: '1.3rem', marginBottom: '1.25rem' }}>Qualifications & Requirements</h3>
+          <div
+            className="paper-card"
+            style={{
+              padding: '2rem',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-default)',
+              borderRadius: '8px',
+            }}
+          >
+            <h3 style={{ fontSize: '1.3rem', marginBottom: '1.25rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
+              Qualifications & Requirements
+            </h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               {requirements.map((req, idx) => (
                 <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', fontSize: '0.94rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-                  <span style={{ color: 'var(--accent-purple)', flexShrink: 0, marginTop: '2px' }}>
+                  <span style={{ color: 'var(--accent-teal)', flexShrink: 0, marginTop: '2px' }}>
                     <Check size={16} />
                   </span>
                   <span>{req}</span>
@@ -313,16 +354,19 @@ const JobDetail = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {/* AI ATS Teaser Card */}
           <div
-            className="card-glass"
+            className="paper-card"
             style={{
               padding: '1.75rem',
-              background: 'linear-gradient(145deg, rgba(138, 43, 226, 0.12) 0%, rgba(6, 182, 212, 0.08) 100%)',
-              border: '1px solid var(--border-focus)',
+              background: 'var(--accent-teal-light)',
+              border: '1px solid rgba(15, 107, 92, 0.25)',
+              borderRadius: '8px',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-              <Sparkles size={18} color="var(--accent-cyan)" />
-              <h4 style={{ fontSize: '1.1rem', fontWeight: 700 }}>AI Resume Matcher</h4>
+              <Sparkles size={18} color="var(--accent-teal)" />
+              <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--accent-teal)' }}>
+                AI Resume Matcher
+              </h4>
             </div>
             <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '1.25rem' }}>
               Submit your resume to benchmark your qualifications against this role using Google Gemini AI.
@@ -330,15 +374,15 @@ const JobDetail = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem', fontSize: '0.82rem', color: 'var(--text-primary)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Zap size={14} color="var(--warning)" />
+                <Zap size={14} color="var(--accent-teal)" />
                 <span>Instant 0–100% Fit Score</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Target size={14} color="var(--accent-cyan)" />
+                <Target size={14} color="var(--accent-teal)" />
                 <span>Automated Skills Gap Analysis</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CheckCircle2 size={14} color="var(--success)" />
+                <CheckCircle2 size={14} color="var(--semantic-green)" />
                 <span>Direct Recruiter Visibility</span>
               </div>
             </div>
@@ -356,8 +400,18 @@ const JobDetail = () => {
           </div>
 
           {/* Required Skills Card */}
-          <div className="card-glass" style={{ padding: '1.75rem' }}>
-            <h4 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Required Tech Stack</h4>
+          <div
+            className="paper-card"
+            style={{
+              padding: '1.75rem',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-default)',
+              borderRadius: '8px',
+            }}
+          >
+            <h4 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
+              Required Tech Stack
+            </h4>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
               {job.requiredSkills?.map((skill, idx) => (
                 <span
@@ -367,9 +421,9 @@ const JobDetail = () => {
                     fontSize: '0.78rem',
                     fontWeight: 600,
                     borderRadius: 'var(--radius-full)',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid var(--border-subtle)',
-                    color: 'var(--text-primary)',
+                    background: 'var(--accent-teal-light)',
+                    border: '1px solid rgba(15, 107, 92, 0.25)',
+                    color: 'var(--accent-teal)',
                   }}
                 >
                   {skill}
@@ -379,8 +433,18 @@ const JobDetail = () => {
           </div>
 
           {/* About Company Card */}
-          <div className="card-glass" style={{ padding: '1.75rem' }}>
-            <h4 style={{ fontSize: '1.1rem', marginBottom: '0.85rem' }}>About {job.company}</h4>
+          <div
+            className="paper-card"
+            style={{
+              padding: '1.75rem',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-default)',
+              borderRadius: '8px',
+            }}
+          >
+            <h4 style={{ fontSize: '1.1rem', marginBottom: '0.85rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
+              About {job.company}
+            </h4>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
               {job.aboutCompany ||
                 `${job.company} is an engineering-driven technology organization committed to building scalable systems, fostering talent, and shipping high-impact products.`}
