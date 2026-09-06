@@ -1,10 +1,7 @@
 import React from 'react';
 import {
-  TrendingUp,
-  Sparkles,
   Award,
   BarChart3,
-  Zap,
   Layers,
 } from 'lucide-react';
 
@@ -79,8 +76,7 @@ const RecruiterAnalytics = () => {
                 gap: '0.35rem',
                 fontSize: '0.72rem',
                 fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.04em',
+                letterSpacing: '0.01em',
                 padding: '0.25rem 0.65rem',
                 borderRadius: '4px',
                 background: 'var(--accent-teal-light)',
@@ -88,7 +84,7 @@ const RecruiterAnalytics = () => {
                 border: '1px solid rgba(15, 107, 92, 0.25)',
               }}
             >
-              Telemetry & Insights
+              Telemetry & insights
             </span>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               Real-time Hiring Intelligence
@@ -129,24 +125,10 @@ const RecruiterAnalytics = () => {
       >
         {/* Pipeline Conversion Rate */}
         <div className="paper-card" style={{ padding: '1.6rem', borderRadius: '8px', background: 'var(--bg-card)', border: '1px solid var(--border-default)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-              Pipeline Conversion Rate
+          <div style={{ marginBottom: '0.75rem' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 700, letterSpacing: '0.01em', color: 'var(--text-muted)' }}>
+              Pipeline conversion rate
             </span>
-            <div
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '4px',
-                background: 'var(--accent-teal-light)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--accent-teal)',
-              }}
-            >
-              <TrendingUp size={17} />
-            </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem' }}>
             <div style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>58.3%</div>
@@ -159,24 +141,10 @@ const RecruiterAnalytics = () => {
 
         {/* AI Match Score Health */}
         <div className="paper-card" style={{ padding: '1.6rem', borderRadius: '8px', background: 'var(--bg-card)', border: '1px solid var(--border-default)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-              AI Match Score Health
+          <div style={{ marginBottom: '0.75rem' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 700, letterSpacing: '0.01em', color: 'var(--text-muted)' }}>
+              AI match score health
             </span>
-            <div
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '4px',
-                background: 'var(--accent-teal-light)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--accent-teal)',
-              }}
-            >
-              <Sparkles size={17} />
-            </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem' }}>
             <div style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--accent-teal)' }}>81.4%</div>
@@ -189,24 +157,10 @@ const RecruiterAnalytics = () => {
 
         {/* Time-to-Shortlist Velocity */}
         <div className="paper-card" style={{ padding: '1.6rem', borderRadius: '8px', background: 'var(--bg-card)', border: '1px solid var(--border-default)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-              ATS Screening Velocity
+          <div style={{ marginBottom: '0.75rem' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 700, letterSpacing: '0.01em', color: 'var(--text-muted)' }}>
+              ATS screening velocity
             </span>
-            <div
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '4px',
-                background: 'var(--accent-teal-light)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--accent-teal)',
-              }}
-            >
-              <Zap size={17} />
-            </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem' }}>
             <div style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>&lt; 2.5s</div>

@@ -237,8 +237,7 @@ const PostJob = () => {
                   gap: '0.35rem',
                   fontSize: '0.72rem',
                   fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.04em',
+                  letterSpacing: '0.01em',
                   padding: '0.25rem 0.65rem',
                   borderRadius: '4px',
                   background: 'var(--accent-teal-light)',
@@ -246,7 +245,7 @@ const PostJob = () => {
                   border: '1px solid rgba(15, 107, 92, 0.25)',
                 }}
               >
-                ATS Requisition Studio
+                ATS requisition studio
               </span>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                 Powered by Gemini AI Semantic Engine

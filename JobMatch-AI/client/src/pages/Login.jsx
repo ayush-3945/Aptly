@@ -149,14 +149,13 @@ const Login = () => {
               gap: '0.4rem',
               fontSize: '0.74rem',
               fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.04em',
+              letterSpacing: '0.01em',
               color: 'var(--text-muted)',
               marginBottom: '0.6rem',
             }}
           >
             <Zap size={13} color="var(--accent-teal)" />
-            <span>1-Click Test Credentials</span>
+            <span>1-click test credentials</span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>

@@ -319,10 +319,10 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                       fontSize: '0.72rem',
                       color: 'var(--text-muted)',
                       fontWeight: 700,
-                      letterSpacing: '0.04em',
+                      letterSpacing: '0.01em',
                     }}
                   >
-                    TARGET ROLE
+                    Target role
                   </span>
                   <h4 style={{ fontSize: '1.05rem', marginTop: '0.15rem', color: 'var(--text-primary)' }}>
                     {job.title}
@@ -566,12 +566,11 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                     <span
                       style={{
                         fontSize: '0.65rem',
-                        textTransform: 'uppercase',
                         color: 'var(--text-muted)',
-                        letterSpacing: '0.04em',
+                        letterSpacing: '0.01em',
                       }}
                     >
-                      Fit Score
+                      Fit score
                     </span>
                   </div>
                 </div>
@@ -671,12 +670,12 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                       color: 'var(--semantic-green)',
                       fontSize: '0.82rem',
                       fontWeight: 700,
-                      letterSpacing: '0.02em',
+                      letterSpacing: '0.01em',
                       marginBottom: '0.85rem',
                     }}
                   >
                     <Check size={15} />
-                    <span>Matched Skills ({evaluationResult.matchedSkills?.length || 0})</span>
+                    <span>Matched skills ({evaluationResult.matchedSkills?.length || 0})</span>
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
                     {evaluationResult.matchedSkills && evaluationResult.matchedSkills.length > 0 ? (
@@ -719,12 +718,12 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                       color: 'var(--semantic-red)',
                       fontSize: '0.82rem',
                       fontWeight: 700,
-                      letterSpacing: '0.02em',
+                      letterSpacing: '0.01em',
                       marginBottom: '0.85rem',
                     }}
                   >
                     <AlertTriangle size={15} />
-                    <span>Missing Skills ({evaluationResult.missingSkills?.length || 0})</span>
+                    <span>Missing skills ({evaluationResult.missingSkills?.length || 0})</span>
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
                     {evaluationResult.missingSkills && evaluationResult.missingSkills.length > 0 ? (
@@ -740,8 +739,9 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                             padding: '0.25rem 0.65rem',
                             borderRadius: 'var(--radius-xs)',
                             fontSize: '0.78rem',
+                            fontWeight: 600,
                             cursor: 'pointer',
-                            display: 'flex',
+                            display: 'inline-flex',
                             alignItems: 'center',
                             gap: '0.35rem',
                             transition: 'var(--transition)',
@@ -832,7 +832,7 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                     marginBottom: '0.25rem',
                   }}
                 >
-                  Recruiter Takeaway:
+                  Recruiter takeaway:
                 </span>
                 {evaluationResult.experienceFit}
               </div>

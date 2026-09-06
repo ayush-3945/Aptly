@@ -191,8 +191,7 @@ const RecruiterJobs = () => {
                 gap: '0.35rem',
                 fontSize: '0.72rem',
                 fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.04em',
+                letterSpacing: '0.01em',
                 padding: '0.28rem 0.7rem',
                 borderRadius: '4px',
                 background: 'var(--accent-teal-light)',
@@ -200,7 +199,7 @@ const RecruiterJobs = () => {
                 border: '1px solid rgba(15, 107, 92, 0.25)',
               }}
             >
-              Recruiter Command Center
+              Recruiter command center
             </span>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               Logged in as <strong style={{ color: 'var(--text-primary)' }}>{user?.name}</strong>
@@ -264,9 +263,8 @@ const RecruiterJobs = () => {
         }}
       >
         <div className="paper-card" style={{ padding: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+          <div style={{ marginBottom: '0.6rem' }}>
             <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Total Jobs Posted</span>
-            <Briefcase size={18} color="var(--accent-teal)" />
           </div>
           <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
             {metrics.totalJobs}
@@ -277,9 +275,8 @@ const RecruiterJobs = () => {
         </div>
 
         <div className="paper-card" style={{ padding: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+          <div style={{ marginBottom: '0.6rem' }}>
             <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Total Applicant Pool</span>
-            <Users size={18} color="var(--accent-teal)" />
           </div>
           <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
             {metrics.totalApplicants}
@@ -290,9 +287,8 @@ const RecruiterJobs = () => {
         </div>
 
         <div className="paper-card" style={{ padding: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+          <div style={{ marginBottom: '0.6rem' }}>
             <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Shortlisted Candidates</span>
-            <CheckCircle2 size={18} color="var(--semantic-green)" />
           </div>
           <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--semantic-green)' }}>
             {metrics.totalShortlisted}
@@ -303,9 +299,8 @@ const RecruiterJobs = () => {
         </div>
 
         <div className="paper-card" style={{ padding: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+          <div style={{ marginBottom: '0.6rem' }}>
             <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Avg Gemini ATS Match</span>
-            <Sparkles size={18} color="var(--accent-teal)" />
           </div>
           <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--accent-teal)' }}>
             {metrics.avgScore}%

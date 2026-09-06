@@ -10,9 +10,6 @@ import {
   ChevronDown,
   ChevronUp,
   ExternalLink,
-  Target,
-  TrendingUp,
-  FileText,
   Building2,
   Calendar,
   Loader2,
@@ -238,12 +235,11 @@ const CandidateDashboard = () => {
             style={{
               fontSize: '0.82rem',
               fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.04em',
+              letterSpacing: '0.01em',
               color: 'var(--accent-teal)',
             }}
           >
-            Candidate Portal
+            Candidate portal
           </span>
         </div>
 
@@ -305,11 +301,10 @@ const CandidateDashboard = () => {
       >
         {/* Total Applications */}
         <div className="paper-card" style={{ padding: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Total Applied
+          <div style={{ color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 700, letterSpacing: '0.01em' }}>
+              Total applied
             </span>
-            <FileText size={18} color="var(--accent-teal)" />
           </div>
           <div style={{ fontSize: '2.4rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--text-primary)' }}>
             {metrics.total}
@@ -321,11 +316,10 @@ const CandidateDashboard = () => {
 
         {/* Shortlisted Count */}
         <div className="paper-card" style={{ padding: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              In Pipeline
+          <div style={{ color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 700, letterSpacing: '0.01em' }}>
+              In pipeline
             </span>
-            <Target size={18} color="var(--semantic-green)" />
           </div>
           <div style={{ fontSize: '2.4rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--semantic-green)' }}>
             {metrics.shortlisted}
@@ -337,11 +331,10 @@ const CandidateDashboard = () => {
 
         {/* Average AI Match Score */}
         <div className="paper-card" style={{ padding: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Avg AI Match
+          <div style={{ color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 700, letterSpacing: '0.01em' }}>
+              Avg AI match
             </span>
-            <TrendingUp size={18} color="var(--accent-teal)" />
           </div>
           <div style={{ fontSize: '2.4rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--accent-teal)' }}>
             {metrics.avgScore}%
@@ -518,8 +511,7 @@ const CandidateDashboard = () => {
                             borderRadius: '4px',
                             fontSize: '0.78rem',
                             fontWeight: 700,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.04em',
+                            letterSpacing: '0.01em',
                             color: statusBadge.color,
                             backgroundColor: statusBadge.bg,
                             border: `1px solid ${statusBadge.border}`,
@@ -631,8 +623,8 @@ const CandidateDashboard = () => {
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
                           {/* Matched Skills */}
                           <div style={{ background: 'var(--bg-card)', padding: '0.85rem', borderRadius: '6px', border: '1px solid var(--border-default)' }}>
-                            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--semantic-green)', marginBottom: '0.45rem', textTransform: 'uppercase' }}>
-                              Matched Skills ({app.matchedSkills?.length || 0})
+                            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--semantic-green)', marginBottom: '0.45rem', letterSpacing: '0.01em' }}>
+                              Matched skills ({app.matchedSkills?.length || 0})
                             </div>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
                               {app.matchedSkills && app.matchedSkills.length > 0 ? (
@@ -660,8 +652,8 @@ const CandidateDashboard = () => {
 
                           {/* Missing Skills */}
                           <div style={{ background: 'var(--bg-card)', padding: '0.85rem', borderRadius: '6px', border: '1px solid var(--border-default)' }}>
-                            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--semantic-red)', marginBottom: '0.45rem', textTransform: 'uppercase' }}>
-                              Missing / Desired Skills ({app.missingSkills?.length || 0})
+                            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--semantic-red)', marginBottom: '0.45rem', letterSpacing: '0.01em' }}>
+                              Missing / desired skills ({app.missingSkills?.length || 0})
                             </div>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
                               {app.missingSkills && app.missingSkills.length > 0 ? (

@@ -240,7 +240,7 @@ const JobsList = () => {
                 letterSpacing: '0.01em',
               }}
             >
-              Clinical Competence Registry
+              Clinical competence registry
             </span>
           </div>
 

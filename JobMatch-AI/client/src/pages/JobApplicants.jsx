@@ -272,8 +272,7 @@ const JobApplicants = () => {
                   gap: '0.35rem',
                   fontSize: '0.72rem',
                   fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.04em',
+                  letterSpacing: '0.01em',
                   padding: '0.25rem 0.65rem',
                   borderRadius: '4px',
                   background: 'var(--accent-teal-light)',
@@ -281,7 +280,7 @@ const JobApplicants = () => {
                   border: '1px solid rgba(15, 107, 92, 0.25)',
                 }}
               >
-                ATS Candidate Pipeline
+                ATS candidate pipeline
               </span>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                 Powered by Gemini 2.5 Flash
@@ -337,8 +336,8 @@ const JobApplicants = () => {
               <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                 {metrics.total}
               </div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                Total Resumes
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', letterSpacing: '0.01em' }}>
+                Total resumes
               </div>
             </div>
 
@@ -355,8 +354,8 @@ const JobApplicants = () => {
               <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--semantic-green)' }}>
                 {metrics.strongMatches}
               </div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                Strong Fit (≥75%)
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', letterSpacing: '0.01em' }}>
+                Strong fit (≥75%)
               </div>
             </div>
 
@@ -373,8 +372,8 @@ const JobApplicants = () => {
               <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--accent-teal)' }}>
                 {metrics.inPipeline}
               </div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                In Interview
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', letterSpacing: '0.01em' }}>
+                In interview
               </div>
             </div>
           </div>
@@ -1135,7 +1134,8 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
                   color: 'var(--accent-teal)',
                   fontSize: '0.75rem',
                   fontWeight: 700,
-                  textTransform: 'uppercase',
+                  letterSpacing: '0.01em',
+                  textTransform: 'capitalize',
                 }}
               >
                 {candidateApp.status}
@@ -1180,8 +1180,8 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.3rem' }}>
               <Sparkles size={16} color="var(--accent-teal)" />
-              <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--accent-teal)' }}>
-                Gemini ATS Evaluation
+              <span style={{ fontSize: '0.82rem', fontWeight: 700, letterSpacing: '0.01em', color: 'var(--accent-teal)' }}>
+                Gemini ATS evaluation
               </span>
             </div>
             <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>

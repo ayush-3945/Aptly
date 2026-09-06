@@ -57,7 +57,7 @@ const Hero = () => {
               fontSize: '0.78rem',
               fontWeight: 600,
               color: 'var(--accent-teal)',
-              letterSpacing: '0.02em',
+              letterSpacing: '0.01em',
             }}
           >
             <span
@@ -248,10 +248,10 @@ const Hero = () => {
                     fontSize: '0.74rem',
                     color: 'var(--text-muted)',
                     fontWeight: 700,
-                    letterSpacing: '0.04em',
+                    letterSpacing: '0.01em',
                   }}
                 >
-                  MATCHED CORE COMPETENCIES
+                  Matched core competencies
                 </span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginTop: '0.6rem' }}>
                   {['React.js', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'REST APIs', 'Git'].map((skill) => (
@@ -279,10 +279,10 @@ const Hero = () => {
                     fontSize: '0.74rem',
                     color: 'var(--text-muted)',
                     fontWeight: 700,
-                    letterSpacing: '0.04em',
+                    letterSpacing: '0.01em',
                   }}
                 >
-                  IDENTIFIED SKILL GAPS
+                  Identified skill gaps
                 </span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginTop: '0.6rem' }}>
                   {['Docker Containerization', 'Kubernetes Orchestration'].map((skill) => (
@@ -329,7 +329,7 @@ const Hero = () => {
                   marginBottom: '0.3rem',
                 }}
               >
-                Diagnostic Synthesis:
+                Diagnostic synthesis:
               </span>
               Candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and Gemini AI SDK integration. The candidate exhibits strong alignment with TechPulse Solutions requirements.
             </div>
