@@ -13,6 +13,7 @@ import JobApplicants from './pages/JobApplicants';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
   return (
@@ -22,10 +23,11 @@ function App() {
           <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <Navbar />
             <main style={{ flex: 1 }}>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/jobs" element={<JobsList />} />
-                <Route path="/jobs/:id" element={<JobDetail />} />
+              <ErrorBoundary>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/jobs" element={<JobsList />} />
+                  <Route path="/jobs/:id" element={<JobDetail />} />
                 <Route
                   path="/jobs/post"
                   element={
@@ -53,7 +55,8 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
               </Routes>
-            </main>
+            </ErrorBoundary>
+          </main>
             <Footer />
           </div>
         </ToastProvider>
