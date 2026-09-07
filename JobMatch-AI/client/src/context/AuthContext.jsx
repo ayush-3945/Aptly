@@ -183,6 +183,15 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
+  // Profile update handler to keep local session in sync
+  const updateUser = (updatedUserData) => {
+    setUser((prev) => {
+      const merged = prev ? { ...prev, ...updatedUserData } : updatedUserData;
+      localStorage.setItem('user', JSON.stringify(merged));
+      return merged;
+    });
+  };
+
   const value = {
     user,
     token,
@@ -191,6 +200,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

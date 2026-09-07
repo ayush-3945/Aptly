@@ -70,7 +70,7 @@ const SAMPLE_DEMO_DATA = {
 };
 
 const CandidateProfile = () => {
-  const { user, login } = useAuth();
+  const { user, updateUser } = useAuth();
   const { showToast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -340,12 +340,8 @@ const CandidateProfile = () => {
 
       if (res.data && res.data.profile) {
         showToast('Profile confirmed and saved successfully!', 'success');
-        // If user object is tracked in authContext, keep it updated
-        if (user && login) {
-          const updatedToken = localStorage.getItem('token');
-          if (updatedToken) {
-            login({ ...user, ...res.data.profile }, updatedToken);
-          }
+        if (updateUser) {
+          updateUser(res.data.profile);
         }
       } else {
         showToast('Profile saved successfully.', 'success');

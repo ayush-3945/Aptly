@@ -54,23 +54,47 @@ class ErrorBoundary extends React.Component {
                 color: 'var(--text-secondary)',
                 fontSize: '0.92rem',
                 lineHeight: 1.5,
-                marginBottom: '1.5rem',
+                marginBottom: '1rem',
               }}
             >
-              An unexpected error occurred while rendering this page. Please try refreshing or return to home.
+              An unexpected error occurred while rendering this page.
             </p>
+            {this.state.error && (
+              <div
+                style={{
+                  background: 'rgba(185, 28, 28, 0.08)',
+                  border: '1px solid rgba(185, 28, 28, 0.25)',
+                  borderRadius: '4px',
+                  padding: '0.65rem 0.85rem',
+                  color: 'var(--semantic-red)',
+                  fontSize: '0.82rem',
+                  fontFamily: 'monospace',
+                  textAlign: 'left',
+                  marginBottom: '1.25rem',
+                  overflowX: 'auto',
+                }}
+              >
+                {this.state.error.message || String(this.state.error)}
+              </div>
+            )}
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
               <button
                 type="button"
                 className="btn btn-secondary"
-                onClick={() => (window.location.href = '/')}
+                onClick={() => {
+                  this.setState({ hasError: false, error: null });
+                  window.location.href = '/';
+                }}
               >
                 Go to home
               </button>
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={() => window.location.reload()}
+                onClick={() => {
+                  this.setState({ hasError: false, error: null });
+                  window.location.reload();
+                }}
               >
                 Reload page
               </button>

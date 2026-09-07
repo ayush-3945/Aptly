@@ -22,7 +22,7 @@ import api from '../services/api';
 const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluation }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { showToast } = useToast();
 
   const [file, setFile] = useState(null);
