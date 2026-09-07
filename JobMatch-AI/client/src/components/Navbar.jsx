@@ -121,7 +121,8 @@ const Navbar = () => {
           {isAuthenticated && user ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
               {/* User Profile Card */}
-              <div
+              <Link
+                to={user.role === 'candidate' ? '/profile' : '/dashboard'}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -130,7 +131,10 @@ const Navbar = () => {
                   borderRadius: '6px',
                   backgroundColor: 'var(--bg-secondary)',
                   border: '1px solid var(--border-default)',
+                  textDecoration: 'none',
+                  transition: 'var(--transition)',
                 }}
+                title={user.role === 'candidate' ? 'Edit candidate profile & resume' : 'View dashboard'}
               >
                 <div
                   style={{
@@ -175,7 +179,7 @@ const Navbar = () => {
                 >
                   {user.role}
                 </span>
-              </div>
+              </Link>
 
               {/* Sign Out Button */}
               <button

@@ -37,6 +37,45 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  phone: {
+    type: String,
+    default: '',
+  },
+  currentRole: {
+    type: String,
+    default: '',
+  },
+  totalExperience: {
+    type: String,
+    default: '',
+  },
+  education: [
+    {
+      degree: { type: String, default: '' },
+      institution: { type: String, default: '' },
+      year: { type: String, default: '' },
+    },
+  ],
+  workHistory: [
+    {
+      company: { type: String, default: '' },
+      role: { type: String, default: '' },
+      duration: { type: String, default: '' },
+      description: { type: String, default: '' },
+    },
+  ],
+  linkedinUrl: {
+    type: String,
+    default: '',
+  },
+  githubUrl: {
+    type: String,
+    default: '',
+  },
+  resumeUrl: {
+    type: String,
+    default: '',
+  },
 }, { timestamps: true }); // timestamps adds createdAt and updatedAt automatically
 
 // Hash password before saving

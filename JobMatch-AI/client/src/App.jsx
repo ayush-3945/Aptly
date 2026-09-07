@@ -13,6 +13,7 @@ import JobApplicants from './pages/JobApplicants';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import CandidateProfile from './pages/CandidateProfile';
 import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
@@ -49,6 +50,22 @@ function App() {
                   element={
                     <ProtectedRoute allowedRoles={['recruiter']}>
                       <JobApplicants />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute allowedRoles={['candidate']}>
+                      <CandidateProfile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/onboarding"
+                  element={
+                    <ProtectedRoute allowedRoles={['candidate']}>
+                      <CandidateProfile />
                     </ProtectedRoute>
                   }
                 />

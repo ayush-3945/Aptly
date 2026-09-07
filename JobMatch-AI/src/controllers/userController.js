@@ -22,13 +22,36 @@ const updateUserProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const { name, bio, targetRole, skills, location } = req.body;
+    const {
+      name,
+      fullName,
+      bio,
+      targetRole,
+      currentRole,
+      totalExperience,
+      phone,
+      skills,
+      location,
+      education,
+      workHistory,
+      linkedinUrl,
+      githubUrl,
+    } = req.body;
 
     if (name !== undefined) user.name = name;
+    else if (fullName !== undefined) user.name = fullName;
+
     if (bio !== undefined) user.bio = bio;
     if (targetRole !== undefined) user.targetRole = targetRole;
+    if (currentRole !== undefined) user.currentRole = currentRole;
+    if (totalExperience !== undefined) user.totalExperience = totalExperience;
+    if (phone !== undefined) user.phone = phone;
     if (skills !== undefined) user.skills = skills;
     if (location !== undefined) user.location = location;
+    if (education !== undefined) user.education = education;
+    if (workHistory !== undefined) user.workHistory = workHistory;
+    if (linkedinUrl !== undefined) user.linkedinUrl = linkedinUrl;
+    if (githubUrl !== undefined) user.githubUrl = githubUrl;
 
     const updatedUser = await user.save();
 
@@ -37,10 +60,17 @@ const updateUserProfile = async (req, res) => {
       name: updatedUser.name,
       email: updatedUser.email,
       role: updatedUser.role,
+      phone: updatedUser.phone,
       bio: updatedUser.bio,
       targetRole: updatedUser.targetRole,
+      currentRole: updatedUser.currentRole,
+      totalExperience: updatedUser.totalExperience,
       skills: updatedUser.skills,
       location: updatedUser.location,
+      education: updatedUser.education,
+      workHistory: updatedUser.workHistory,
+      linkedinUrl: updatedUser.linkedinUrl,
+      githubUrl: updatedUser.githubUrl,
       createdAt: updatedUser.createdAt,
       updatedAt: updatedUser.updatedAt,
     });

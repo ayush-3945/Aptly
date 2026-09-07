@@ -31,8 +31,8 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/jobs', require('./routes/jobRoutes'));
 app.use('/api/applications', aiUploadLimiter, require('./routes/applicationRoutes'));
 app.use('/api/resumes', aiUploadLimiter, require('./routes/resumeRoutes'));
-app.use('/api/test', require('./routes/testRoute'));
-// app.use('/api/candidates', require('./routes/candidateRoutes'));
+app.use('/api/candidate', aiUploadLimiter, require('./routes/candidateRoutes'));
+app.use('/api/candidates', aiUploadLimiter, require('./routes/candidateRoutes'));
 
 // Global Error Handler Middleware
 app.use(require('./middlewares/errorHandler'));

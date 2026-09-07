@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   Briefcase,
   Sparkles,
@@ -16,6 +16,7 @@ import {
   Bookmark,
   MapPin,
   FileText,
+  User,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -23,6 +24,7 @@ import api from '../services/api';
 import { useSavedJobs } from '../utils/savedJobs';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
 import ApplyModal from '../components/ApplyModal';
+import CandidateProfile from './CandidateProfile';
 
 // Curated sample applications so candidate dashboard demonstrates rich state even prior to first application
 const SAMPLE_APPLICATIONS = [
@@ -72,8 +74,23 @@ const CandidateDashboard = () => {
   const [withdrawModalApp, setWithdrawModalApp] = useState(null);
   const [actionMessage, setActionMessage] = useState('');
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'applications';
+
   // Tab & Saved Jobs State
-  const [activeTab, setActiveTab] = useState('applications'); // 'applications' | 'saved'
+  const [activeTab, setActiveTab] = useState(initialTab); // 'applications' | 'saved' | 'profile'
+
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl && ['applications', 'saved', 'profile'].includes(tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tabName) => {
+    setActiveTab(tabName);
+    setSearchParams({ tab: tabName });
+  };
   const { savedJobIds, removeSaved } = useSavedJobs();
   const [allJobs, setAllJobs] = useState(FALLBACK_JOBS);
   const [applyModalJob, setApplyModalJob] = useState(null);
@@ -358,7 +375,7 @@ const CandidateDashboard = () => {
       >
         <button
           type="button"
-          onClick={() => setActiveTab('applications')}
+          onClick={() => handleTabChange('applications')}
           style={{
             padding: '0.65rem 1.35rem',
             borderRadius: '6px',
@@ -386,7 +403,7 @@ const CandidateDashboard = () => {
 
         <button
           type="button"
-          onClick={() => setActiveTab('saved')}
+          onClick={() => handleTabChange('saved')}
           style={{
             padding: '0.65rem 1.35rem',
             borderRadius: '6px',
@@ -414,6 +431,34 @@ const CandidateDashboard = () => {
             color={activeTab === 'saved' ? 'var(--semantic-amber)' : 'currentColor'}
           />
           <span>Saved Jobs ({savedJobs.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleTabChange('profile')}
+          style={{
+            padding: '0.65rem 1.35rem',
+            borderRadius: '6px',
+            fontSize: '0.92rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            border:
+              activeTab === 'profile'
+                ? '1px solid var(--accent-teal)'
+                : '1px solid var(--border-default)',
+            background:
+              activeTab === 'profile'
+                ? 'var(--accent-teal-light)'
+                : 'var(--bg-card)',
+            color: activeTab === 'profile' ? 'var(--accent-teal)' : 'var(--text-secondary)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            transition: 'var(--transition)',
+          }}
+        >
+          <User size={17} color={activeTab === 'profile' ? 'var(--accent-teal)' : 'currentColor'} />
+          <span>Resume & Profile</span>
         </button>
       </div>
 
@@ -903,6 +948,13 @@ const CandidateDashboard = () => {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Embedded Resume & Profile Management */}
+      {activeTab === 'profile' && (
+        <div className="animate-fade-in">
+          <CandidateProfile />
         </div>
       )}
 

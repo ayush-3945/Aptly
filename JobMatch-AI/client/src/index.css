@@ -452,3 +452,65 @@ a {
   background: var(--border-medium);
   border-radius: var(--radius-xs);
 }
+
+/* Spin Animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* AI Auto-filled Profile Field Indication */
+.field-ai-filled {
+  border-left: 3.5px solid var(--accent-teal) !important;
+  background-color: rgba(15, 107, 92, 0.02) !important;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.ai-tag-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--accent-teal);
+  background: var(--accent-teal-light);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid rgba(15, 107, 92, 0.25);
+}
+
+/* Resume PDF Dropzone */
+.resume-dropzone {
+  border: 2px dashed var(--border-medium);
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 2.25rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.resume-dropzone:hover,
+.resume-dropzone.dropzone-active {
+  border-color: var(--accent-teal);
+  background: var(--accent-teal-light);
+}
+
+.resume-dropzone.dropzone-reject {
+  border-color: var(--semantic-red);
+  background: rgba(185, 28, 28, 0.04);
+}
+
