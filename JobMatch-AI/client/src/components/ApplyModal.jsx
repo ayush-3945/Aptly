@@ -33,13 +33,41 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
   const [evaluationResult, setEvaluationResult] = useState(null);
   const [selectedMissingSkill, setSelectedMissingSkill] = useState(null);
 
+  // Real-time Match Score Preview State
+  const [candidateProfile, setCandidateProfile] = useState(null);
+  const [previewMatchData, setPreviewMatchData] = useState(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+
   React.useEffect(() => {
     if (isOpen && initialEvaluation) {
       setEvaluationResult(initialEvaluation);
     }
   }, [isOpen, initialEvaluation]);
 
+  // Fetch candidate profile when modal opens
+  React.useEffect(() => {
+    if (isOpen && isAuthenticated) {
+      api
+        .get('/candidate/profile')
+        .then((res) => {
+          if (res.data && res.data.profile) {
+            setCandidateProfile(res.data.profile);
+          }
+        })
+        .catch(() => {
+          if (user) setCandidateProfile(user);
+        });
+    }
+  }, [isOpen, isAuthenticated, user]);
+
   if (!isOpen || !job) return null;
+
+  const candidateSkills =
+    candidateProfile?.skills && candidateProfile.skills.length > 0
+      ? candidateProfile.skills
+      : user?.skills && user.skills.length > 0
+      ? user.skills
+      : [];
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -76,7 +104,68 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
     setSubmitStep('');
     setEvaluationResult(null);
     setSelectedMissingSkill(null);
+    setPreviewMatchData(null);
+    setPreviewLoading(false);
     onClose();
+  };
+
+  // Real-time AI Match Score Preview Handler
+  const handleCheckMatchFirst = async () => {
+    if (candidateSkills.length === 0) {
+      showToast('Complete your profile first to see your match score', 'warning');
+      return;
+    }
+
+    setPreviewLoading(true);
+    setError('');
+
+    try {
+      const payload = {
+        skills: candidateSkills,
+        totalExperience: candidateProfile?.totalExperience || '3+ years',
+        experience: candidateProfile?.workHistory || [],
+        education: candidateProfile?.education || [],
+        currentRole: candidateProfile?.currentRole || '',
+        jobTitle: job.title,
+        jobCompany: job.company,
+        requiredSkills: job.requiredSkills,
+      };
+
+      const res = await api.post(`/jobs/${job._id}/preview-match`, payload);
+      if (res.data && res.data.data) {
+        setPreviewMatchData(res.data.data);
+      } else {
+        throw new Error('Preview match data unavailable.');
+      }
+    } catch (err) {
+      console.warn('Backend preview match fallback:', err.message);
+      const required = Array.isArray(job.requiredSkills) ? job.requiredSkills : ['React', 'Node.js'];
+      const matched = required.filter((r) =>
+        candidateSkills.some(
+          (c) => c.toLowerCase() === r.toLowerCase() || c.toLowerCase().includes(r.toLowerCase())
+        )
+      );
+      const missing = required.filter((r) => !matched.includes(r));
+      const score = Math.min(100, Math.max(15, Math.round((matched.length / Math.max(1, required.length)) * 100)));
+      const tier = score >= 75 ? 'Strong Match' : score >= 50 ? 'Moderate Match' : 'Low Match';
+
+      setPreviewMatchData({
+        matchScore: score,
+        matchTier: tier,
+        matchedSkills: matched,
+        missingSkills: missing,
+        strengthSummary:
+          matched.length > 0
+            ? `Strong technical alignment demonstrated in ${matched.slice(0, 3).join(', ')}.`
+            : 'Candidate brings versatile software foundations ready to develop role-specific competencies.',
+        gapSummary:
+          missing.length > 0
+            ? `Potential competencies to review: ${missing.slice(0, 3).join(', ')}.`
+            : 'No critical competency gaps identified against the posted requirements.',
+      });
+    } finally {
+      setPreviewLoading(false);
+    }
   };
 
   // Local client-side simulation fallback in case backend server is unreachable
@@ -359,118 +448,539 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                 </div>
               </div>
 
-              {/* PDF Upload Area */}
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label className="form-label" style={{ marginBottom: '0.6rem' }}>
-                  Upload Resume PDF
-                </label>
+              {/* Incomplete Candidate Profile Advisory */}
+              {candidateSkills.length === 0 && !previewMatchData && (
                 <div
+                  className="animate-fade-in"
                   style={{
-                    border: file ? '1px solid var(--accent-teal)' : '1px dashed var(--border-default)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '2rem 1.5rem',
-                    textAlign: 'center',
-                    background: file ? 'var(--accent-teal-light)' : 'var(--bg-card)',
-                    cursor: 'pointer',
-                    transition: 'var(--transition)',
-                    position: 'relative',
+                    padding: '0.85rem 1.15rem',
+                    borderRadius: '6px',
+                    background: 'rgba(180, 83, 9, 0.08)',
+                    border: '1px solid rgba(180, 83, 9, 0.25)',
+                    marginBottom: '1.25rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '0.75rem',
                   }}
-                  onClick={() => document.getElementById('resume-file-input').click()}
                 >
-                  <input
-                    id="resume-file-input"
-                    type="file"
-                    accept=".pdf,application/pdf"
-                    onChange={handleFileChange}
-                    style={{ display: 'none' }}
-                  />
-
-                  {file ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                      <div
-                        style={{
-                          width: '40px',
-                          height: '40px',
-                          borderRadius: '4px',
-                          background: 'rgba(45, 122, 58, 0.12)',
-                          border: '1px solid rgba(45, 122, 58, 0.3)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        <CheckCircle2 size={22} color="var(--semantic-green)" />
-                      </div>
-                      <div style={{ fontWeight: 600, fontSize: '0.92rem', color: 'var(--text-primary)' }}>
-                        {file.name}
-                      </div>
-                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                        {(file.size / 1024 / 1024).toFixed(2)} MB • Ready for Evaluation
-                      </div>
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                      <div
-                        style={{
-                          width: '40px',
-                          height: '40px',
-                          borderRadius: '4px',
-                          background: 'var(--accent-teal-light)',
-                          border: '1px solid rgba(15, 107, 92, 0.25)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'var(--accent-teal)',
-                        }}
-                      >
-                        <Upload size={20} />
-                      </div>
-                      <div style={{ fontWeight: 600, fontSize: '0.92rem', color: 'var(--text-primary)' }}>
-                        Click to browse or drag & drop resume PDF
-                      </div>
-                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                        PDF format up to 5MB (text or parsed layout)
-                      </div>
-                    </div>
-                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                    <AlertTriangle size={17} color="var(--semantic-amber)" style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '0.84rem', color: 'var(--text-primary)', fontWeight: 500 }}>
+                      Complete your profile first to see your match score
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleClose();
+                      navigate('/profile');
+                    }}
+                    className="btn btn-secondary"
+                    style={{
+                      fontSize: '0.78rem',
+                      padding: '0.35rem 0.75rem',
+                      color: 'var(--accent-teal)',
+                      borderColor: 'var(--accent-teal)',
+                    }}
+                  >
+                    Go to Profile
+                  </button>
                 </div>
-              </div>
+              )}
 
-              {/* 1-Click Demo Resume Option */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '0.85rem 1.15rem',
-                  background: useDemoResume ? 'var(--accent-teal-light)' : 'var(--bg-secondary)',
-                  border: useDemoResume ? '1px solid var(--accent-teal)' : '1px solid var(--border-default)',
-                  borderRadius: 'var(--radius-sm)',
-                  marginBottom: '1.5rem',
-                  cursor: 'pointer',
-                  transition: 'var(--transition)',
-                }}
-                onClick={handleSelectDemoResume}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                  <Zap size={16} color="var(--accent-teal)" />
-                  <div>
-                    <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                      Or use 1-Click Verified Demo CV
+              {/* Inline Match Scorecard Preview (When generated) */}
+              {previewMatchData ? (
+                <div
+                  className="animate-fade-in paper-card"
+                  style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-default)',
+                    borderRadius: '8px',
+                    padding: '1.5rem',
+                    marginBottom: '1.5rem',
+                    boxShadow: 'var(--shadow-subtle)',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: '0.5rem',
+                      marginBottom: '1.25rem',
+                      borderBottom: '1px solid var(--border-default)',
+                      paddingBottom: '0.75rem',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Sparkles size={18} color="var(--accent-teal)" />
+                      <h4
+                        style={{
+                          margin: 0,
+                          fontSize: '1.15rem',
+                          fontWeight: 700,
+                          fontFamily: "'Newsreader', Georgia, serif",
+                          color: 'var(--text-primary)',
+                        }}
+                      >
+                        AI Match Score Preview
+                      </h4>
                     </div>
-                    <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
-                      Pre-loaded Senior MERN & AI engineer profile for instant testing
+
+                    {/* Semantic Match Tier Badge */}
+                    <span
+                      style={{
+                        padding: '0.25rem 0.65rem',
+                        borderRadius: '4px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.01em',
+                        background:
+                          previewMatchData.matchScore >= 75
+                            ? 'rgba(45, 122, 58, 0.12)'
+                            : previewMatchData.matchScore >= 50
+                            ? 'rgba(180, 83, 9, 0.12)'
+                            : 'rgba(185, 28, 28, 0.12)',
+                        color:
+                          previewMatchData.matchScore >= 75
+                            ? 'var(--semantic-green)'
+                            : previewMatchData.matchScore >= 50
+                            ? 'var(--semantic-amber)'
+                            : 'var(--semantic-red)',
+                        border: `1px solid ${
+                          previewMatchData.matchScore >= 75
+                            ? 'rgba(45, 122, 58, 0.3)'
+                            : previewMatchData.matchScore >= 50
+                            ? 'rgba(180, 83, 9, 0.3)'
+                            : 'rgba(185, 28, 28, 0.3)'
+                        }`,
+                      }}
+                    >
+                      {previewMatchData.matchTier}
+                    </span>
+                  </div>
+
+                  {/* Large Circular Score Indicator */}
+                  <div
+                    style={{
+                      background: 'var(--bg-primary)',
+                      border: '1px solid var(--border-default)',
+                      borderRadius: '8px',
+                      padding: '1.5rem',
+                      textAlign: 'center',
+                      marginBottom: '1.25rem',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '116px',
+                        height: '116px',
+                        borderRadius: '50%',
+                        margin: '0 auto 0.75rem',
+                        border: `6px solid ${
+                          previewMatchData.matchScore >= 75
+                            ? 'var(--semantic-green)'
+                            : previewMatchData.matchScore >= 50
+                            ? 'var(--semantic-amber)'
+                            : 'var(--semantic-red)'
+                        }`,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'var(--bg-card)',
+                        boxShadow: 'var(--shadow-subtle)',
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: '2rem',
+                          fontWeight: 800,
+                          fontFamily: "'JetBrains Mono', monospace",
+                          color:
+                            previewMatchData.matchScore >= 75
+                              ? 'var(--semantic-green)'
+                              : previewMatchData.matchScore >= 50
+                              ? 'var(--semantic-amber)'
+                              : 'var(--semantic-red)',
+                          lineHeight: 1,
+                        }}
+                      >
+                        {previewMatchData.matchScore}%
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '0.66rem',
+                          color: 'var(--text-muted)',
+                          fontWeight: 700,
+                          letterSpacing: '0.02em',
+                          marginTop: '0.2rem',
+                        }}
+                      >
+                        MATCH FIT
+                      </span>
+                    </div>
+
+                    <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', margin: 0 }}>
+                      Evaluated against {job.title} at {job.company}
+                    </p>
+                  </div>
+
+                  {/* Two Columns: Matched vs Missing Skills */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                      gap: '1rem',
+                      marginBottom: '1.25rem',
+                    }}
+                  >
+                    {/* Matched Skills */}
+                    <div
+                      style={{
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--border-default)',
+                        borderRadius: '6px',
+                        padding: '1rem',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          marginBottom: '0.65rem',
+                        }}
+                      >
+                        <CheckCircle2 size={16} color="var(--accent-teal)" />
+                        <span
+                          style={{
+                            fontSize: '0.82rem',
+                            fontWeight: 700,
+                            color: 'var(--accent-teal)',
+                          }}
+                        >
+                          ✓ Matched skills ({previewMatchData.matchedSkills?.length || 0})
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                        {previewMatchData.matchedSkills?.length > 0 ? (
+                          previewMatchData.matchedSkills.map((skill, i) => (
+                            <span
+                              key={i}
+                              style={{
+                                fontSize: '0.76rem',
+                                fontWeight: 600,
+                                background: 'var(--accent-teal-light)',
+                                color: 'var(--accent-teal)',
+                                border: '1px solid rgba(15, 107, 92, 0.25)',
+                                padding: '0.2rem 0.55rem',
+                                borderRadius: '4px',
+                              }}
+                            >
+                              {skill}
+                            </span>
+                          ))
+                        ) : (
+                          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                            No direct overlap identified
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Missing Skills */}
+                    <div
+                      style={{
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--border-default)',
+                        borderRadius: '6px',
+                        padding: '1rem',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          marginBottom: '0.65rem',
+                        }}
+                      >
+                        <X size={16} color="var(--semantic-red)" />
+                        <span
+                          style={{
+                            fontSize: '0.82rem',
+                            fontWeight: 700,
+                            color: 'var(--semantic-red)',
+                          }}
+                        >
+                          ✗ Missing skills ({previewMatchData.missingSkills?.length || 0})
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                        {previewMatchData.missingSkills?.length > 0 ? (
+                          previewMatchData.missingSkills.map((skill, i) => (
+                            <span
+                              key={i}
+                              style={{
+                                fontSize: '0.76rem',
+                                fontWeight: 600,
+                                background: 'rgba(185, 28, 28, 0.08)',
+                                color: 'var(--semantic-red)',
+                                border: '1px solid rgba(185, 28, 28, 0.2)',
+                                padding: '0.2rem 0.55rem',
+                                borderRadius: '4px',
+                              }}
+                            >
+                              {skill}
+                            </span>
+                          ))
+                        ) : (
+                          <span style={{ fontSize: '0.78rem', color: 'var(--semantic-green)' }}>
+                            All required competencies satisfied!
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
+
+                  {/* One-Line Strength & Gap Summaries */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginBottom: '1.25rem' }}>
+                    {previewMatchData.strengthSummary && (
+                      <div
+                        style={{
+                          background: 'var(--bg-primary)',
+                          borderLeft: '3.5px solid var(--accent-teal)',
+                          borderTop: '1px solid var(--border-default)',
+                          borderRight: '1px solid var(--border-default)',
+                          borderBottom: '1px solid var(--border-default)',
+                          padding: '0.75rem 1rem',
+                          borderRadius: '4px',
+                          fontSize: '0.84rem',
+                          color: 'var(--text-secondary)',
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        <strong style={{ color: 'var(--accent-teal)' }}>Strength: </strong>
+                        {previewMatchData.strengthSummary}
+                      </div>
+                    )}
+
+                    {previewMatchData.gapSummary && (
+                      <div
+                        style={{
+                          background: 'var(--bg-primary)',
+                          borderLeft: '3.5px solid var(--semantic-amber)',
+                          borderTop: '1px solid var(--border-default)',
+                          borderRight: '1px solid var(--border-default)',
+                          borderBottom: '1px solid var(--border-default)',
+                          padding: '0.75rem 1rem',
+                          borderRadius: '4px',
+                          fontSize: '0.84rem',
+                          color: 'var(--text-secondary)',
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        <strong style={{ color: 'var(--semantic-amber)' }}>Gap summary: </strong>
+                        {previewMatchData.gapSummary}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Bar Directly Below Scorecard */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                      gap: '0.75rem',
+                      paddingTop: '0.75rem',
+                      borderTop: '1px solid var(--border-default)',
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setPreviewMatchData(null)}
+                      className="btn btn-ghost"
+                      style={{ fontSize: '0.88rem' }}
+                    >
+                      Go back
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      className="btn btn-primary"
+                      disabled={submitting}
+                      style={{ padding: '0.6rem 1.35rem', fontSize: '0.88rem' }}
+                    >
+                      {submitting ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          <span>Submitting...</span>
+                        </>
+                      ) : (
+                        <span>Submit anyway</span>
+                      )}
+                    </button>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  className={useDemoResume ? 'btn btn-primary' : 'btn btn-secondary'}
-                  style={{ fontSize: '0.78rem', padding: '0.35rem 0.75rem' }}
-                >
-                  {useDemoResume ? 'Selected ✓' : 'Use Demo CV'}
-                </button>
-              </div>
+              ) : (
+                <>
+                  {/* PDF Upload Area */}
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    <label className="form-label" style={{ marginBottom: '0.6rem' }}>
+                      Upload Resume PDF
+                    </label>
+                    <div
+                      style={{
+                        border: file ? '1px solid var(--accent-teal)' : '1px dashed var(--border-default)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '2rem 1.5rem',
+                        textAlign: 'center',
+                        background: file ? 'var(--accent-teal-light)' : 'var(--bg-card)',
+                        cursor: 'pointer',
+                        transition: 'var(--transition)',
+                        position: 'relative',
+                      }}
+                      onClick={() => document.getElementById('resume-file-input').click()}
+                    >
+                      <input
+                        id="resume-file-input"
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        onChange={handleFileChange}
+                        style={{ display: 'none' }}
+                      />
+
+                      {file ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                          <div
+                            style={{
+                              width: '40px',
+                              height: '40px',
+                              borderRadius: '4px',
+                              background: 'rgba(45, 122, 58, 0.12)',
+                              border: '1px solid rgba(45, 122, 58, 0.3)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <CheckCircle2 size={22} color="var(--semantic-green)" />
+                          </div>
+                          <div style={{ fontWeight: 600, fontSize: '0.92rem', color: 'var(--text-primary)' }}>
+                            {file.name}
+                          </div>
+                          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                            {(file.size / 1024 / 1024).toFixed(2)} MB • Ready for Evaluation
+                          </div>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                          <div
+                            style={{
+                              width: '40px',
+                              height: '40px',
+                              borderRadius: '4px',
+                              background: 'var(--accent-teal-light)',
+                              border: '1px solid rgba(15, 107, 92, 0.25)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: 'var(--accent-teal)',
+                            }}
+                          >
+                            <Upload size={20} />
+                          </div>
+                          <div style={{ fontWeight: 600, fontSize: '0.92rem', color: 'var(--text-primary)' }}>
+                            Click to browse or drag & drop resume PDF
+                          </div>
+                          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                            PDF format up to 5MB (text or parsed layout)
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 1-Click Demo Resume Option */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0.85rem 1.15rem',
+                      background: useDemoResume ? 'var(--accent-teal-light)' : 'var(--bg-secondary)',
+                      border: useDemoResume ? '1px solid var(--accent-teal)' : '1px solid var(--border-default)',
+                      borderRadius: 'var(--radius-sm)',
+                      marginBottom: '1.25rem',
+                      cursor: 'pointer',
+                      transition: 'var(--transition)',
+                    }}
+                    onClick={handleSelectDemoResume}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <Zap size={16} color="var(--accent-teal)" />
+                      <div>
+                        <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                          Or use 1-Click Verified Demo CV
+                        </div>
+                        <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+                          Pre-loaded Senior MERN & AI engineer profile for instant testing
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className={useDemoResume ? 'btn btn-primary' : 'btn btn-secondary'}
+                      style={{ fontSize: '0.78rem', padding: '0.35rem 0.75rem' }}
+                    >
+                      {useDemoResume ? 'Selected ✓' : 'Use Demo CV'}
+                    </button>
+                  </div>
+
+                  {/* "Check your match first" Action Step */}
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    <button
+                      type="button"
+                      onClick={handleCheckMatchFirst}
+                      disabled={previewLoading}
+                      className="btn btn-secondary"
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem 1rem',
+                        fontSize: '0.92rem',
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.55rem',
+                        color: 'var(--accent-teal)',
+                        background: 'var(--accent-teal-light)',
+                        border: '1px solid rgba(15, 107, 92, 0.3)',
+                        borderRadius: 'var(--radius-sm)',
+                        cursor: previewLoading ? 'not-allowed' : 'pointer',
+                        transition: 'var(--transition)',
+                      }}
+                    >
+                      {previewLoading ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          <span>Evaluating match criteria against job requirements...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles size={16} color="var(--accent-teal)" />
+                          <span>Check your match first</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </>
+              )}
 
               {/* Live Loading Progress Bar during Evaluation */}
               {submitting && (
@@ -484,7 +994,7 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                     marginBottom: '1rem',
                   }}
                 >
-                  <Loader2 size={24} className="spin" color="var(--accent-teal)" style={{ margin: '0 auto 0.6rem' }} />
+                  <Loader2 size={24} className="animate-spin" color="var(--accent-teal)" style={{ margin: '0 auto 0.6rem' }} />
                   <div
                     style={{
                       fontSize: '0.88rem',
@@ -843,35 +1353,67 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
         {/* Modal Sticky Footer */}
         <div className="modal-footer">
           {!evaluationResult ? (
-            <>
-              <button
-                type="button"
-                onClick={handleClose}
-                className="btn btn-ghost"
-                disabled={submitting}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSubmit}
-                className="btn btn-primary"
-                disabled={submitting || (!file && !useDemoResume)}
-                style={{ padding: '0.65rem 1.4rem' }}
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 size={16} className="spin" />
-                    <span>Evaluating...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Submit & Run AI Match</span>
-                    <ArrowRight size={16} />
-                  </>
-                )}
-              </button>
-            </>
+            previewMatchData ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setPreviewMatchData(null)}
+                  className="btn btn-ghost"
+                  disabled={submitting}
+                >
+                  Go back
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  className="btn btn-primary"
+                  disabled={submitting}
+                  style={{ padding: '0.65rem 1.4rem' }}
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Submit anyway</span>
+                      <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className="btn btn-ghost"
+                  disabled={submitting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  className="btn btn-primary"
+                  disabled={submitting || (!file && !useDemoResume)}
+                  style={{ padding: '0.65rem 1.4rem' }}
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Evaluating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Submit & Run AI Match</span>
+                      <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+              </>
+            )
           ) : (
             <>
               <button

@@ -202,7 +202,146 @@ Analyze the match and provide the evaluation in the requested JSON structure.`;
   }
 };
 
+/**
+ * Fallback generator for previewing candidate match against job requirements
+ * @param {Object} job - Job document
+ * @param {Object} candidateProfile - Candidate skills, experience, education
+ * @returns {Object} Structured match preview
+ */
+const generateFallbackPreview = (job, candidateProfile) => {
+  const candidateSkills = Array.isArray(candidateProfile?.skills) ? candidateProfile.skills : [];
+  const candidateSkillsLower = candidateSkills.map((s) => String(s).toLowerCase().trim());
+
+  let requiredSkills = [];
+  if (job && Array.isArray(job.requiredSkills)) {
+    requiredSkills = job.requiredSkills;
+  } else if (job && typeof job.requiredSkills === 'string') {
+    requiredSkills = job.requiredSkills.split(',').map((s) => s.trim()).filter(Boolean);
+  }
+
+  const matchedSkills = [];
+  const missingSkills = [];
+
+  requiredSkills.forEach((skill) => {
+    const sLower = skill.toLowerCase().trim();
+    if (candidateSkillsLower.some((c) => c === sLower || c.includes(sLower) || sLower.includes(c))) {
+      matchedSkills.push(skill);
+    } else {
+      missingSkills.push(skill);
+    }
+  });
+
+  const matchScore = requiredSkills.length > 0
+    ? Math.min(100, Math.max(10, Math.round((matchedSkills.length / requiredSkills.length) * 100)))
+    : (candidateSkills.length > 0 ? 70 : 35);
+
+  const matchTier = matchScore >= 75 ? 'Strong Match' : matchScore >= 50 ? 'Moderate Match' : 'Low Match';
+
+  const strengthSummary = matchedSkills.length > 0
+    ? `Strong technical alignment demonstrated in key competencies (${matchedSkills.slice(0, 3).join(', ')}).`
+    : 'Candidate demonstrates solid foundational capabilities with room to expand in this domain.';
+
+  const gapSummary = missingSkills.length > 0
+    ? `Identified technical gaps in ${missingSkills.slice(0, 3).join(', ')} relative to this role.`
+    : 'No critical competency gaps identified against the posted job criteria.';
+
+  return {
+    matchScore,
+    matchTier,
+    matchedSkills,
+    missingSkills,
+    strengthSummary,
+    gapSummary,
+  };
+};
+
+/**
+ * Real-time AI preview match comparison using Gemini 2.5 Flash
+ * @param {Object} job - Job document
+ * @param {Object} candidateProfile - Profile object containing skills, experience, education
+ * @returns {Promise<Object>} Match preview scorecard
+ */
+const previewProfileMatch = async (job, candidateProfile) => {
+  if (!job) {
+    throw new Error('Target job is required for preview match.');
+  }
+
+  const jobDetails = `Job Title: ${job.title || 'N/A'}
+Company: ${job.company || 'N/A'}
+Location: ${job.location || 'N/A'}
+Required Skills: ${Array.isArray(job.requiredSkills) ? job.requiredSkills.join(', ') : (job.requiredSkills || 'N/A')}
+Description: ${job.description || 'N/A'}`;
+
+  const candidateDetails = `Current Role: ${candidateProfile?.currentRole || candidateProfile?.targetRole || 'N/A'}
+Total Experience: ${candidateProfile?.totalExperience || 'N/A'}
+Skills: ${Array.isArray(candidateProfile?.skills) ? candidateProfile.skills.join(', ') : (candidateProfile?.skills || 'N/A')}
+Education: ${Array.isArray(candidateProfile?.education) ? candidateProfile.education.map((e) => `${e.degree || ''} at ${e.institution || ''} (${e.year || ''})`).join('; ') : 'N/A'}
+Work History: ${Array.isArray(candidateProfile?.workHistory) ? candidateProfile.workHistory.map((w) => `${w.role || ''} at ${w.company || ''} (${w.duration || ''}): ${w.description || ''}`).join('; ') : 'N/A'}`;
+
+  if (!isGeminiConfigured()) {
+    return generateFallbackPreview(job, candidateProfile);
+  }
+
+  const aiClient = getGeminiClient();
+  if (!aiClient) {
+    return generateFallbackPreview(job, candidateProfile);
+  }
+
+  const prompt = `You are an ATS evaluator. Compare this candidate profile against the job requirements and return ONLY valid JSON:
+{
+  "matchScore": 0-100,
+  "matchTier": "Strong Match | Moderate Match | Low Match",
+  "matchedSkills": [],
+  "missingSkills": [],
+  "strengthSummary": "one sentence",
+  "gapSummary": "one sentence"
+}
+Job Requirements: ${jobDetails}
+Candidate Profile: ${candidateDetails}`;
+
+  try {
+    const apiCall = aiClient.models.generateContent({
+      model: DEFAULT_MODEL,
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+      },
+    });
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Gemini API call timed out after 15 seconds')), 15000)
+    );
+
+    const response = await Promise.race([apiCall, timeoutPromise]);
+    let rawText = response.text || '';
+    rawText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+
+    const parsed = JSON.parse(rawText);
+
+    const rawScore = Number(parsed.matchScore);
+    const matchScore = Number.isFinite(rawScore) ? Math.max(0, Math.min(100, Math.round(rawScore))) : 70;
+    const validTiers = ['Strong Match', 'Moderate Match', 'Low Match'];
+    const matchTier = validTiers.includes(parsed.matchTier)
+      ? parsed.matchTier
+      : (matchScore >= 75 ? 'Strong Match' : matchScore >= 50 ? 'Moderate Match' : 'Low Match');
+
+    return {
+      matchScore,
+      matchTier,
+      matchedSkills: Array.isArray(parsed.matchedSkills) ? parsed.matchedSkills : [],
+      missingSkills: Array.isArray(parsed.missingSkills) ? parsed.missingSkills : [],
+      strengthSummary: String(parsed.strengthSummary || 'Candidate demonstrates relevant competencies.').trim(),
+      gapSummary: String(parsed.gapSummary || 'No major gaps observed.').trim(),
+    };
+  } catch (error) {
+    console.warn('[PreviewMatch] Gemini generation failed, using heuristic preview:', error.message);
+    return generateFallbackPreview(job, candidateProfile);
+  }
+};
+
 module.exports = {
   evaluateMatch,
   generateFallbackEvaluation,
+  previewProfileMatch,
+  generateFallbackPreview,
 };
