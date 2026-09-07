@@ -5,13 +5,26 @@ const Job = require('../models/Job');
 const { extractTextFromPDF } = require('../services/resumeParserService');
 const { evaluateMatch } = require('../services/aiMatcherService');
 
-// POST /api/applications - Apply for a job
+const { sendEmail } = require('../utils/emailService');
+const {
+  applicationReceivedTemplate,
+  applicationShortlistedTemplate,
+  interviewScheduledTemplate,
+  newApplicationAlertTemplate,
+} = require('../emails/templates');
+
+// POST /api/applications or POST /api/jobs/:jobId/apply - Apply for a job
 const applyForJob = async (req, res) => {
   try {
-    const { jobId, resumeUrl, resumeText: rawResumeText } = req.body;
+    const jobId = req.params.jobId || req.body.jobId;
+    const { resumeUrl, resumeText: rawResumeText } = req.body;
 
-    // Check if job exists
-    const job = await Job.findById(jobId);
+    if (!jobId) {
+      return res.status(400).json({ message: 'jobId is required' });
+    }
+
+    // Check if job exists and populate recruiter details
+    const job = await Job.findById(jobId).populate('postedBy', 'name email');
     if (!job) {
       return res.status(404).json({ message: 'Job not found' });
     }
@@ -61,6 +74,40 @@ const applyForJob = async (req, res) => {
       experienceFit: evaluation.experienceFit,
       recommendation: evaluation.recommendation,
     });
+
+    // 1. Send confirmation email to Candidate
+    if (req.user && req.user.email) {
+      const candidateHtml = applicationReceivedTemplate({
+        candidateName: req.user.name || 'Candidate',
+        jobTitle: job.title,
+        companyName: job.company,
+        matchScore: evaluation.matchScore,
+        dashboardUrl: `${process.env.APP_URL || 'http://localhost:3000'}/dashboard`,
+      });
+
+      sendEmail(
+        req.user.email,
+        `Application Received: ${job.title} at ${job.company}`,
+        candidateHtml
+      ).catch(err => console.warn('[applyForJob] Error sending candidate email:', err.message));
+    }
+
+    // 2. Send pipeline alert email to Recruiter
+    if (job.postedBy && job.postedBy.email) {
+      const recruiterHtml = newApplicationAlertTemplate({
+        recruiterName: job.postedBy.name || 'Recruiter',
+        candidateName: req.user.name || 'Applicant',
+        jobTitle: job.title,
+        matchScore: evaluation.matchScore,
+        scorecardUrl: `${process.env.APP_URL || 'http://localhost:3000'}/recruiter/pipeline`,
+      });
+
+      sendEmail(
+        job.postedBy.email,
+        `New Candidate: ${req.user.name || 'Applicant'} applied for ${job.title}`,
+        recruiterHtml
+      ).catch(err => console.warn('[applyForJob] Error sending recruiter alert:', err.message));
+    }
 
     res.status(201).json(application);
   } catch (error) {
@@ -184,7 +231,14 @@ const getJobApplications = async (req, res) => {
 // PATCH /api/applications/:id/status - Recruiter updates application status
 const updateApplicationStatus = async (req, res) => {
   try {
-    const { status } = req.body;
+    const {
+      status,
+      nextSteps,
+      interviewDate,
+      interviewTime,
+      interviewerName,
+      meetingLink,
+    } = req.body;
     const allowedStatuses = ['applied', 'shortlisted', 'interview', 'rejected', 'hired'];
 
     if (!status || !allowedStatuses.includes(status)) {
@@ -193,7 +247,10 @@ const updateApplicationStatus = async (req, res) => {
       });
     }
 
-    const application = await Application.findById(req.params.id).populate('job');
+    const application = await Application.findById(req.params.id)
+      .populate('job')
+      .populate('candidate', 'name email');
+
     if (!application) {
       return res.status(404).json({ message: 'Application not found' });
     }
@@ -203,8 +260,47 @@ const updateApplicationStatus = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to update status for this application' });
     }
 
+    const previousStatus = application.status;
     application.status = status;
     await application.save();
+
+    const appUrl = process.env.APP_URL || 'http://localhost:3000';
+
+    // Trigger candidate emails based on the new status
+    if (application.candidate && application.candidate.email) {
+      if (status === 'shortlisted' && previousStatus !== 'shortlisted') {
+        const shortlistedHtml = applicationShortlistedTemplate({
+          candidateName: application.candidate.name || 'Candidate',
+          jobTitle: application.job.title,
+          companyName: application.job.company,
+          nextSteps: nextSteps || 'Our recruiting team will reach out shortly regarding interview scheduling and next steps.',
+          dashboardUrl: `${appUrl}/dashboard`,
+        });
+
+        sendEmail(
+          application.candidate.email,
+          `Congratulations: Shortlisted for ${application.job.title} at ${application.job.company}`,
+          shortlistedHtml
+        ).catch(err => console.warn('[updateApplicationStatus] Error sending shortlisted email:', err.message));
+      } else if (status === 'interview' && previousStatus !== 'interview') {
+        const interviewHtml = interviewScheduledTemplate({
+          candidateName: application.candidate.name || 'Candidate',
+          jobTitle: application.job.title,
+          companyName: application.job.company,
+          interviewDate: interviewDate || 'To be confirmed',
+          interviewTime: interviewTime || 'To be confirmed',
+          interviewerName: interviewerName || req.user.name || 'Hiring Team',
+          meetingLink: meetingLink || null,
+          dashboardUrl: `${appUrl}/dashboard`,
+        });
+
+        sendEmail(
+          application.candidate.email,
+          `Interview Scheduled: ${application.job.title} at ${application.job.company}`,
+          interviewHtml
+        ).catch(err => console.warn('[updateApplicationStatus] Error sending interview email:', err.message));
+      }
+    }
 
     res.status(200).json(application);
   } catch (error) {
