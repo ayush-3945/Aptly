@@ -30,6 +30,7 @@ app.use('/api/auth', authLimiter, require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/jobs', require('./routes/jobRoutes'));
 app.use('/api/applications', aiUploadLimiter, require('./routes/applicationRoutes'));
+app.use('/api/interviews', require('./routes/interviewRoutes'));
 app.use('/api/resumes', aiUploadLimiter, require('./routes/resumeRoutes'));
 app.use('/api/candidate', aiUploadLimiter, require('./routes/candidateRoutes'));
 app.use('/api/candidates', aiUploadLimiter, require('./routes/candidateRoutes'));

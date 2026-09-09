@@ -274,8 +274,11 @@ function interviewScheduledTemplate({
   companyName = 'Company',
   interviewDate = 'To be confirmed',
   interviewTime = 'To be confirmed',
+  duration = 45,
+  format = 'Video Call',
   interviewerName = 'Hiring Team',
   meetingLink = null,
+  notes = '',
   dashboardUrl = null,
 }) {
   const appUrl = process.env.APP_URL || 'http://localhost:3000';
@@ -314,16 +317,29 @@ function interviewScheduledTemplate({
         </tr>
         <tr>
           <td style="padding-bottom: 12px; font-size: 13px; color: #6B7280;">Time:</td>
-          <td style="padding-bottom: 12px; font-size: 14px; font-weight: 600; color: #0F6B5C;">${interviewTime}</td>
+          <td style="padding-bottom: 12px; font-size: 14px; font-weight: 600; color: #0F6B5C;">${interviewTime} (${duration} mins)</td>
         </tr>
         <tr>
-          <td style="padding-bottom: ${meetingLink ? '12px' : '0'}; font-size: 13px; color: #6B7280;">Interviewer:</td>
-          <td style="padding-bottom: ${meetingLink ? '12px' : '0'}; font-size: 14px; font-weight: 600; color: #111827;">${interviewerName}</td>
+          <td style="padding-bottom: 12px; font-size: 13px; color: #6B7280;">Format:</td>
+          <td style="padding-bottom: 12px; font-size: 14px; font-weight: 600; color: #111827;">
+            <span style="display: inline-block; padding: 2px 7px; font-size: 12px; font-weight: 600; background: #E6F4F1; color: #0F6B5C; border-radius: 3px;">
+              ${format}
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-bottom: ${meetingLink || notes ? '12px' : '0'}; font-size: 13px; color: #6B7280;">Interviewer:</td>
+          <td style="padding-bottom: ${meetingLink || notes ? '12px' : '0'}; font-size: 14px; font-weight: 600; color: #111827;">${interviewerName}</td>
         </tr>
         ${meetingLink ? `
         <tr>
-          <td style="font-size: 13px; color: #6B7280;">Meeting Link:</td>
-          <td style="font-size: 14px; font-weight: 600;"><a href="${meetingLink}" style="color: #0F6B5C; text-decoration: underline;">${meetingLink}</a></td>
+          <td style="padding-bottom: ${notes ? '12px' : '0'}; font-size: 13px; color: #6B7280;">Meeting Link:</td>
+          <td style="padding-bottom: ${notes ? '12px' : '0'}; font-size: 14px; font-weight: 600;"><a href="${meetingLink}" style="color: #0F6B5C; text-decoration: underline;">${meetingLink}</a></td>
+        </tr>` : ''}
+        ${notes ? `
+        <tr>
+          <td style="vertical-align: top; font-size: 13px; color: #6B7280;">Preparation Notes:</td>
+          <td style="font-size: 13px; color: #4B5563; line-height: 1.5;">${notes}</td>
         </tr>` : ''}
       </table>
     </div>
@@ -417,6 +433,64 @@ function newApplicationAlertTemplate({
   });
 }
 
+/**
+ * 5. Candidate: Interview Cancelled Template
+ */
+function interviewCancelledTemplate({
+  candidateName = 'Candidate',
+  jobTitle = 'Position',
+  companyName = 'Company',
+  interviewDate = 'Scheduled Date',
+  reason = 'The hiring team had to cancel this session.',
+  dashboardUrl = null,
+}) {
+  const appUrl = process.env.APP_URL || 'http://localhost:3000';
+  const actionUrl = dashboardUrl || `${appUrl}/dashboard`;
+
+  const content = `
+    <div style="margin-bottom: 12px;">
+      <span style="display: inline-block; font-size: 12px; font-weight: 600; color: #B91C1C; background-color: #FEE2E2; border: 1px solid #FECACA; padding: 3px 8px; border-radius: 3px;">
+        Interview Cancelled
+      </span>
+    </div>
+    <h1 style="margin: 0 0 16px 0; font-family: 'Charter', 'Newsreader', 'Georgia', serif; font-size: 24px; font-weight: 700; color: #111827; line-height: 1.3;">
+      Update on your interview
+    </h1>
+    <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #374151;">
+      Dear ${candidateName},
+    </p>
+    <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #374151;">
+      Your scheduled interview for <strong>${jobTitle}</strong> at <strong>${companyName}</strong> on <strong>${interviewDate}</strong> has been cancelled.
+    </p>
+
+    <div style="margin: 24px 0; padding: 18px; background-color: #FFF5F5; border: 1px solid #FED7D7; border-left: 4px solid #B91C1C; border-radius: 4px;">
+      <div style="font-size: 13px; font-weight: 600; color: #991B1B; margin-bottom: 4px;">
+        Notice from Hiring Team
+      </div>
+      <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #4B5563;">
+        ${reason}
+      </p>
+    </div>
+
+    <p style="margin: 0 0 28px 0; font-size: 14px; line-height: 1.6; color: #4B5563;">
+      The recruiter may reach out to reschedule. You can track your application status anytime on your candidate dashboard.
+    </p>
+
+    <div style="margin: 28px 0 10px 0;">
+      <a href="${actionUrl}" style="display: inline-block; background-color: #0F6B5C; color: #FFFFFF; font-size: 14px; font-weight: 600; text-decoration: none; padding: 12px 24px; border-radius: 3px; box-shadow: 0 1px 2px rgba(15, 107, 92, 0.2);">
+        View Dashboard
+      </a>
+    </div>
+  `;
+
+  return baseLayout({
+    title: `Interview Cancelled: ${jobTitle} at ${companyName}`,
+    previewText: `Your interview for ${jobTitle} at ${companyName} has been cancelled.`,
+    content,
+    unsubscribeUrl: `${appUrl}/settings/notifications`,
+  });
+}
+
 module.exports = {
   getScoreStyles,
   baseLayout,
@@ -424,4 +498,6 @@ module.exports = {
   applicationShortlistedTemplate,
   interviewScheduledTemplate,
   newApplicationAlertTemplate,
+  interviewCancelledTemplate,
 };
+

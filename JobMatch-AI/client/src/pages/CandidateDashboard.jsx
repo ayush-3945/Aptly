@@ -25,6 +25,7 @@ import { useSavedJobs } from '../utils/savedJobs';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
 import ApplyModal from '../components/ApplyModal';
 import CandidateProfile from './CandidateProfile';
+import UpcomingInterviews from '../components/UpcomingInterviews';
 
 // Curated sample applications so candidate dashboard demonstrates rich state even prior to first application
 const SAMPLE_APPLICATIONS = [
@@ -78,11 +79,11 @@ const CandidateDashboard = () => {
   const initialTab = searchParams.get('tab') || 'applications';
 
   // Tab & Saved Jobs State
-  const [activeTab, setActiveTab] = useState(initialTab); // 'applications' | 'saved' | 'profile'
+  const [activeTab, setActiveTab] = useState(initialTab); // 'applications' | 'interviews' | 'saved' | 'profile'
 
   useEffect(() => {
     const tabFromUrl = searchParams.get('tab');
-    if (tabFromUrl && ['applications', 'saved', 'profile'].includes(tabFromUrl)) {
+    if (tabFromUrl && ['applications', 'interviews', 'saved', 'profile'].includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
     }
   }, [searchParams]);
@@ -399,6 +400,34 @@ const CandidateDashboard = () => {
         >
           <FileText size={17} color={activeTab === 'applications' ? 'var(--accent-teal)' : 'currentColor'} />
           <span>My Applications ({applications.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleTabChange('interviews')}
+          style={{
+            padding: '0.65rem 1.35rem',
+            borderRadius: '6px',
+            fontSize: '0.92rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            border:
+              activeTab === 'interviews'
+                ? '1px solid var(--accent-teal)'
+                : '1px solid var(--border-default)',
+            background:
+              activeTab === 'interviews'
+                ? 'var(--accent-teal-light)'
+                : 'var(--bg-card)',
+            color: activeTab === 'interviews' ? 'var(--accent-teal)' : 'var(--text-secondary)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            transition: 'var(--transition)',
+          }}
+        >
+          <Calendar size={17} color={activeTab === 'interviews' ? 'var(--accent-teal)' : 'currentColor'} />
+          <span>Scheduled Interviews</span>
         </button>
 
         <button
@@ -732,8 +761,16 @@ const CandidateDashboard = () => {
               })}
             </div>
           )}
+
+          {/* Candidate Scheduled Interviews Section */}
+          <UpcomingInterviews viewMode="candidate" />
         </div>
-      ) : (
+      ) : activeTab === 'interviews' ? (
+        /* Dedicated Scheduled Interviews Tab */
+        <div className="animate-fade-in">
+          <UpcomingInterviews viewMode="candidate" />
+        </div>
+      ) : activeTab === 'saved' ? (
         /* Saved Jobs View */
         <div>
           <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '1.25rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
@@ -949,7 +986,7 @@ const CandidateDashboard = () => {
             </div>
           )}
         </div>
-      )}
+      ) : null}
 
       {/* Embedded Resume & Profile Management */}
       {activeTab === 'profile' && (

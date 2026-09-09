@@ -20,11 +20,13 @@ import {
   RotateCcw,
   Search,
   ExternalLink,
+  Calendar,
 } from 'lucide-react';
 import api from '../services/api';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
 import { getDemoApplicantsForJob } from '../utils/demoApplicants';
 import { useToast } from '../context/ToastContext';
+import ScheduleInterviewModal from '../components/ScheduleInterviewModal';
 
 const PIPELINE_COLUMNS = [
   {
@@ -80,6 +82,16 @@ const JobApplicants = () => {
 
   // Resume / Candidate Detail Modal
   const [selectedCandidate, setSelectedCandidate] = useState(null);
+
+  // Native Interview Scheduling Modal
+  const [schedulingApplicant, setSchedulingApplicant] = useState(null);
+
+  const handleInterviewScheduled = (_newInterview, applicationId) => {
+    setApplicants((prev) =>
+      prev.map((app) => (app._id === applicationId ? { ...app, status: 'interview' } : app))
+    );
+    setSchedulingApplicant(null);
+  };
 
   // Global Toast
   const { showToast } = useToast();
@@ -649,6 +661,7 @@ const JobApplicants = () => {
                           application={app}
                           onTransition={handleTransition}
                           onViewResume={() => setSelectedCandidate(app)}
+                          onScheduleInterview={(appToSchedule) => setSchedulingApplicant(appToSchedule)}
                         />
                       ))
                     )}
@@ -738,6 +751,7 @@ const JobApplicants = () => {
                         application={app}
                         onTransition={handleTransition}
                         onViewResume={() => setSelectedCandidate(app)}
+                        onScheduleInterview={(appToSchedule) => setSchedulingApplicant(appToSchedule)}
                         isRejectedColumn
                       />
                     ))}
@@ -755,13 +769,31 @@ const JobApplicants = () => {
           candidateApp={selectedCandidate}
           onClose={() => setSelectedCandidate(null)}
           onTransition={handleTransition}
+          onScheduleInterview={(appToSchedule) => setSchedulingApplicant(appToSchedule)}
+        />
+      )}
+
+      {/* Native Schedule Interview Modal */}
+      {schedulingApplicant && (
+        <ScheduleInterviewModal
+          isOpen={!!schedulingApplicant}
+          onClose={() => setSchedulingApplicant(null)}
+          application={schedulingApplicant}
+          job={job}
+          onSuccess={handleInterviewScheduled}
         />
       )}
     </div>
   );
 };
 
-const CandidateCard = ({ application, onTransition, onViewResume, _isRejectedColumn }) => {
+const CandidateCard = ({
+  application,
+  onTransition,
+  onViewResume,
+  onScheduleInterview,
+  _isRejectedColumn,
+}) => {
   const candidate = application.candidate || {};
   const score = application.aiMatchScore || 0;
 
@@ -966,7 +998,34 @@ const CandidateCard = ({ application, onTransition, onViewResume, _isRejectedCol
         </button>
 
         {/* 1-Click Quick Move Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap' }}>
+          {/* Prominent "Schedule Interview" button on shortlisted candidate cards */}
+          {application.status === 'shortlisted' && (
+            <button
+              type="button"
+              onClick={() => onScheduleInterview && onScheduleInterview(application)}
+              style={{
+                padding: '0.35rem 0.65rem',
+                borderRadius: '4px',
+                background: 'var(--accent-teal)',
+                border: '1px solid var(--accent-teal)',
+                color: '#FFFFFF',
+                fontSize: '0.74rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem',
+                boxShadow: '0 1px 3px rgba(15, 107, 92, 0.2)',
+                transition: 'all 0.15s ease',
+              }}
+              title="Schedule Native Interview"
+            >
+              <Calendar size={13} />
+              Schedule Interview
+            </button>
+          )}
+
           {application.status !== 'shortlisted' && (
             <button
               onClick={() => onTransition(application._id, 'shortlisted', candidate.name)}
@@ -990,9 +1049,15 @@ const CandidateCard = ({ application, onTransition, onViewResume, _isRejectedCol
             </button>
           )}
 
-          {application.status !== 'interview' && (
+          {application.status !== 'interview' && application.status !== 'shortlisted' && (
             <button
-              onClick={() => onTransition(application._id, 'interview', candidate.name)}
+              onClick={() => {
+                if (onScheduleInterview) {
+                  onScheduleInterview(application);
+                } else {
+                  onTransition(application._id, 'interview', candidate.name);
+                }
+              }}
               style={{
                 padding: '0.35rem 0.55rem',
                 borderRadius: '4px',
@@ -1081,7 +1146,7 @@ const CandidateCard = ({ application, onTransition, onViewResume, _isRejectedCol
   );
 };
 
-const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
+const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInterview }) => {
   const candidate = candidateApp.candidate || {};
   const score = candidateApp.aiMatchScore || 0;
 
@@ -1354,21 +1419,47 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition }) => {
             >
               ⭐ Shortlist
             </button>
-            <button
-              onClick={() => {
-                onTransition(candidateApp._id, 'interview', candidate.name);
-                onClose();
-              }}
-              className="btn btn-secondary"
-              style={{
-                padding: '0.65rem 1.15rem',
-                fontSize: '0.85rem',
-                borderColor: 'rgba(180, 83, 9, 0.3)',
-                color: 'var(--semantic-amber)',
-              }}
-            >
-              💬 Interview
-            </button>
+
+            {candidateApp.status === 'shortlisted' ? (
+              <button
+                onClick={() => {
+                  onClose();
+                  if (onScheduleInterview) onScheduleInterview(candidateApp);
+                }}
+                className="btn btn-primary"
+                style={{
+                  padding: '0.65rem 1.25rem',
+                  fontSize: '0.85rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  background: 'var(--accent-teal)',
+                }}
+              >
+                <Calendar size={15} />
+                Schedule Interview
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  onClose();
+                  if (onScheduleInterview) {
+                    onScheduleInterview(candidateApp);
+                  } else {
+                    onTransition(candidateApp._id, 'interview', candidate.name);
+                  }
+                }}
+                className="btn btn-secondary"
+                style={{
+                  padding: '0.65rem 1.15rem',
+                  fontSize: '0.85rem',
+                  borderColor: 'rgba(180, 83, 9, 0.3)',
+                  color: 'var(--semantic-amber)',
+                }}
+              >
+                💬 Interview
+              </button>
+            )}
             <button
               onClick={() => {
                 onTransition(candidateApp._id, 'hired', candidate.name);

@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import CandidateDashboard from './CandidateDashboard';
 import RecruiterJobs from '../components/RecruiterJobs';
 import RecruiterAnalytics from '../components/RecruiterAnalytics';
+import UpcomingInterviews from '../components/UpcomingInterviews';
 import { ShieldCheck } from 'lucide-react';
 
 const Dashboard = () => {
@@ -18,6 +19,9 @@ const Dashboard = () => {
     <div className="container" style={{ padding: '3.5rem 1.5rem', minHeight: '80vh' }}>
       {/* Active Job Postings Management */}
       <RecruiterJobs />
+
+      {/* Recruiter Native Upcoming Interviews Section */}
+      <UpcomingInterviews viewMode="recruiter" />
 
       {/* Recruiter Talent Analytics & Hiring Telemetry */}
       <RecruiterAnalytics />

@@ -17,7 +17,7 @@ const signup = async (req, res) => {
     if (!name || !email || !password || !role) {
       return res.status(400).json({ message: 'Please provide all required fields: name, email, password, and role' });
     }
-
+    
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
