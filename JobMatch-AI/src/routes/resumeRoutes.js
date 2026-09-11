@@ -7,15 +7,29 @@ const { candidateOnly } = require('../middlewares/roleMiddleware');
 const { extractTextFromPDF } = require('../services/resumeParserService');
 
 // POST /api/resumes/upload - Upload a PDF resume
-router.post('/upload', protect, candidateOnly, upload.single('resume'), (req, res) => {
+router.post('/upload', protect, candidateOnly, upload.single('resume'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'Please upload a PDF resume' });
   }
 
+  const normalizedPath = req.file.path.replace(/\\/g, '/');
+  let extractedText = '';
+
+  try {
+    const parsed = await extractTextFromPDF(req.file.path);
+    if (parsed && parsed.text) {
+      extractedText = parsed.text;
+    }
+  } catch (parseErr) {
+    console.warn('PDF text extraction error on upload:', parseErr.message);
+  }
+
   res.status(200).json({
     message: 'Resume uploaded successfully',
-    filePath: req.file.path,
+    filePath: normalizedPath,
+    fileUrl: normalizedPath,
     filename: req.file.filename,
+    extractedText,
   });
 });
 

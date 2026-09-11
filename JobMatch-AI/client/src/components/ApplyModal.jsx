@@ -238,7 +238,15 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
           const uploadRes = await api.post('/resumes/upload', uploadFormData, {
             headers: { 'Content-Type': 'multipart/form-data' },
           });
-          resumeUrl = uploadRes.data.fileUrl || resumeUrl;
+          resumeUrl = uploadRes.data?.filePath || uploadRes.data?.fileUrl || resumeUrl;
+          if (uploadRes.data?.extractedText) {
+            resumeText = uploadRes.data.extractedText;
+          }
+        } else if (useDemoResume) {
+          resumeText = `Alex Morgan
+Senior Full-Stack MERN & AI Engineer
+Email: candidate@jobmatch.ai | Location: San Francisco, CA
+Skills: React, Node.js, Express, MongoDB, Gemini AI, Docker, JavaScript, REST APIs, Git`;
         }
 
         const applyRes = await api.post('/applications', {
@@ -247,14 +255,14 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
           resumeText,
         });
 
-        if (applyRes.data && applyRes.data.aiMatchScore !== undefined) {
+        if (applyRes.data && applyRes.data.aiMatchScore !== undefined && applyRes.data.aiMatchScore !== null) {
           evaluationData = applyRes.data;
         }
       } catch (apiErr) {
         console.warn('Backend application endpoint fallback to simulated evaluation:', apiErr);
       }
 
-      if (!evaluationData) {
+      if (!evaluationData || evaluationData.aiMatchScore === null || evaluationData.aiMatchScore === undefined) {
         evaluationData = generateSimulatedMatch(job, useDemoResume);
       }
 
@@ -286,7 +294,7 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
   };
 
   const circumference = 2 * Math.PI * 52; // r = 52
-  const score = evaluationResult ? evaluationResult.aiMatchScore : 0;
+  const score = evaluationResult ? (evaluationResult.aiMatchScore ?? 0) : 0;
   const strokeOffset = circumference - (circumference * score) / 100;
 
   const scoreColor =
@@ -1071,7 +1079,7 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
                         color: scoreColor,
                       }}
                     >
-                      {evaluationResult.aiMatchScore}%
+                      {evaluationResult.aiMatchScore ?? 0}%
                     </span>
                     <span
                       style={{
