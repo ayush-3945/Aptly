@@ -23,6 +23,7 @@ import {
   Sparkles,
   FileText,
   GripVertical,
+  Calendar,
 } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
@@ -82,7 +83,7 @@ const STAGE_LABELS = {
 };
 
 // Draggable candidate card
-const DraggableCard = ({ application, onViewResume }) => {
+const DraggableCard = ({ application, onViewResume, onScheduleInterview }) => {
   const {
     attributes,
     listeners,
@@ -96,6 +97,7 @@ const DraggableCard = ({ application, onViewResume }) => {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.4 : 1,
+    cursor: 'pointer',
   };
 
   const candidate = application.candidate || {};
@@ -202,7 +204,7 @@ const DraggableCard = ({ application, onViewResume }) => {
         </span>
       </div>
 
-      {/* Bottom row: date + scorecard button */}
+      {/* Bottom row: date + action buttons */}
       <div
         style={{
           display: 'flex',
@@ -211,37 +213,66 @@ const DraggableCard = ({ application, onViewResume }) => {
           marginTop: '0.5rem',
           paddingTop: '0.45rem',
           borderTop: '1px solid var(--border-default)',
+          gap: '0.35rem',
         }}
       >
         <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
           {appliedDate}
         </span>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onViewResume(application);
-          }}
-          className="kanban-scorecard-btn"
-          style={{
-            padding: '0.2rem 0.5rem',
-            borderRadius: '3px',
-            background: 'transparent',
-            border: '1px solid var(--border-default)',
-            color: 'var(--accent-teal)',
-            fontSize: '0.68rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.25rem',
-            opacity: 0,
-            transition: 'opacity 0.15s ease',
-          }}
-        >
-          <FileText size={11} />
-          Scorecard
-        </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+          {application.status === 'shortlisted' && onScheduleInterview && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onScheduleInterview(application);
+              }}
+              style={{
+                padding: '0.22rem 0.55rem',
+                borderRadius: '4px',
+                background: 'var(--accent-teal)',
+                border: 'none',
+                color: '#FFFFFF',
+                fontSize: '0.68rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.25rem',
+              }}
+              title="Schedule interview for this candidate"
+            >
+              <Calendar size={11} />
+              Schedule
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewResume(application);
+            }}
+            className="kanban-scorecard-btn"
+            style={{
+              padding: '0.2rem 0.5rem',
+              borderRadius: '3px',
+              background: 'transparent',
+              border: '1px solid var(--border-default)',
+              color: 'var(--accent-teal)',
+              fontSize: '0.68rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.25rem',
+            }}
+          >
+            <FileText size={11} />
+            Scorecard
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -288,7 +319,7 @@ const CardOverlay = ({ application }) => {
 };
 
 // Droppable column
-const KanbanColumn = ({ stage, applications, onViewResume }) => {
+const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview }) => {
   const IconComponent = stage.icon;
   const isRejected = stage.id === 'rejected';
 
@@ -396,6 +427,7 @@ const KanbanColumn = ({ stage, applications, onViewResume }) => {
                 key={app._id}
                 application={app}
                 onViewResume={onViewResume}
+                onScheduleInterview={onScheduleInterview}
               />
             ))
           )}
@@ -406,7 +438,7 @@ const KanbanColumn = ({ stage, applications, onViewResume }) => {
 };
 
 // Main KanbanBoard component
-const KanbanBoard = ({ applicants, setApplicants, onViewResume, job }) => {
+const KanbanBoard = ({ applicants, setApplicants, onViewResume, onScheduleInterview, job }) => {
   const { showToast } = useToast();
   const [activeId, setActiveId] = useState(null);
 
@@ -531,6 +563,7 @@ const KanbanBoard = ({ applicants, setApplicants, onViewResume, job }) => {
             stage={stage}
             applications={columnData[stage.id] || []}
             onViewResume={onViewResume}
+            onScheduleInterview={onScheduleInterview}
           />
         ))}
       </div>

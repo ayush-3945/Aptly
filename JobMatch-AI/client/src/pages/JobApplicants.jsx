@@ -591,6 +591,7 @@ const JobApplicants = () => {
               applicants={processedApplicants}
               setApplicants={setApplicants}
               onViewResume={(app) => setSelectedCandidate(app)}
+              onScheduleInterview={(app) => setSchedulingApplicant(app)}
               job={job}
             />
           )}
