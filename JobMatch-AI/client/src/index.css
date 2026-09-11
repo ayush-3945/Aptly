@@ -514,3 +514,55 @@ a {
   background: rgba(185, 28, 28, 0.04);
 }
 
+/* Kanban Board Card Styles */
+.kanban-card {
+  padding: 0.85rem 1rem;
+  border-radius: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
+}
+
+.kanban-card:hover {
+  border-color: var(--accent-teal);
+  box-shadow: 0 2px 8px rgba(15, 107, 92, 0.1);
+}
+
+.kanban-card:hover .kanban-scorecard-btn {
+  opacity: 1 !important;
+}
+
+/* Kanban view toggle pill styles */
+.view-toggle-pill {
+  display: flex;
+  align-items: center;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  padding: 0.2rem;
+  border: 1px solid var(--border-default);
+}
+
+.view-toggle-btn {
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  border: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.view-toggle-btn.active {
+  background: var(--accent-teal);
+  color: #FFFFFF;
+}
+
+.view-toggle-btn:not(.active) {
+  background: transparent;
+  color: var(--text-muted);
+}

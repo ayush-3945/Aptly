@@ -87,16 +87,21 @@ const PostJob = () => {
     setError('');
   };
 
-  // Skill Input Handler
+  // Skill Input Handler — supports comma-separated bulk input
   const handleAddSkill = (skillToAdd) => {
-    const trimmed = (skillToAdd || skillInput).trim();
-    if (!trimmed) return;
+    const raw = (skillToAdd || skillInput).trim();
+    if (!raw) return;
 
-    // Check if duplicate
-    const exists = skills.some((s) => s.toLowerCase() === trimmed.toLowerCase());
-    if (!exists) {
-      setSkills([...skills, trimmed]);
-    }
+    // Split by comma to support "React Native, JavaScript, Expo" bulk input
+    const parts = raw.split(',').map((s) => s.trim()).filter(Boolean);
+    const newSkills = [...skills];
+    parts.forEach((part) => {
+      const exists = newSkills.some((s) => s.toLowerCase() === part.toLowerCase());
+      if (!exists && part.length > 0) {
+        newSkills.push(part);
+      }
+    });
+    setSkills(newSkills);
     setSkillInput('');
   };
 
@@ -128,6 +133,23 @@ const PostJob = () => {
     e.preventDefault();
     setError('');
 
+    // Auto-add any remaining skill text before validating
+    if (skillInput.trim()) {
+      const parts = skillInput.split(',').map((s) => s.trim()).filter(Boolean);
+      const updated = [...skills];
+      parts.forEach((part) => {
+        if (!updated.some((s) => s.toLowerCase() === part.toLowerCase())) {
+          updated.push(part);
+        }
+      });
+      setSkills(updated);
+      setSkillInput('');
+      // Use updated for validation below
+      if (updated.length > 0) {
+        // Skip the skills.length === 0 check since we just added
+      }
+    }
+
     // Validation
     if (!title.trim()) {
       setError('Please provide a job title.');
@@ -144,7 +166,11 @@ const PostJob = () => {
       showToast('Please provide the job location or select Remote.', 'warning');
       return;
     }
-    if (skills.length === 0) {
+    // Get latest skills count (including any just auto-added from input)
+    const currentSkills = skillInput.trim()
+      ? [...skills, ...skillInput.split(',').map(s => s.trim()).filter(s => s && !skills.some(sk => sk.toLowerCase() === s.toLowerCase()))]
+      : skills;
+    if (currentSkills.length === 0) {
       setError('Please add at least one required technical skill.');
       showToast('Please add at least one required technical skill.', 'warning');
       return;

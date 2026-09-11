@@ -239,7 +239,7 @@ const updateApplicationStatus = async (req, res) => {
       interviewerName,
       meetingLink,
     } = req.body;
-    const allowedStatuses = ['applied', 'shortlisted', 'interview', 'rejected', 'hired'];
+    const allowedStatuses = ['applied', 'shortlisted', 'interview', 'offer', 'rejected', 'hired'];
 
     if (!status || !allowedStatuses.includes(status)) {
       return res.status(400).json({
@@ -329,10 +329,84 @@ const withdrawApplication = async (req, res) => {
   }
 };
 
+// PATCH /api/applications/:id/stage - Recruiter updates application stage via Kanban drag-and-drop
+const updateApplicationStage = async (req, res) => {
+  try {
+    const { stage } = req.body;
+    const allowedStages = ['applied', 'shortlisted', 'interview', 'offer', 'hired', 'rejected'];
+
+    if (!stage || !allowedStages.includes(stage)) {
+      return res.status(400).json({
+        message: `Invalid stage. Allowed stages are: ${allowedStages.join(', ')}`,
+      });
+    }
+
+    const application = await Application.findById(req.params.id)
+      .populate('job')
+      .populate('candidate', 'name email');
+
+    if (!application) {
+      return res.status(404).json({ message: 'Application not found' });
+    }
+
+    // Verify the logged-in recruiter posted the job
+    if (!application.job || application.job.postedBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to update stage for this application' });
+    }
+
+    const previousStatus = application.status;
+    application.status = stage;
+    await application.save();
+
+    const appUrl = process.env.APP_URL || 'http://localhost:3000';
+
+    // Trigger email notifications based on the new stage
+    if (application.candidate && application.candidate.email) {
+      if (stage === 'shortlisted' && previousStatus !== 'shortlisted') {
+        const shortlistedHtml = applicationShortlistedTemplate({
+          candidateName: application.candidate.name || 'Candidate',
+          jobTitle: application.job.title,
+          companyName: application.job.company,
+          nextSteps: 'Our recruiting team will reach out shortly regarding interview scheduling and next steps.',
+          dashboardUrl: `${appUrl}/dashboard`,
+        });
+
+        sendEmail(
+          application.candidate.email,
+          `Congratulations: Shortlisted for ${application.job.title} at ${application.job.company}`,
+          shortlistedHtml
+        ).catch(err => console.warn('[updateApplicationStage] Error sending shortlisted email:', err.message));
+      } else if (stage === 'interview' && previousStatus !== 'interview') {
+        const interviewHtml = interviewScheduledTemplate({
+          candidateName: application.candidate.name || 'Candidate',
+          jobTitle: application.job.title,
+          companyName: application.job.company,
+          interviewDate: 'To be confirmed',
+          interviewTime: 'To be confirmed',
+          interviewerName: req.user.name || 'Hiring Team',
+          meetingLink: null,
+          dashboardUrl: `${appUrl}/dashboard`,
+        });
+
+        sendEmail(
+          application.candidate.email,
+          `Interview Scheduled: ${application.job.title} at ${application.job.company}`,
+          interviewHtml
+        ).catch(err => console.warn('[updateApplicationStage] Error sending interview email:', err.message));
+      }
+    }
+
+    res.status(200).json(application);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   applyForJob,
   getMyApplications,
   getJobApplications,
   updateApplicationStatus,
+  updateApplicationStage,
   withdrawApplication,
 };

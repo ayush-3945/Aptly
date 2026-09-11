@@ -21,12 +21,16 @@ import {
   Search,
   ExternalLink,
   Calendar,
+  LayoutList,
+  Columns3,
+  Gift,
 } from 'lucide-react';
 import api from '../services/api';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
 import { getDemoApplicantsForJob } from '../utils/demoApplicants';
 import { useToast } from '../context/ToastContext';
 import ScheduleInterviewModal from '../components/ScheduleInterviewModal';
+import KanbanBoard from '../components/KanbanBoard';
 
 const PIPELINE_COLUMNS = [
   {
@@ -52,9 +56,18 @@ const PIPELINE_COLUMNS = [
     title: 'Interview',
     subtitle: 'Rounds in Progress',
     icon: MessageSquare,
-    color: 'var(--semantic-amber)',
-    accentBg: 'rgba(180, 83, 9, 0.1)',
-    borderTop: 'var(--semantic-amber)',
+    color: 'var(--accent-teal)',
+    accentBg: 'var(--accent-teal-light)',
+    borderTop: 'var(--accent-teal)',
+  },
+  {
+    id: 'offer',
+    title: 'Offer',
+    subtitle: 'Pending Acceptance',
+    icon: Gift,
+    color: 'var(--semantic-green)',
+    accentBg: 'rgba(45, 122, 58, 0.1)',
+    borderTop: 'var(--semantic-green)',
   },
   {
     id: 'hired',
@@ -79,6 +92,7 @@ const JobApplicants = () => {
   const [sortBy, setSortBy] = useState('score'); // 'score', 'date'
   const [searchQuery, setSearchQuery] = useState('');
   const [showRejectedTray, setShowRejectedTray] = useState(false);
+  const [viewMode, setViewMode] = useState('kanban'); // 'kanban' | 'list'
 
   // Resume / Candidate Detail Modal
   const [selectedCandidate, setSelectedCandidate] = useState(null);
@@ -203,6 +217,7 @@ const JobApplicants = () => {
       applied: [],
       shortlisted: [],
       interview: [],
+      offer: [],
       hired: [],
       rejected: [],
     };
@@ -526,6 +541,24 @@ const JobApplicants = () => {
               Date
             </button>
           </div>
+
+          {/* View Mode Toggle */}
+          <div className="view-toggle-pill">
+            <button
+              onClick={() => setViewMode('kanban')}
+              className={`view-toggle-btn ${viewMode === 'kanban' ? 'active' : ''}`}
+            >
+              <Columns3 size={13} />
+              Kanban
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+            >
+              <LayoutList size={13} />
+              List
+            </button>
+          </div>
         </div>
       </div>
 
@@ -552,7 +585,18 @@ const JobApplicants = () => {
         </div>
       ) : (
         <>
-          {/* Kanban Board Grid (4 Columns) with Touch-Friendly Scroll */}
+          {/* Kanban Drag-and-Drop View */}
+          {viewMode === 'kanban' && (
+            <KanbanBoard
+              applicants={processedApplicants}
+              setApplicants={setApplicants}
+              onViewResume={(app) => setSelectedCandidate(app)}
+              job={job}
+            />
+          )}
+
+          {/* List / Column Grid View */}
+          {viewMode === 'list' && (
           <div
             className="kanban-scroll-container"
             style={{
@@ -670,6 +714,7 @@ const JobApplicants = () => {
               );
             })}
           </div>
+          )}
 
           {/* Collapsible Rejected / Archived Tray */}
           <div

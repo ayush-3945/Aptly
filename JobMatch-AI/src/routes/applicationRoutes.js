@@ -5,6 +5,7 @@ const {
   getMyApplications,
   getJobApplications,
   updateApplicationStatus,
+  updateApplicationStage,
   withdrawApplication,
 } = require('../controllers/applicationController');
 const { protect } = require('../middlewares/authMiddleware');
@@ -22,7 +23,11 @@ router.get('/job/:jobId', protect, recruiterOnly, getJobApplications);
 // PATCH /api/applications/:id/status - Recruiter updates application status
 router.patch('/:id/status', protect, recruiterOnly, updateApplicationStatus);
 
+// PATCH /api/applications/:id/stage - Recruiter updates application stage (Kanban drag-and-drop)
+router.patch('/:id/stage', protect, recruiterOnly, updateApplicationStage);
+
 // DELETE /api/applications/:id - Candidate withdraws an application
 router.delete('/:id', protect, candidateOnly, withdrawApplication);
 
 module.exports = router;
+
