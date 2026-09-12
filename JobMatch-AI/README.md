@@ -31,7 +31,7 @@ The live production deployment is hosted at **[aptly-ai.vercel.app](https://aptl
 | Persona | Demo Email | Demo Password | Capabilities & Test Views |
 | :--- | :--- | :--- | :--- |
 | **🎯 Candidate** | `candidate@jobmatch.ai` | `password123` | Explore open roles, bookmark jobs, upload PDF resumes, real-time Gemini AI ATS scoring, live application tracking |
-| **🏢 Recruiter** | `recruiter@jobmatch.ai` | `password123` | Publish job requisitions, 5-stage interactive ATS Kanban board, 1-click status transitions, candidate match breakdown |
+| **🏢 Recruiter** | `recruiter@jobmatch.ai` | `password123` | Publish job requisitions, 6-stage @dnd-kit drag-and-drop ATS Kanban board, 1-click status transitions, native interview scheduler, candidate match breakdown |
 
 *Note: You can also register a new account or use the built-in "Fill Demo Candidate / Recruiter" pills on the login screen.*
 
