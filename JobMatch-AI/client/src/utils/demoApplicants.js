@@ -143,4 +143,27 @@ export const getDemoApplicantsForJob = (jobId = 'demo-job') => [
     appliedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     isDemo: true,
   },
+  {
+    _id: `demo_app_7_${jobId}`,
+    job: jobId,
+    status: 'offer',
+    candidate: {
+      _id: 'cand_7',
+      name: 'Liam Walker',
+      email: 'liam.walker@cloudnative.dev',
+      profile: {
+        targetRole: 'Senior Full-Stack & Cloud Engineer',
+        location: 'Chicago, IL (Hybrid)',
+      },
+    },
+    aiMatchScore: 91,
+    recommendation: 'Strong Match',
+    matchedSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'Docker'],
+    missingSkills: ['Gemini AI'],
+    experienceFit: '5 years delivering production cloud services and full-stack web applications with high reliability.',
+    fitSummary: 'Formal employment offer extended. Exceptional team player with verified architectural leadership.',
+    resumeUrl: '/uploads/resumes/sample-liam-walker.pdf',
+    appliedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    isDemo: true,
+  },
 ];

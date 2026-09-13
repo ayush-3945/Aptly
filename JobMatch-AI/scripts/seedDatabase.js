@@ -314,14 +314,14 @@ Requirements:
       {
         job: flagshipJob._id,
         candidate: userMap['sophie.martin@example.com']._id,
-        status: 'shortlisted',
+        status: 'offer',
         resumeUrl: 'uploads/resumes/sophie-martin-resume.pdf',
-        aiMatchScore: 82,
+        aiMatchScore: 89,
         recommendation: 'Strong Match',
-        matchedSkills: ['React', 'Node.js', 'MongoDB', 'Docker'],
-        missingSkills: ['Gemini AI', 'Express'],
+        matchedSkills: ['React', 'Node.js', 'MongoDB', 'Docker', 'Express'],
+        missingSkills: ['Gemini AI'],
         experienceFit: '3.5 years of production web development across full-stack JavaScript architectures.',
-        fitSummary: 'Shortlisted for initial screening call. Clear communicator with verified GitHub portfolio.',
+        fitSummary: 'Formal offer extended following successful technical panel and system design rounds.',
       },
       {
         job: flagshipJob._id,
@@ -338,7 +338,7 @@ Requirements:
     ];
 
     const createdApplications = await Application.insertMany(applicationDefinitions);
-    console.log(`✔ Seeded ${createdApplications.length} applications across all 5 Kanban stages.\n`);
+    console.log(`✔ Seeded ${createdApplications.length} applications across all 6 Kanban stages.\n`);
 
     // 7. Render Formatted Summary Table
     console.log('================================================================================');
@@ -346,13 +346,14 @@ Requirements:
     console.log('================================================================================');
     console.log(`👥 Demo Accounts     : ${createdUsers.length} (1 Recruiter, ${createdUsers.length - 1} Candidates)`);
     console.log(`💼 Active Jobs       : ${createdJobs.length} Production Requisitions`);
-    console.log(`📋 ATS Applications  : ${createdApplications.length} Applications Distributed Across 5 Stages`);
+    console.log(`📋 ATS Applications  : ${createdApplications.length} Applications Distributed Across 6 Stages`);
     console.log('--------------------------------------------------------------------------------');
     console.log('Kanban Stage Distribution for Flagship Role ("Full-Stack MERN & AI Engineer"):');
     console.log('  📥 Applied        : 2 candidates (David Chen [95%], Priya Sharma [76%])');
-    console.log('  ⭐ Shortlisted    : 2 candidates (Alex Morgan [92%], Sophie Martin [82%])');
+    console.log('  ⭐ Shortlisted    : 1 candidate  (Alex Morgan [92%])');
     console.log('  💬 Interview      : 2 candidates (Elena Rostova [88%], Liam Walker [84%])');
-    console.log('  🎉 Offer Accepted : 1 candidate  (Marcus Vance [96%])');
+    console.log('  🎁 Offer Extended : 1 candidate  (Sophie Martin [89%])');
+    console.log('  🎉 Hired          : 1 candidate  (Marcus Vance [96%])');
     console.log('  📁 Archived       : 1 candidate  (Jordan Taylor [40%])');
     console.log('================================================================================');
     console.log('✨ Seeder executed successfully! Default logins:');
