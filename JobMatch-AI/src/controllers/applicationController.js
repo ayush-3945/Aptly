@@ -12,6 +12,8 @@ const {
   applicationShortlistedTemplate,
   interviewScheduledTemplate,
   newApplicationAlertTemplate,
+  applicationOfferTemplate,
+  applicationHiredTemplate,
 } = require('../emails/templates');
 
 // POST /api/applications or POST /api/jobs/:jobId/apply - Apply for a job
@@ -475,6 +477,34 @@ const updateApplicationStage = async (req, res) => {
           `Interview Scheduled: ${application.job.title} at ${application.job.company}`,
           interviewHtml
         ).catch(err => console.warn('[updateApplicationStage] Error sending interview email:', err.message));
+      } else if (stage === 'offer' && previousStatus !== 'offer') {
+        const offerHtml = applicationOfferTemplate({
+          candidateName: application.candidate.name || 'Candidate',
+          jobTitle: application.job.title,
+          companyName: application.job.company,
+          offerDetails: 'The recruitment team has extended an official employment offer for this position. Formal offer documentation and onboarding schedules will follow shortly.',
+          dashboardUrl: `${appUrl}/dashboard`,
+        });
+
+        sendEmail(
+          application.candidate.email,
+          `Official Job Offer: ${application.job.title} at ${application.job.company} 🎉`,
+          offerHtml
+        ).catch(err => console.warn('[updateApplicationStage] Error sending offer email:', err.message));
+      } else if (stage === 'hired' && previousStatus !== 'hired') {
+        const hiredHtml = applicationHiredTemplate({
+          candidateName: application.candidate.name || 'Candidate',
+          jobTitle: application.job.title,
+          companyName: application.job.company,
+          welcomeMessage: 'Welcome to the team! Our HR team will reach out with equipment provisioning, system access, and day-one orientation details.',
+          dashboardUrl: `${appUrl}/dashboard`,
+        });
+
+        sendEmail(
+          application.candidate.email,
+          `Welcome to ${application.job.company}: Officially Hired as ${application.job.title}! 🎉`,
+          hiredHtml
+        ).catch(err => console.warn('[updateApplicationStage] Error sending hired email:', err.message));
       }
     }
 

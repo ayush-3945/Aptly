@@ -491,6 +491,116 @@ function interviewCancelledTemplate({
   });
 }
 
+/**
+ * 6. Candidate: Job Offer Extended Template
+ */
+function applicationOfferTemplate({
+  candidateName = 'Candidate',
+  jobTitle = 'Position',
+  companyName = 'Company',
+  offerDetails = 'The hiring team has extended a formal employment offer for this position.',
+  dashboardUrl = null,
+}) {
+  const appUrl = process.env.APP_URL || 'http://localhost:3000';
+  const actionUrl = dashboardUrl || `${appUrl}/dashboard`;
+
+  const content = `
+    <div style="margin-bottom: 12px;">
+      <span style="display: inline-block; font-size: 12px; font-weight: 700; color: #2D7A3A; background-color: #EAF6EC; border: 1px solid #BCE2C5; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em;">
+        Offer Extended
+      </span>
+    </div>
+    <h1 style="margin: 0 0 16px 0; font-family: 'Charter', 'Newsreader', 'Georgia', serif; font-size: 26px; font-weight: 700; color: #111827; line-height: 1.3;">
+      Exciting News: Official Job Offer!
+    </h1>
+    <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #374151;">
+      Dear ${candidateName},
+    </p>
+    <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #374151;">
+      We are thrilled to share that following your exceptional performance throughout the evaluation process, <strong>${companyName}</strong> has extended an official employment offer for the role of <strong>${jobTitle}</strong>.
+    </p>
+
+    <div style="margin: 24px 0; padding: 20px; background-color: #F0FDF4; border: 1px solid #BBF7D0; border-left: 4px solid #2D7A3A; border-radius: 4px;">
+      <div style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: #166534; margin-bottom: 6px;">
+        Offer Summary & Next Steps
+      </div>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #374151;">
+        ${offerDetails}
+      </p>
+    </div>
+
+    <p style="margin: 0 0 28px 0; font-size: 14px; line-height: 1.6; color: #4B5563;">
+      The recruiting team will be in touch directly with formal offer documentation and onboarding schedules. You can also view your updated pipeline stage directly on your candidate dashboard.
+    </p>
+
+    <div style="margin: 28px 0 10px 0;">
+      <a href="${actionUrl}" style="display: inline-block; background-color: #0F6B5C; color: #FFFFFF; font-size: 14px; font-weight: 600; text-decoration: none; padding: 12px 26px; border-radius: 4px; box-shadow: 0 1px 2px rgba(15, 107, 92, 0.2);">
+        View Offer on Dashboard
+      </a>
+    </div>
+  `;
+
+  return baseLayout({
+    title: `Job Offer: ${jobTitle} at ${companyName}`,
+    previewText: `Congratulations! Official job offer extended for ${jobTitle} at ${companyName}.`,
+    content,
+    unsubscribeUrl: `${appUrl}/settings/notifications`,
+  });
+}
+
+/**
+ * 7. Candidate: Welcome Aboard / Hired Template
+ */
+function applicationHiredTemplate({
+  candidateName = 'Candidate',
+  jobTitle = 'Position',
+  companyName = 'Company',
+  welcomeMessage = 'Welcome to the team! We are excited to embark on this journey together.',
+  dashboardUrl = null,
+}) {
+  const appUrl = process.env.APP_URL || 'http://localhost:3000';
+  const actionUrl = dashboardUrl || `${appUrl}/dashboard`;
+
+  const content = `
+    <div style="margin-bottom: 12px;">
+      <span style="display: inline-block; font-size: 12px; font-weight: 700; color: #0F6B5C; background-color: #E6F4F1; border: 1px solid #B2DFD8; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em;">
+        Hired 🎉
+      </span>
+    </div>
+    <h1 style="margin: 0 0 16px 0; font-family: 'Charter', 'Newsreader', 'Georgia', serif; font-size: 26px; font-weight: 700; color: #111827; line-height: 1.3;">
+      Welcome to the Team!
+    </h1>
+    <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #374151;">
+      Dear ${candidateName},
+    </p>
+    <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #374151;">
+      Congratulations on officially joining <strong>${companyName}</strong> as <strong>${jobTitle}</strong>! Your offer has been finalized, and your status is officially marked as <strong>Hired</strong>.
+    </p>
+
+    <div style="margin: 24px 0; padding: 20px; background-color: #F8FAF9; border: 1px solid #E5E7EB; border-left: 4px solid #0F6B5C; border-radius: 4px;">
+      <div style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: #0F6B5C; margin-bottom: 6px;">
+        Onboarding & Next Steps
+      </div>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #374151;">
+        ${welcomeMessage}
+      </p>
+    </div>
+
+    <div style="margin: 28px 0 10px 0;">
+      <a href="${actionUrl}" style="display: inline-block; background-color: #0F6B5C; color: #FFFFFF; font-size: 14px; font-weight: 600; text-decoration: none; padding: 12px 26px; border-radius: 4px; box-shadow: 0 1px 2px rgba(15, 107, 92, 0.2);">
+        Go to Candidate Portal
+      </a>
+    </div>
+  `;
+
+  return baseLayout({
+    title: `Welcome to ${companyName}: You're Hired as ${jobTitle}!`,
+    previewText: `Welcome aboard! Your hire has been confirmed for ${jobTitle} at ${companyName}.`,
+    content,
+    unsubscribeUrl: `${appUrl}/settings/notifications`,
+  });
+}
+
 module.exports = {
   getScoreStyles,
   baseLayout,
@@ -499,5 +609,7 @@ module.exports = {
   interviewScheduledTemplate,
   newApplicationAlertTemplate,
   interviewCancelledTemplate,
+  applicationOfferTemplate,
+  applicationHiredTemplate,
 };
 
