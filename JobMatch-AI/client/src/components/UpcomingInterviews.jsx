@@ -119,22 +119,20 @@ const UpcomingInterviews = ({ viewMode = 'recruiter' }) => {
 
   // Date/Time formatting helpers
   const formatDateTime = (isoDateString) => {
-    if (!isoDateString) return { dateStr: 'Date TBD', timeStr: '' };
+    if (!isoDateString) return { weekday: 'TBD', month: '', day: '--', timeStr: '' };
     try {
       const d = new Date(isoDateString);
-      const dateStr = d.toLocaleDateString('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-      });
+      const weekday = d.toLocaleDateString('en-US', { weekday: 'short' });
+      const month = d.toLocaleDateString('en-US', { month: 'short' });
+      const day = d.getDate();
       const timeStr = d.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true,
       });
-      return { dateStr, timeStr };
+      return { weekday, month, day, timeStr };
     } catch (_e) {
-      return { dateStr: isoDateString, timeStr: '' };
+      return { weekday: '', month: '', day: '', timeStr: isoDateString };
     }
   };
 
@@ -326,7 +324,7 @@ const UpcomingInterviews = ({ viewMode = 'recruiter' }) => {
             const candidate = item.candidateId || {};
             const recruiter = item.recruiterId || {};
             const currentJob = item.jobId || {};
-            const { dateStr, timeStr } = formatDateTime(item.scheduledAt);
+            const { weekday, month, day, timeStr } = formatDateTime(item.scheduledAt);
             const formatBadge = getFormatBadge(item.format);
             const FormatIcon = formatBadge.icon;
             const statusStyle = getStatusStyle(item.status);
@@ -361,11 +359,11 @@ const UpcomingInterviews = ({ viewMode = 'recruiter' }) => {
                       minWidth: '85px',
                     }}
                   >
-                    <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-teal)', textTransform: 'uppercase' }}>
-                      {dateStr.split(',')[0]}
+                    <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-teal)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      {weekday} • {month}
                     </div>
-                    <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                      {dateStr.split(' ')[1] || dateStr}
+                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.15, margin: '2px 0' }}>
+                      {day}
                     </div>
                     <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                       {timeStr}
