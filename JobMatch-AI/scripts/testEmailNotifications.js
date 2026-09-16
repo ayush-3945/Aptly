@@ -7,21 +7,39 @@ const {
   applicationShortlistedTemplate,
   interviewScheduledTemplate,
   newApplicationAlertTemplate,
+  interviewCancelledTemplate,
+  applicationOfferTemplate,
+  applicationHiredTemplate,
 } = require('../src/emails/templates');
 const serverTemplates = require('../server/emails/templates');
 
 async function runTests() {
   console.log('🧪 [Test Suite] Starting Resend Email Service & Template Validation...\n');
 
-  // 1. Check template functions exist across both src/ and server/ imports
-  console.log('1. Checking template exports and aliases...');
-  if (typeof applicationReceivedTemplate !== 'function' || typeof serverTemplates.applicationReceivedTemplate !== 'function') {
-    throw new Error('Template applicationReceivedTemplate export mismatch between src and server');
+  // 1. Check all 7 template functions exist across both src/ and server/ imports
+  console.log('1. Checking template exports and aliases across src/ and server/...');
+  const requiredTemplates = [
+    'applicationReceivedTemplate',
+    'applicationShortlistedTemplate',
+    'interviewScheduledTemplate',
+    'newApplicationAlertTemplate',
+    'interviewCancelledTemplate',
+    'applicationOfferTemplate',
+    'applicationHiredTemplate',
+  ];
+
+  for (const tName of requiredTemplates) {
+    const srcFn = require('../src/emails/templates')[tName];
+    const srvFn = serverTemplates[tName];
+    if (typeof srcFn !== 'function' || typeof srvFn !== 'function') {
+      throw new Error(`Template ${tName} export mismatch or missing between src/ and server/`);
+    }
   }
+
   if (typeof sendEmail !== 'function' || typeof serverEmailService.sendEmail !== 'function') {
     throw new Error('Email service sendEmail export mismatch between src and server');
   }
-  console.log('   ✅ src/ and server/ exports correctly aligned.\n');
+  console.log('   ✅ All 7 transactional templates & email service exports correctly aligned.\n');
 
   // 2. Test getScoreStyles for semantic thresholds
   console.log('2. Testing semantic match score color logic...');
@@ -101,8 +119,51 @@ async function runTests() {
   }
   console.log('   ✅ Recruiter New Application Alert template valid.\n');
 
-  // 7. Test sendEmail function with simulation fallback
-  console.log('7. Testing sendEmail execution...');
+  // 7. Test Template 5: Interview Cancelled Template
+  console.log('7. Generating Interview Cancelled Template...');
+  const cancelledHtml = interviewCancelledTemplate({
+    candidateName: 'Dr. Sarah Lin',
+    jobTitle: 'Senior Clinical Research Associate',
+    companyName: 'Genentech',
+    interviewDate: 'September 18, 2026 at 2:00 PM EST',
+    reason: 'The hiring committee had an unexpected schedule conflict and will reschedule.',
+    dashboardUrl: 'http://localhost:3000/dashboard',
+  });
+  if (!cancelledHtml.includes('Interview Cancelled') || !cancelledHtml.includes('schedule conflict')) {
+    throw new Error('Interview Cancelled template failed validation check.');
+  }
+  console.log('   ✅ Interview Cancelled template valid.\n');
+
+  // 8. Test Template 6: Application Offer Extended Template
+  console.log('8. Generating Application Offer Extended Template...');
+  const offerHtml = applicationOfferTemplate({
+    candidateName: 'Dr. Sarah Lin',
+    jobTitle: 'Senior Clinical Research Associate',
+    companyName: 'Genentech',
+    offerDetails: 'Base Salary: $145,000 + 15% bonus and health benefits package.',
+    dashboardUrl: 'http://localhost:3000/dashboard',
+  });
+  if (!offerHtml.includes('Offer Extended') || !offerHtml.includes('$145,000') || !offerHtml.includes('Official Job Offer')) {
+    throw new Error('Application Offer Extended template failed validation check.');
+  }
+  console.log('   ✅ Application Offer Extended template valid.\n');
+
+  // 9. Test Template 7: Application Hired Template
+  console.log('9. Generating Application Hired Template...');
+  const hiredHtml = applicationHiredTemplate({
+    candidateName: 'Dr. Sarah Lin',
+    jobTitle: 'Senior Clinical Research Associate',
+    companyName: 'Genentech',
+    welcomeMessage: 'Your laptop and security clearance packet will ship by Monday.',
+    dashboardUrl: 'http://localhost:3000/dashboard',
+  });
+  if (!hiredHtml.includes('Hired 🎉') || !hiredHtml.includes('Welcome to the Team!') || !hiredHtml.includes('security clearance')) {
+    throw new Error('Application Hired template failed validation check.');
+  }
+  console.log('   ✅ Application Hired template valid.\n');
+
+  // 10. Test sendEmail function with simulation fallback
+  console.log('10. Testing sendEmail execution...');
   const res1 = await sendEmail(
     'candidate@example.com',
     'Application Received: Senior Clinical Research Associate at Genentech',
@@ -113,16 +174,16 @@ async function runTests() {
   }
 
   const res2 = await sendEmail({
-    to: 'recruiter@genentech.com',
-    subject: 'New Candidate: Dr. Sarah Lin applied for Senior Clinical Research Associate',
-    htmlContent: alertHtml,
+    to: 'candidate@example.com',
+    subject: 'Official Job Offer: Senior Clinical Research Associate at Genentech',
+    htmlContent: offerHtml,
   });
   if (!res2.success) {
     throw new Error(`sendEmail object format failed: ${res2.error}`);
   }
   console.log('   ✅ sendEmail executed successfully in both positional & object configurations.\n');
 
-  console.log('🎉 ALL EMAIL NOTIFICATION TESTS PASSED SUCCESSFULLY!');
+  console.log('🎉 ALL 7 TRANSACTIONAL EMAIL NOTIFICATION TESTS PASSED SUCCESSFULLY!');
 }
 
 runTests().catch(err => {

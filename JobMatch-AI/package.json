@@ -12,6 +12,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:ai": "node scripts/verifyAIPipeline.js",
     "test:preview": "node scripts/testPreviewMatch.js",
+    "test:emails": "node scripts/testEmailNotifications.js",
     "test:health": "node scripts/testHealth.js"
   },
   "keywords": [],

@@ -298,8 +298,10 @@ Aptly/
 │   │   │   └── utils/           # savedJobs helper & demoApplicants generator
 │   │   └── package.json
 │   ├── scripts/
-│   │   ├── testHealth.js        # Automated Production Health Check Suite
-│   │   └── verifyAIPipeline.js  # Phase 2 ATS Evaluation & Benchmarking Suite
+│   │   ├── testHealth.js             # Automated Production Health Check Suite
+│   │   ├── testEmailNotifications.js # 7-Stage Transactional Email & Resend Validation Suite
+│   │   ├── testPreviewMatch.js       # Pre-Application Resume Match Preview Test Suite
+│   │   └── verifyAIPipeline.js       # Phase 2 ATS Evaluation & Benchmarking Suite
 │   ├── src/
 │   │   ├── config/              # aiConfig.js (Gemini SDK), db.js (Mongoose)
 │   │   ├── controllers/         # healthController, jobController, applicationController, etc.
