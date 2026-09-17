@@ -17,6 +17,7 @@ try {
 const User = require('../src/models/User');
 const Job = require('../src/models/Job');
 const Application = require('../src/models/Application');
+const Interview = require('../src/models/Interview');
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/jobmatch-ai';
 
@@ -143,10 +144,17 @@ async function seedDatabase() {
     const existingUserIds = existingUsers.map((u) => u._id);
 
     if (existingUserIds.length > 0) {
+      await Interview.deleteMany({
+        $or: [
+          { recruiterId: { $in: existingUserIds } },
+          { candidateId: { $in: existingUserIds } },
+        ],
+      });
       await Application.deleteMany({ candidate: { $in: existingUserIds } });
       const existingJobs = await Job.find({ postedBy: { $in: existingUserIds } });
       const existingJobIds = existingJobs.map((j) => j._id);
       if (existingJobIds.length > 0) {
+        await Interview.deleteMany({ jobId: { $in: existingJobIds } });
         await Application.deleteMany({ job: { $in: existingJobIds } });
         await Job.deleteMany({ _id: { $in: existingJobIds } });
       }
@@ -333,20 +341,54 @@ Requirements:
         matchedSkills: ['React'],
         missingSkills: ['Node.js', 'Express', 'MongoDB', 'Gemini AI', 'Docker'],
         experienceFit: 'Junior UI developer with HTML/CSS focus; lacks requisite backend microservices experience.',
-        fitSummary: 'Profile archived due to significant gap in required server-side and database competencies.',
+        fitSummary: 'Application rejected due to significant gap in required server-side and database competencies.',
       },
     ];
 
     const createdApplications = await Application.insertMany(applicationDefinitions);
     console.log(`✔ Seeded ${createdApplications.length} applications across all 6 Kanban stages.\n`);
 
-    // 7. Render Formatted Summary Table
+    // 7. Seed Production Interviews for Pipeline Candidates
+    console.log('📅 Scheduling upcoming interview sessions for pipeline candidates...');
+    const elenaUser = userMap['elena.rostova@example.com'];
+    const liamUser = userMap['liam.walker@example.com'];
+
+    const interviewDefinitions = [
+      {
+        jobId: flagshipJob._id,
+        candidateId: elenaUser._id,
+        recruiterId: recruiterUser._id,
+        scheduledAt: new Date(Date.now() + 26 * 60 * 60 * 1000), // ~Tomorrow afternoon
+        duration: 45,
+        format: 'Video Call',
+        meetingLink: 'https://meet.google.com/aptly-mern-round',
+        notes: 'Round 1 technical evaluation: MERN architecture, React state patterns, and Gemini API integration.',
+        status: 'Scheduled',
+      },
+      {
+        jobId: flagshipJob._id,
+        candidateId: liamUser._id,
+        recruiterId: recruiterUser._id,
+        scheduledAt: new Date(Date.now() + 72 * 60 * 60 * 1000), // ~3 days out
+        duration: 60,
+        format: 'Video Call',
+        meetingLink: 'https://meet.google.com/aptly-liam-design',
+        notes: 'System architecture deep-dive: high-throughput Node.js microservices & MongoDB aggregations.',
+        status: 'Scheduled',
+      },
+    ];
+
+    const createdInterviews = await Interview.insertMany(interviewDefinitions);
+    console.log(`✔ Seeded ${createdInterviews.length} upcoming interview appointments in calendar.\n`);
+
+    // 8. Render Formatted Summary Table
     console.log('================================================================================');
     console.log('                    DATABASE SEEDING VERIFICATION SUMMARY                       ');
     console.log('================================================================================');
     console.log(`👥 Demo Accounts     : ${createdUsers.length} (1 Recruiter, ${createdUsers.length - 1} Candidates)`);
     console.log(`💼 Active Jobs       : ${createdJobs.length} Production Requisitions`);
     console.log(`📋 ATS Applications  : ${createdApplications.length} Applications Distributed Across 6 Stages`);
+    console.log(`📅 Active Interviews : ${createdInterviews.length} Scheduled Sessions Linked to Flagship Opening`);
     console.log('--------------------------------------------------------------------------------');
     console.log('Kanban Stage Distribution for Flagship Role ("Full-Stack MERN & AI Engineer"):');
     console.log('  📥 Applied        : 2 candidates (David Chen [95%], Priya Sharma [76%])');
@@ -354,7 +396,7 @@ Requirements:
     console.log('  💬 Interview      : 2 candidates (Elena Rostova [88%], Liam Walker [84%])');
     console.log('  🎁 Offer Extended : 1 candidate  (Sophie Martin [89%])');
     console.log('  🎉 Hired          : 1 candidate  (Marcus Vance [96%])');
-    console.log('  📁 Archived       : 1 candidate  (Jordan Taylor [40%])');
+    console.log('  ❌ Rejected       : 1 candidate  (Jordan Taylor [40%])');
     console.log('================================================================================');
     console.log('✨ Seeder executed successfully! Default logins:');
     console.log('   Recruiter : recruiter@jobmatch.ai / password123');
