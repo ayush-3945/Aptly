@@ -100,9 +100,20 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job: pr
     cursor: 'pointer',
   };
 
+  const candidateName =
+    application.candidateName ||
+    application.candidate?.fullName ||
+    application.candidate?.name ||
+    'Anonymous Candidate';
+
+  if (!application.candidateName) {
+    application.candidateName = candidateName;
+  }
+
   const candidate = {
     ...application.candidate,
-    fullName: application.candidate?.fullName || application.candidate?.name || 'Anonymous Candidate',
+    name: candidateName,
+    fullName: candidateName,
   };
   const score = application.aiMatchScore || 0;
   const scoreColor =
@@ -169,7 +180,7 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job: pr
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <h4
-            title={candidate.fullName}
+            title={application.candidateName}
             style={{
               fontSize: '0.9rem',
               fontWeight: 700,
@@ -182,7 +193,7 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job: pr
               textOverflow: 'ellipsis',
             }}
           >
-            {candidate.fullName}
+            {application.candidateName}
           </h4>
           <span
             title={job.title}
@@ -354,8 +365,9 @@ const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview, 
         border: '1px solid var(--border-default)',
         display: 'flex',
         flexDirection: 'column',
-        minWidth: '210px',
         flex: 1,
+        minWidth: '160px',
+        maxWidth: '220px',
       }}
     >
       {/* Column header */}
@@ -574,8 +586,8 @@ const KanbanBoard = ({ applicants, setApplicants, onViewResume, onScheduleInterv
       <div
         style={{
           display: 'flex',
-          gap: '12px',
           width: '100%',
+          gap: '8px',
           overflowX: 'auto',
           paddingBottom: '1rem',
           marginBottom: '2rem',
