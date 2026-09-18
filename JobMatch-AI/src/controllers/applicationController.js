@@ -322,6 +322,8 @@ const updateApplicationStatus = async (req, res) => {
       interviewTime,
       interviewerName,
       meetingLink,
+      offerDetails,
+      welcomeMessage,
     } = req.body;
     const allowedStatuses = ['applied', 'shortlisted', 'interview', 'offer', 'rejected', 'hired'];
 
@@ -378,11 +380,34 @@ const updateApplicationStatus = async (req, res) => {
           dashboardUrl: `${appUrl}/dashboard`,
         });
 
+      } else if (status === 'offer' && previousStatus !== 'offer') {
+        const offerHtml = applicationOfferTemplate({
+          candidateName: application.candidate.name || 'Candidate',
+          jobTitle: application.job.title,
+          companyName: application.job.company,
+          offerDetails: offerDetails || 'The recruitment team has extended an official employment offer for this position. Formal offer documentation and onboarding schedules will follow shortly.',
+          dashboardUrl: `${appUrl}/dashboard`,
+        });
+
         sendEmail(
           application.candidate.email,
-          `Interview Scheduled: ${application.job.title} at ${application.job.company}`,
-          interviewHtml
-        ).catch(err => console.warn('[updateApplicationStatus] Error sending interview email:', err.message));
+          `Official Job Offer: ${application.job.title} at ${application.job.company} 🎉`,
+          offerHtml
+        ).catch(err => console.warn('[updateApplicationStatus] Error sending offer email:', err.message));
+      } else if (status === 'hired' && previousStatus !== 'hired') {
+        const hiredHtml = applicationHiredTemplate({
+          candidateName: application.candidate.name || 'Candidate',
+          jobTitle: application.job.title,
+          companyName: application.job.company,
+          welcomeMessage: welcomeMessage || 'Welcome to the team! Our HR team will reach out with equipment provisioning, system access, and day-one orientation details.',
+          dashboardUrl: `${appUrl}/dashboard`,
+        });
+
+        sendEmail(
+          application.candidate.email,
+          `Welcome to ${application.job.company}: Officially Hired as ${application.job.title}! 🎉`,
+          hiredHtml
+        ).catch(err => console.warn('[updateApplicationStatus] Error sending hired email:', err.message));
       }
     }
 
