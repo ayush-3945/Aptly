@@ -100,20 +100,26 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job: pr
     cursor: 'pointer',
   };
 
-  const candidateName =
+  const fullName =
     application.candidateName ||
     application.candidate?.fullName ||
     application.candidate?.name ||
     'Anonymous Candidate';
 
+  const firstName =
+    application.candidate?.firstName ||
+    fullName.trim().split(' ')[0] ||
+    fullName;
+
   if (!application.candidateName) {
-    application.candidateName = candidateName;
+    application.candidateName = fullName;
   }
 
   const candidate = {
     ...application.candidate,
-    name: candidateName,
-    fullName: candidateName,
+    name: fullName,
+    fullName: fullName,
+    firstName,
   };
   const score = application.aiMatchScore || 0;
   const scoreColor =
@@ -193,7 +199,7 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job: pr
               textOverflow: 'ellipsis',
             }}
           >
-            {application.candidateName}
+            {firstName}
           </h4>
           <span
             title={job.title}
@@ -315,6 +321,15 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job: pr
 // Static card for DragOverlay
 const CardOverlay = ({ application }) => {
   const candidate = application.candidate || {};
+  const fullName =
+    application.candidateName ||
+    candidate.fullName ||
+    candidate.name ||
+    'Candidate';
+  const firstName =
+    candidate.firstName ||
+    fullName.trim().split(' ')[0] ||
+    fullName;
   const score = application.aiMatchScore || 0;
   const scoreColor =
     score >= 75 ? 'var(--semantic-green)' : score >= 50 ? 'var(--semantic-amber)' : 'var(--semantic-red)';
@@ -333,6 +348,7 @@ const CardOverlay = ({ application }) => {
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <h4
+          title={fullName}
           style={{
             fontSize: '0.9rem',
             fontWeight: 700,
@@ -342,7 +358,7 @@ const CardOverlay = ({ application }) => {
             flex: 1,
           }}
         >
-          {candidate.name || 'Candidate'}
+          {firstName}
         </h4>
         <span style={{ fontSize: '0.72rem', fontWeight: 800, color: scoreColor }}>
           {score}%
