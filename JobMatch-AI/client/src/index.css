@@ -566,3 +566,82 @@ a {
   background: transparent;
   color: var(--text-muted);
 }
+
+/* Kanban Interview Kit Button */
+.kanban-kit-btn {
+  padding: 0.2rem 0.45rem;
+  border-radius: 3px;
+  background: transparent;
+  border: 1px solid rgba(15, 107, 92, 0.35);
+  color: var(--accent-teal);
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.kanban-kit-btn:hover {
+  background: rgba(15, 107, 92, 0.12);
+  border-color: var(--accent-teal);
+}
+
+/* Print Stylesheet for Interview Question Kit */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .interview-kit-modal-container,
+  .interview-kit-modal-container * {
+    visibility: visible;
+  }
+
+  .interview-kit-modal-overlay {
+    position: static !important;
+    background: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .interview-kit-modal-container {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    overflow: visible !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .interview-kit-section-content {
+    display: block !important;
+  }
+
+  .interview-kit-tips {
+    display: block !important;
+  }
+
+  .interview-question-card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 1rem !important;
+  }
+}
+

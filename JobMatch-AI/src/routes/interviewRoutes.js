@@ -5,9 +5,13 @@ const {
   getInterviews,
   updateInterview,
   cancelInterview,
+  generateQuestions,
 } = require('../controllers/interviewController');
-const { protect } = require('../middlewares/authMiddleware');
+const { protect, optionalProtect } = require('../middlewares/authMiddleware');
 const { recruiterOnly } = require('../middlewares/roleMiddleware');
+
+// POST /api/interviews/generate-questions — Generate AI personalized interview question kit
+router.post('/generate-questions', optionalProtect, generateQuestions);
 
 // POST /api/interviews/schedule — Recruiter schedules an interview with a candidate
 router.post('/schedule', protect, recruiterOnly, scheduleInterview);
@@ -22,3 +26,4 @@ router.patch('/:id', protect, updateInterview);
 router.delete('/:id', protect, recruiterOnly, cancelInterview);
 
 module.exports = router;
+

@@ -31,6 +31,7 @@ import { getDemoApplicantsForJob } from '../utils/demoApplicants';
 import { useToast } from '../context/ToastContext';
 import ScheduleInterviewModal from '../components/ScheduleInterviewModal';
 import KanbanBoard from '../components/KanbanBoard';
+import InterviewKitModal from '../components/InterviewKitModal';
 
 const PIPELINE_COLUMNS = [
   {
@@ -99,6 +100,8 @@ const JobApplicants = () => {
 
   // Native Interview Scheduling Modal
   const [schedulingApplicant, setSchedulingApplicant] = useState(null);
+  // AI Interview Question Kit Modal
+  const [selectedKitCandidate, setSelectedKitCandidate] = useState(null);
 
   const handleInterviewScheduled = (_newInterview, applicationId) => {
     setApplicants((prev) =>
@@ -592,6 +595,7 @@ const JobApplicants = () => {
               setApplicants={setApplicants}
               onViewResume={(app) => setSelectedCandidate(app)}
               onScheduleInterview={(app) => setSchedulingApplicant(app)}
+              onGenerateKit={(app) => setSelectedKitCandidate(app)}
               job={job}
             />
           )}
@@ -816,6 +820,7 @@ const JobApplicants = () => {
           onClose={() => setSelectedCandidate(null)}
           onTransition={handleTransition}
           onScheduleInterview={(appToSchedule) => setSchedulingApplicant(appToSchedule)}
+          onGenerateKit={(appToKit) => setSelectedKitCandidate(appToKit)}
         />
       )}
 
@@ -827,6 +832,15 @@ const JobApplicants = () => {
           application={schedulingApplicant}
           job={job}
           onSuccess={handleInterviewScheduled}
+        />
+      )}
+
+      {/* AI Interview Question Kit Modal */}
+      {selectedKitCandidate && (
+        <InterviewKitModal
+          application={selectedKitCandidate}
+          job={job}
+          onClose={() => setSelectedKitCandidate(null)}
         />
       )}
     </div>
@@ -1192,7 +1206,7 @@ const CandidateCard = ({
   );
 };
 
-const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInterview }) => {
+const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInterview, onGenerateKit }) => {
   const candidate = candidateApp.candidate || {};
   const score = candidateApp.aiMatchScore || 0;
 
@@ -1449,7 +1463,29 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInte
             <div />
           )}
 
-          <div style={{ display: 'flex', gap: '0.65rem' }}>
+          <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => {
+                if (onGenerateKit) onGenerateKit(candidateApp);
+              }}
+              className="btn btn-secondary"
+              style={{
+                padding: '0.65rem 1.15rem',
+                fontSize: '0.85rem',
+                borderColor: 'var(--accent-teal)',
+                color: 'var(--accent-teal)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                fontWeight: 600,
+              }}
+              title="Generate personalized AI interview kit based on skills & gaps"
+            >
+              <Sparkles size={14} />
+              Generate Interview Kit
+            </button>
+
             <button
               onClick={() => {
                 onTransition(candidateApp._id, 'shortlisted', candidate.name);

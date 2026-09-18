@@ -83,7 +83,7 @@ const STAGE_LABELS = {
 };
 
 // Draggable candidate card
-const DraggableCard = ({ application, onViewResume, onScheduleInterview, job: propJob }) => {
+const DraggableCard = ({ application, onViewResume, onScheduleInterview, onGenerateKit, job: propJob }) => {
   const {
     attributes,
     listeners,
@@ -255,7 +255,22 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job: pr
           {appliedDate}
         </span>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
+          {onGenerateKit && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onGenerateKit(application);
+              }}
+              className="kanban-kit-btn"
+              title="Generate Interview Kit"
+            >
+              <Sparkles size={11} style={{ flexShrink: 0 }} />
+              {!hasScheduleBtn && <span style={{ whiteSpace: 'nowrap' }}>Kit</span>}
+            </button>
+          )}
+
           {hasScheduleBtn && (
             <button
               type="button"
@@ -369,7 +384,7 @@ const CardOverlay = ({ application }) => {
 };
 
 // Droppable column
-const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview, job }) => {
+const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview, onGenerateKit, job }) => {
   const IconComponent = stage.icon;
   const isRejected = stage.id === 'rejected';
 
@@ -478,6 +493,7 @@ const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview, 
                 application={app}
                 onViewResume={onViewResume}
                 onScheduleInterview={onScheduleInterview}
+                onGenerateKit={onGenerateKit}
                 job={job}
               />
             ))
@@ -489,7 +505,7 @@ const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview, 
 };
 
 // Main KanbanBoard component
-const KanbanBoard = ({ applicants, setApplicants, onViewResume, onScheduleInterview, job }) => {
+const KanbanBoard = ({ applicants, setApplicants, onViewResume, onScheduleInterview, onGenerateKit, job }) => {
   const { showToast } = useToast();
   const [activeId, setActiveId] = useState(null);
 
@@ -616,6 +632,7 @@ const KanbanBoard = ({ applicants, setApplicants, onViewResume, onScheduleInterv
             applications={columnData[stage.id] || []}
             onViewResume={onViewResume}
             onScheduleInterview={onScheduleInterview}
+            onGenerateKit={onGenerateKit}
             job={job}
           />
         ))}

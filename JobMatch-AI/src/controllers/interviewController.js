@@ -349,9 +349,50 @@ const cancelInterview = async (req, res) => {
   }
 };
 
+const { generateInterviewQuestions } = require('../services/interviewQuestionService');
+
+// POST /api/interviews/generate-questions — Generates AI personalized interview question kit
+const generateQuestions = async (req, res) => {
+  try {
+    const {
+      candidateName = 'Candidate',
+      jobTitle = 'Engineering Role',
+      matchScore = 0,
+      matchedSkills = [],
+      missingSkills = [],
+      jobRequirements = '',
+    } = req.body || {};
+
+    const questions = await generateInterviewQuestions({
+      candidateName,
+      jobTitle,
+      matchScore,
+      matchedSkills,
+      missingSkills,
+      jobRequirements,
+    });
+
+    return res.status(200).json({
+      success: true,
+      candidateName,
+      jobTitle,
+      matchScore,
+      ...questions,
+    });
+  } catch (error) {
+    console.error('[generateQuestions] Exception:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to generate interview questions.',
+    });
+  }
+};
+
 module.exports = {
   scheduleInterview,
   getInterviews,
   updateInterview,
   cancelInterview,
+  generateQuestions,
 };
+
