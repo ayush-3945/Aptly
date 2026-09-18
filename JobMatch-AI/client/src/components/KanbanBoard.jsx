@@ -83,7 +83,7 @@ const STAGE_LABELS = {
 };
 
 // Draggable candidate card
-const DraggableCard = ({ application, onViewResume, onScheduleInterview, job }) => {
+const DraggableCard = ({ application, onViewResume, onScheduleInterview, job: propJob }) => {
   const {
     attributes,
     listeners,
@@ -100,7 +100,10 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job }) 
     cursor: 'pointer',
   };
 
-  const candidate = application.candidate || {};
+  const candidate = {
+    ...application.candidate,
+    fullName: application.candidate?.fullName || application.candidate?.name || 'Anonymous Candidate',
+  };
   const score = application.aiMatchScore || 0;
   const scoreColor =
     score >= 75
@@ -128,10 +131,17 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job }) 
       })
     : '';
 
-  const fullJobTitle =
-    (typeof application.job === 'object' && application.job?.title)
-      ? application.job.title
-      : job?.title || candidate.profile?.targetRole || 'Engineering Role';
+  const job = {
+    ...(typeof propJob === 'object' ? propJob : {}),
+    ...(typeof application.job === 'object' ? application.job : {}),
+    title:
+      (typeof application.job === 'object' && application.job?.title) ||
+      propJob?.title ||
+      candidate.profile?.targetRole ||
+      'Engineering Role',
+  };
+
+  const hasScheduleBtn = application.status === 'shortlisted' && Boolean(onScheduleInterview);
 
   return (
     <div
@@ -159,6 +169,7 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job }) 
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <h4
+            title={candidate.fullName}
             style={{
               fontSize: '0.9rem',
               fontWeight: 700,
@@ -171,10 +182,10 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job }) 
               textOverflow: 'ellipsis',
             }}
           >
-            {candidate.name || 'Anonymous Candidate'}
+            {candidate.fullName}
           </h4>
           <span
-            title={fullJobTitle}
+            title={job.title}
             style={{
               fontSize: '0.72rem',
               color: 'var(--text-muted)',
@@ -185,7 +196,7 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job }) 
               maxWidth: '100%',
             }}
           >
-            {fullJobTitle}
+            {job.title}
           </span>
         </div>
 
@@ -227,8 +238,8 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job }) 
           {appliedDate}
         </span>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-          {application.status === 'shortlisted' && onScheduleInterview && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
+          {hasScheduleBtn && (
             <button
               type="button"
               onClick={(e) => {
@@ -247,11 +258,13 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job }) 
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.25rem',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
               }}
               title="Schedule interview for this candidate"
             >
-              <Calendar size={11} />
-              Schedule
+              <Calendar size={11} style={{ flexShrink: 0 }} />
+              <span>Schedule</span>
             </button>
           )}
 
@@ -262,6 +275,7 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job }) 
               onViewResume(application);
             }}
             className="kanban-scorecard-btn"
+            title="Scorecard"
             style={{
               padding: '0.2rem 0.5rem',
               borderRadius: '3px',
@@ -274,10 +288,12 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, job }) 
               display: 'flex',
               alignItems: 'center',
               gap: '0.25rem',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
             }}
           >
-            <FileText size={11} />
-            Scorecard
+            <FileText size={11} style={{ flexShrink: 0 }} />
+            {!hasScheduleBtn && <span style={{ whiteSpace: 'nowrap' }}>Scorecard</span>}
           </button>
         </div>
       </div>
@@ -338,7 +354,7 @@ const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview, 
         border: '1px solid var(--border-default)',
         display: 'flex',
         flexDirection: 'column',
-        minWidth: '180px',
+        minWidth: '210px',
         flex: 1,
       }}
     >
