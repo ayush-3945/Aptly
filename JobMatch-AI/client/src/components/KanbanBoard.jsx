@@ -83,7 +83,7 @@ const STAGE_LABELS = {
 };
 
 // Draggable candidate card
-const DraggableCard = ({ application, onViewResume, onScheduleInterview }) => {
+const DraggableCard = ({ application, onViewResume, onScheduleInterview, job }) => {
   const {
     attributes,
     listeners,
@@ -128,6 +128,11 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview }) => {
       })
     : '';
 
+  const fullJobTitle =
+    (typeof application.job === 'object' && application.job?.title)
+      ? application.job.title
+      : job?.title || candidate.profile?.targetRole || 'Engineering Role';
+
   return (
     <div
       ref={setNodeRef}
@@ -169,6 +174,7 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview }) => {
             {candidate.name || 'Anonymous Candidate'}
           </h4>
           <span
+            title={fullJobTitle}
             style={{
               fontSize: '0.72rem',
               color: 'var(--text-muted)',
@@ -176,9 +182,10 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview }) => {
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              maxWidth: '100%',
             }}
           >
-            {application.job?.title || 'Engineering Role'}
+            {fullJobTitle}
           </span>
         </div>
 
@@ -319,7 +326,7 @@ const CardOverlay = ({ application }) => {
 };
 
 // Droppable column
-const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview }) => {
+const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview, job }) => {
   const IconComponent = stage.icon;
   const isRejected = stage.id === 'rejected';
 
@@ -331,9 +338,8 @@ const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview }
         border: '1px solid var(--border-default)',
         display: 'flex',
         flexDirection: 'column',
-        minWidth: '220px',
-        maxWidth: '280px',
-        flex: '1 1 220px',
+        minWidth: '180px',
+        flex: 1,
       }}
     >
       {/* Column header */}
@@ -380,11 +386,11 @@ const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview }
           style={{
             padding: '0.15rem 0.55rem',
             borderRadius: '4px',
-            background: isRejected ? 'var(--bg-secondary)' : 'var(--accent-teal-light)',
-            border: `1px solid ${isRejected ? 'var(--border-default)' : 'rgba(15, 107, 92, 0.25)'}`,
+            background: isRejected ? 'rgba(185, 28, 28, 0.08)' : 'var(--accent-teal-light)',
+            border: `1px solid ${isRejected ? 'rgba(185, 28, 28, 0.25)' : 'rgba(15, 107, 92, 0.25)'}`,
             fontSize: '0.72rem',
             fontWeight: 700,
-            color: isRejected ? 'var(--text-muted)' : 'var(--accent-teal)',
+            color: isRejected ? 'rgba(185, 28, 28, 0.7)' : 'var(--accent-teal)',
           }}
         >
           {applications.length}
@@ -428,6 +434,7 @@ const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview }
                 application={app}
                 onViewResume={onViewResume}
                 onScheduleInterview={onScheduleInterview}
+                job={job}
               />
             ))
           )}
@@ -551,7 +558,8 @@ const KanbanBoard = ({ applicants, setApplicants, onViewResume, onScheduleInterv
       <div
         style={{
           display: 'flex',
-          gap: '0.85rem',
+          gap: '12px',
+          width: '100%',
           overflowX: 'auto',
           paddingBottom: '1rem',
           marginBottom: '2rem',
@@ -564,6 +572,7 @@ const KanbanBoard = ({ applicants, setApplicants, onViewResume, onScheduleInterv
             applications={columnData[stage.id] || []}
             onViewResume={onViewResume}
             onScheduleInterview={onScheduleInterview}
+            job={job}
           />
         ))}
       </div>
