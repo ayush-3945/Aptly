@@ -67,23 +67,23 @@
 ## Architecture
 
 ```
-client/                  # React 19 + Vite
-├── src/
-│   ├── pages/           # Home, JobsList, PostJob, Dashboard, JobApplicants
-│   ├── components/      # KanbanBoard, InterviewKitModal, JDQualityPanel, RecruiterAnalytics
-│   └── index.css        # Clinical Teal Paper design system
-
-JobMatch-AI/             # Node.js + Express Backend
-├── src/
-│   ├── models/          # User, Job, Application, Interview
-│   ├── routes/          # Auth, Jobs, Applications, Interviews, Analytics
-│   ├── controllers/     # Business logic
-│   └── services/        # Gemini AI integrations
-│       ├── resumeParserService.js
-│       ├── matchScoreService.js
-│       ├── interviewQuestionService.js
-│       ├── jdScorerService.js
-│       └── analyticsService.js
+JobMatch-AI/
+├── client/                  # React 19 + Vite (Frontend)
+│   └── src/
+│       ├── pages/           # Home, JobsList, PostJob, Dashboard, JobApplicants
+│       ├── components/      # KanbanBoard, InterviewKitModal, JDQualityPanel, RecruiterAnalytics
+│       └── index.css        # Clinical Teal Paper design system
+│
+└── src/                     # Node.js + Express (Backend)
+    ├── models/              # User, Job, Application, Interview
+    ├── routes/              # Auth, Jobs, Applications, Interviews, Analytics
+    ├── controllers/         # Business logic
+    └── services/            # Gemini AI integrations
+        ├── resumeParserService.js
+        ├── matchScoreService.js
+        ├── interviewQuestionService.js
+        ├── jdScorerService.js
+        └── analyticsService.js
 ```
 
 ---
