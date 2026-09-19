@@ -34,6 +34,7 @@ app.use('/api/interviews', require('./routes/interviewRoutes'));
 app.use('/api/resumes', aiUploadLimiter, require('./routes/resumeRoutes'));
 app.use('/api/candidate', aiUploadLimiter, require('./routes/candidateRoutes'));
 app.use('/api/candidates', aiUploadLimiter, require('./routes/candidateRoutes'));
+app.use('/api/analytics', require('./routes/analyticsRoutes'));
 
 // Global Error Handler Middleware
 app.use(require('./middlewares/errorHandler'));

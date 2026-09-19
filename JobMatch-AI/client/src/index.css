@@ -660,4 +660,21 @@ a {
   }
 }
 
+/* Animated Skeleton Shimmer */
+@keyframes shimmerAnim {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #ECEAE4 25%, #F7F6F2 50%, #ECEAE4 75%);
+  background-size: 200% 100%;
+  animation: shimmerAnim 1.6s infinite ease-in-out;
+  border-radius: 6px;
+}
+
 
