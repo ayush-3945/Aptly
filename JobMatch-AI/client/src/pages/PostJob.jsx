@@ -88,6 +88,7 @@ const PostJob = () => {
   // Live JD Quality Scorer State
   const [scoreData, setScoreData] = useState(null);
   const [scoringLoading, setScoringLoading] = useState(false);
+  const descriptionInputRef = React.useRef(null);
 
   // Fetch JD Quality Analysis
   const fetchJdScore = async (
@@ -98,7 +99,7 @@ const PostJob = () => {
     expVal = experienceLevel
   ) => {
     const combined = `${descVal} ${reqVal}`.trim();
-    if (combined.length < 20) {
+    if (combined.length < 10) {
       setScoreData(null);
       setScoringLoading(false);
       return;
@@ -108,7 +109,7 @@ const PostJob = () => {
     try {
       const res = await api.post('/jobs/score-jd', {
         jobTitle: titleVal.trim() || 'Engineering Role',
-        description: descVal.trim(),
+        description: descVal.trim() || 'Software Engineer',
         requirements: reqVal.trim(),
         location: locVal.trim() || 'Remote',
         experienceLevel: expVal,
@@ -119,6 +120,7 @@ const PostJob = () => {
       }
     } catch (err) {
       console.warn('[PostJob] Failed to score JD:', err.message);
+      showToast('Could not score JD right now. Please verify server connection.', 'error');
     } finally {
       setScoringLoading(false);
     }
@@ -127,7 +129,7 @@ const PostJob = () => {
   // Debounced trigger: 1.5s after user stops typing
   useEffect(() => {
     const combined = `${description} ${requirements}`.trim();
-    if (combined.length < 20) {
+    if (combined.length < 10) {
       setScoreData(null);
       return;
     }
@@ -140,6 +142,23 @@ const PostJob = () => {
   }, [description, requirements, title, location, experienceLevel]);
 
   const handleAnalyzeNow = () => {
+    const combined = `${description} ${requirements}`.trim();
+    if (combined.length === 0) {
+      showToast(
+        'Please enter text in Job Overview or Requirements before analyzing, or click "Pre-fill Sample Job".',
+        'warning'
+      );
+      descriptionInputRef.current?.focus();
+      return;
+    }
+    if (combined.length < 10) {
+      showToast(
+        `Please write at least 10 characters for JD analysis (currently ${combined.length} chars).`,
+        'info'
+      );
+      descriptionInputRef.current?.focus();
+      return;
+    }
     fetchJdScore();
   };
 
@@ -709,6 +728,7 @@ const PostJob = () => {
                 </span>
               </div>
               <textarea
+                ref={descriptionInputRef}
                 rows={8}
                 placeholder="Describe the company mission, role summary, day-to-day duties, and compensation/benefits package..."
                 value={description}
@@ -859,6 +879,8 @@ const PostJob = () => {
             scoreData={scoreData}
             loading={scoringLoading}
             onAnalyzeNow={handleAnalyzeNow}
+            onPrefill={handlePrefill}
+            hasText={Boolean(description.trim() || requirements.trim())}
           />
         </div>
       </div>

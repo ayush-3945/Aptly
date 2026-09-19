@@ -13,6 +13,7 @@ import {
   HelpCircle,
   ShieldAlert,
   ArrowRight,
+  Wand2,
 } from 'lucide-react';
 
 const CATEGORY_NAMES = {
@@ -29,7 +30,7 @@ const getScoreColor = (score) => {
   return { color: '#B91C1C', bg: 'rgba(185, 28, 28, 0.1)', border: 'rgba(185, 28, 28, 0.25)' };
 };
 
-const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow }) => {
+const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }) => {
   const [issuesOpen, setIssuesOpen] = useState(true);
   const [improvementsOpen, setImprovementsOpen] = useState(true);
   const [strengthsOpen, setStrengthsOpen] = useState(false);
@@ -114,11 +115,48 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow }) => {
         </div>
       </div>
 
+      {/* Initial Loading State when scoring is in progress */}
+      {!scoreData && loading && (
+        <div
+          style={{
+            padding: '3rem 1rem',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1rem',
+          }}
+        >
+          <div
+            style={{
+              width: '52px',
+              height: '52px',
+              borderRadius: '50%',
+              background: 'var(--accent-teal-light)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--accent-teal)',
+            }}
+          >
+            <Loader2 className="spin" size={26} />
+          </div>
+          <div>
+            <p style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--text-primary)', margin: '0 0 0.35rem 0' }}>
+              Gemini AI is analyzing your job description...
+            </p>
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.4, display: 'block' }}>
+              Evaluating clarity, market competitiveness, and scanning for biased wording.
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Initial Empty State */}
       {!scoreData && !loading && (
         <div
           style={{
-            padding: '3rem 1rem',
+            padding: '2.5rem 1rem',
             textAlign: 'center',
             display: 'flex',
             flexDirection: 'column',
@@ -148,17 +186,46 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow }) => {
               Gemini AI will score your clarity, technical specificity, and scan for exclusionary bias terms as you type.
             </span>
           </div>
-          {onAnalyzeNow && (
-            <button
-              type="button"
-              onClick={onAnalyzeNow}
-              className="btn btn-secondary"
-              style={{ fontSize: '0.78rem', padding: '0.4rem 0.85rem', marginTop: '0.5rem' }}
-            >
-              <Sparkles size={13} />
-              Analyze Current Text
-            </button>
-          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', alignItems: 'center', marginTop: '0.5rem', width: '100%' }}>
+            {onAnalyzeNow && (
+              <button
+                type="button"
+                onClick={onAnalyzeNow}
+                className="btn btn-secondary"
+                style={{ fontSize: '0.8rem', padding: '0.45rem 1rem' }}
+                title="Click to analyze current text"
+              >
+                <Sparkles size={13} />
+                Analyze Current Text
+              </button>
+            )}
+
+            {onPrefill && !hasText && (
+              <button
+                type="button"
+                onClick={onPrefill}
+                style={{
+                  background: 'rgba(15, 118, 110, 0.08)',
+                  border: '1px solid rgba(15, 118, 110, 0.25)',
+                  borderRadius: '6px',
+                  color: 'var(--accent-teal)',
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                  padding: '0.4rem 0.85rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  transition: 'all 0.15s ease',
+                }}
+                title="Populate complete sample requisition & run instant analysis"
+              >
+                <Wand2 size={13} />
+                Pre-fill Sample Job & Score
+              </button>
+            )}
+          </div>
         </div>
       )}
 
