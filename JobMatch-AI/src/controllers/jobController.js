@@ -198,6 +198,41 @@ const previewJobMatch = async (req, res) => {
   }
 };
 
+const { analyzeJobDescription } = require('../services/jdScorerService');
+
+// POST /api/jobs/score-jd - Real-time AI job description quality and bias analysis
+const scoreJobDescription = async (req, res) => {
+  try {
+    const {
+      jobTitle = '',
+      description = '',
+      requirements = '',
+      location = '',
+      experienceLevel = '',
+    } = req.body || {};
+
+    const analysis = await analyzeJobDescription({
+      jobTitle,
+      description,
+      requirements,
+      location,
+      experienceLevel,
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: analysis,
+      ...analysis,
+    });
+  } catch (error) {
+    console.error('[scoreJobDescription] Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to score job description',
+    });
+  }
+};
+
 module.exports = {
   createJob,
   getJobs,
@@ -205,5 +240,7 @@ module.exports = {
   updateJob,
   deleteJob,
   previewJobMatch,
+  scoreJobDescription,
 };
+
 

@@ -1,9 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const { createJob, getJobs, getJobById, updateJob, deleteJob, previewJobMatch } = require('../controllers/jobController');
+const {
+  createJob,
+  getJobs,
+  getJobById,
+  updateJob,
+  deleteJob,
+  previewJobMatch,
+  scoreJobDescription,
+} = require('../controllers/jobController');
 const { applyForJob } = require('../controllers/applicationController');
 const { protect, optionalProtect } = require('../middlewares/authMiddleware');
 const { recruiterOnly, candidateOnly } = require('../middlewares/roleMiddleware');
+
+// POST /api/jobs/score-jd - Real-time AI job description quality and bias analysis
+router.post('/score-jd', optionalProtect, scoreJobDescription);
 
 // POST /api/jobs - Protected (recruiter only)
 router.post('/', protect, recruiterOnly, createJob);

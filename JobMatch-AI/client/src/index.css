@@ -645,3 +645,19 @@ a {
   }
 }
 
+/* Post Job 60/40 Grid Layout */
+.post-job-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .post-job-grid-layout {
+    grid-template-columns: 3fr 2fr; /* 60% / 40% split */
+    gap: 2.25rem;
+  }
+}
+
+
