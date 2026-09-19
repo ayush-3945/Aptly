@@ -1,4 +1,4 @@
-# Aptly.AI — Clinical Talent Intelligence Platform
+# Aptly.AI - Clinical Talent Intelligence Platform
 
 > AI-powered ATS replacing blind keyword filters with semantic skill evaluation, 
 > transparent gap reports, and precision candidate ranking.
