@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ Aptly.AI — Clinical Talent Intelligence Platform
+# ⚡ Aptly.AI - Clinical Talent Intelligence Platform
 
 ### Next-Generation Semantic ATS, Real-Time Requisition Scorer, Kanban Pipeline & Talent Analytics
 
