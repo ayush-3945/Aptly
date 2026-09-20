@@ -38,9 +38,10 @@ const RecruiterAnalytics = () => {
         aggregatedData: {
           totalApplicants: 48,
           totalJobs: 4,
-          conversionRate: 58.3,
-          conversionTrend: '+8.2% vs last week',
-          avgAiMatchScore: 81.4,
+          conversionRate: 8.3,
+          hasHistoricalData: false,
+          conversionTrend: null,
+          avgAiMatchScore: 78.4,
           screeningVelocity: '< 2.5s',
           avgDaysToHire: 18,
           industryAvgDays: 23,
@@ -63,24 +64,24 @@ const RecruiterAnalytics = () => {
             {
               tier: 'strong',
               label: 'Strong Match (≥ 75%)',
-              count: 30,
-              percentage: 62.5,
+              count: 24,
+              percentage: 50.0,
               color: '#2D7A3A',
               desc: 'High technical alignment with core required skills and experience.',
             },
             {
               tier: 'moderate',
               label: 'Moderate Match (50% – 74%)',
-              count: 14,
-              percentage: 29.2,
+              count: 18,
+              percentage: 37.5,
               color: '#B45309',
               desc: 'Solid foundations with 1–2 minor gaps in specific platform tools.',
             },
             {
               tier: 'low',
               label: 'Low Match (< 50%)',
-              count: 4,
-              percentage: 8.3,
+              count: 6,
+              percentage: 12.5,
               color: '#B91C1C',
               desc: 'Significant divergence from required technical stack.',
             },
@@ -330,6 +331,26 @@ const RecruiterAnalytics = () => {
   // SVG Funnel calculation data
   const funnel = aggregatedData.funnelSteps || [];
 
+  // Fix 1: Pipeline Conversion Rate Calculation
+  // Formula: (Hired candidates / Total applied candidates) * 100
+  // Cap at 99% maximum. If 0 or empty, display "—"
+  const hiredCount =
+    aggregatedData.stageDistribution?.find((s) => (s.stage || '').toLowerCase() === 'hired')?.count ??
+    funnel[funnel.length - 1]?.count ??
+    0;
+  const totalApplied =
+    aggregatedData.totalApplicants ||
+    funnel[0]?.count ||
+    aggregatedData.stageDistribution?.reduce((acc, s) => acc + (s.count || 0), 0) ||
+    0;
+
+  const rawConversionRate = totalApplied > 0 ? (hiredCount / totalApplied) * 100 : 0;
+  const cappedConversionRate = Math.min(99, rawConversionRate);
+  const displayConversionRate =
+    cappedConversionRate <= 0
+      ? '—'
+      : `${cappedConversionRate % 1 === 0 ? cappedConversionRate.toFixed(0) : cappedConversionRate.toFixed(1)}%`;
+
   // Weekly timeline max calculation for SVG line chart
   const weeklyTimeline = aggregatedData.weeklyTimeline || [];
   const maxWeeklyCount = Math.max(...weeklyTimeline.map((w) => w.count), 1);
@@ -475,6 +496,7 @@ const RecruiterAnalytics = () => {
           SECTION 2 — KEY METRICS ROW (4 Cards with Serif Numbers & Accents)
          ========================================================================= */}
       <div
+        className="analytics-metrics-grid"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
@@ -502,15 +524,17 @@ const RecruiterAnalytics = () => {
             </span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginTop: '0.5rem' }}>
               <div style={{ fontSize: '2.4rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
-                {aggregatedData.conversionRate}%
+                {displayConversionRate}
               </div>
-              <span style={{ fontSize: '0.8rem', color: '#2D7A3A', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-                <TrendingUp size={13} /> {aggregatedData.conversionTrend}
-              </span>
+              {aggregatedData.hasHistoricalData && aggregatedData.conversionTrend && (
+                <span style={{ fontSize: '0.8rem', color: '#2D7A3A', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                  <TrendingUp size={13} /> {aggregatedData.conversionTrend}
+                </span>
+              )}
             </div>
           </div>
           <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '0.75rem', margin: 0 }}>
-            Applicants advancing from initial screening to Interview or Offer stage
+            Candidates successfully hired out of total applications received
           </p>
         </div>
 
@@ -672,6 +696,7 @@ const RecruiterAnalytics = () => {
 
         {/* 2-Column Grid of Actionable Insight Cards */}
         <div
+          className="analytics-insights-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
@@ -797,6 +822,7 @@ const RecruiterAnalytics = () => {
           SECTION 4 — CHARTS ROW (Funnel, Quality Tiers, Skill Heatmap)
          ========================================================================= */}
       <div
+        className="analytics-charts-grid"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
@@ -873,7 +899,7 @@ const RecruiterAnalytics = () => {
 
           <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--border-default)', fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between' }}>
             <span>Top of funnel: {funnel[0]?.count || 48} entries</span>
-            <span style={{ color: '#2D7A3A', fontWeight: 600 }}>Hired: {funnel[funnel.length - 1]?.count || 4} ({aggregatedData.conversionRate}%)</span>
+            <span style={{ color: '#2D7A3A', fontWeight: 600 }}>Hired: {funnel[funnel.length - 1]?.count || hiredCount} ({displayConversionRate})</span>
           </div>
         </div>
 
@@ -1059,6 +1085,7 @@ const RecruiterAnalytics = () => {
 
         {/* 3 Prioritized Recommendation Cards */}
         <div
+          className="analytics-recommendations-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',

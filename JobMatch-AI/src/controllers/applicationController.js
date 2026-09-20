@@ -88,13 +88,13 @@ CORE TECHNICAL SKILLS
 - DevOps & Tools: Docker, Git/GitHub, AWS (S3, EC2), Postman, Jest, CI/CD
 
 PROFESSIONAL EXPERIENCE
-Senior Full-Stack Engineer | TechPulse Solutions | 2022 - Present
-- Architected enterprise ATS pipeline featuring AI candidate match scoring using React and Node.js.
+Senior Full-Stack Engineer | Razorpay | 2022 - Present
+- Architected enterprise ATS pipeline featuring candidate match scoring using React and Node.js.
 - Developed real-time REST APIs with Express and MongoDB, serving 50k+ daily candidate requests.
-- Integrated Google Gemini AI models for automatic document evaluation and semantic skill extraction.
+- Integrated semantic evaluation models for automatic document evaluation and skill extraction.
 - Containerized frontend and backend services using Docker for seamless cloud deployments.
 
-Full-Stack Developer | CloudSphere Innovations | 2020 - 2022
+Full-Stack Developer | Slice | 2020 - 2022
 - Built responsive React dashboards and high-throughput Node.js microservices.
 - Optimized MongoDB aggregation pipelines, cutting database query latency by 40%.
 

@@ -88,6 +88,12 @@ const InterviewKitModal = ({ application, job, onClose }) => {
   const fetchQuestions = async () => {
     setLoading(true);
     setError(null);
+
+    // 12-second timeout protection
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('AI is taking longer than usual — try again')), 12000)
+    );
+
     try {
       const payload = {
         candidateName,
@@ -98,15 +104,29 @@ const InterviewKitModal = ({ application, job, onClose }) => {
         jobRequirements: job?.description || job?.requirements || '',
       };
 
-      const res = await api.post('/interviews/generate-questions', payload);
+      const res = await Promise.race([
+        api.post('/interviews/generate-questions', payload),
+        timeoutPromise,
+      ]);
+
       if (res.data && res.data.warmup) {
         setQuestions(res.data);
       } else {
-        throw new Error('Invalid format received from question generator.');
+        throw new Error('AI is taking longer than usual — try again');
       }
     } catch (err) {
       console.error('[InterviewKitModal] Fetch error:', err);
-      setError(err.response?.data?.message || err.message || 'Failed to generate interview questions.');
+      const isTimeout =
+        err.message?.includes('longer than usual') ||
+        err.code === 'ECONNABORTED' ||
+        err.response?.status === 504 ||
+        err.response?.status === 408;
+
+      setError(
+        isTimeout
+          ? 'AI is taking longer than usual — try again'
+          : err.response?.data?.message || err.message || 'AI is taking longer than usual — try again'
+      );
     } finally {
       setLoading(false);
     }
@@ -372,44 +392,46 @@ const InterviewKitModal = ({ application, job, onClose }) => {
           </div>
         )}
 
-        {/* Error State */}
-        {!loading && error && (
+        {/* Error / Timeout State */}
+        {!loading && (error || !questions) && (
           <div
             style={{
-              padding: '2rem',
+              padding: '2.5rem 1.5rem',
               borderRadius: '6px',
-              background: 'rgba(185, 28, 28, 0.06)',
-              border: '1px solid rgba(185, 28, 28, 0.25)',
+              background: 'rgba(185, 28, 28, 0.05)',
+              border: '1px solid rgba(185, 28, 28, 0.2)',
+              borderLeft: '4px solid var(--semantic-red, #B91C1C)',
               textAlign: 'center',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '0.75rem',
+              gap: '0.85rem',
             }}
           >
-            <AlertCircle size={28} color="var(--semantic-red)" />
-            <div style={{ color: 'var(--semantic-red)', fontWeight: 600, fontSize: '0.9rem' }}>
-              {error}
+            <AlertCircle size={28} color="var(--semantic-red, #B91C1C)" />
+            <div style={{ color: '#991B1B', fontWeight: 600, fontSize: '0.95rem' }}>
+              {error || 'AI is taking longer than usual — try again'}
             </div>
             <button
               type="button"
               onClick={fetchQuestions}
               style={{
-                padding: '0.45rem 1rem',
-                borderRadius: '4px',
-                background: 'var(--accent-teal)',
+                padding: '0.55rem 1.25rem',
+                borderRadius: '6px',
+                background: 'var(--accent-teal, #0F766E)',
                 border: 'none',
                 color: '#FFFFFF',
-                fontSize: '0.8rem',
+                fontSize: '0.85rem',
                 fontWeight: 600,
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.35rem',
+                gap: '0.45rem',
+                boxShadow: '0 2px 6px rgba(15, 118, 110, 0.2)',
               }}
             >
-              <RefreshCw size={13} />
-              Retry Question Generation
+              <RefreshCw size={14} />
+              <span>Retry Question Generation</span>
             </button>
           </div>
         )}

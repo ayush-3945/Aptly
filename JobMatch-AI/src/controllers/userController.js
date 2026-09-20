@@ -52,6 +52,9 @@ const updateUserProfile = async (req, res) => {
     if (workHistory !== undefined) user.workHistory = workHistory;
     if (linkedinUrl !== undefined) user.linkedinUrl = linkedinUrl;
     if (githubUrl !== undefined) user.githubUrl = githubUrl;
+    if (req.body.role && ['candidate', 'recruiter'].includes(req.body.role)) {
+      user.role = req.body.role;
+    }
 
     const updatedUser = await user.save();
 

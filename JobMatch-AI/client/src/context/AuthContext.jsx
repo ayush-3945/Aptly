@@ -104,8 +104,8 @@ export const AuthProvider = ({ children }) => {
           email: email.trim().toLowerCase(),
           role: isRecruiter ? 'recruiter' : 'candidate',
           headline: isRecruiter
-            ? 'Lead Technical Recruiter @ TechPulse'
-            : 'Full-Stack MERN & AI Systems Engineer',
+            ? 'Lead Technical Recruiter @ Razorpay'
+            : 'Full-Stack MERN & Systems Engineer',
         };
         const demoToken = `demo_jwt_token_${Date.now()}`;
 

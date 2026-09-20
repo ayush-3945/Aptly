@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -23,6 +23,8 @@ import {
   FileText,
   GripVertical,
   Calendar,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
@@ -471,12 +473,14 @@ const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview, 
           {applications.length === 0 ? (
             <div
               style={{
-                padding: '2rem 0.75rem',
+                padding: '2.25rem 0.75rem',
                 textAlign: 'center',
                 borderRadius: '6px',
-                border: '1px dashed var(--border-default)',
-                color: 'var(--text-muted)',
-                fontSize: '0.76rem',
+                border: '1.5px dashed var(--border-default, #D1D5DB)',
+                color: 'var(--text-muted, #9CA3AF)',
+                fontSize: '0.8rem',
+                fontWeight: 500,
+                backgroundColor: 'rgba(0,0,0,0.01)',
               }}
             >
               Drop candidates here
@@ -503,6 +507,35 @@ const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview, 
 const KanbanBoard = ({ applicants, setApplicants, onViewResume, onScheduleInterview, onGenerateKit, job }) => {
   const { showToast } = useToast();
   const [activeId, setActiveId] = useState(null);
+
+  // Mobile responsiveness check (max-width: 768px)
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth <= 768 : false
+  );
+
+  const [expandedStages, setExpandedStages] = useState({
+    applied: true,
+    shortlisted: true,
+    interview: true,
+    offer: true,
+    hired: false,
+    rejected: false,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const toggleStage = (stageId) => {
+    setExpandedStages((prev) => ({
+      ...prev,
+      [stageId]: !prev[stageId],
+    }));
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -602,6 +635,127 @@ const KanbanBoard = ({ applicants, setApplicants, onViewResume, onScheduleInterv
     }
   };
 
+  // Mobile Accordion View on <= 768px
+  if (isMobile) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2.5rem' }}>
+        {KANBAN_STAGES.map((stage) => {
+          const apps = columnData[stage.id] || [];
+          const isOpen = Boolean(expandedStages[stage.id]);
+          const isRejected = stage.id === 'rejected';
+
+          return (
+            <div
+              key={stage.id}
+              style={{
+                borderRadius: '8px',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid var(--border-default, #E2E8F0)',
+                overflow: 'hidden',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+              }}
+            >
+              {/* Accordion Header */}
+              <button
+                type="button"
+                onClick={() => toggleStage(stage.id)}
+                style={{
+                  width: '100%',
+                  padding: '0.85rem 1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  backgroundColor: isOpen ? 'var(--bg-secondary, #FAF9F5)' : '#FFFFFF',
+                  border: 'none',
+                  borderBottom: isOpen ? '1px solid var(--border-default, #E2E8F0)' : 'none',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'background-color 0.15s ease',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <span
+                    style={{
+                      width: '9px',
+                      height: '9px',
+                      borderRadius: '50%',
+                      backgroundColor: stage.color,
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontFamily: "'Newsreader', Georgia, serif",
+                      fontSize: '1.05rem',
+                      fontWeight: 700,
+                      color: 'var(--text-primary, #0F172A)',
+                    }}
+                  >
+                    {stage.title}
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                  <span
+                    style={{
+                      padding: '0.15rem 0.55rem',
+                      borderRadius: '4px',
+                      background: isRejected ? 'rgba(185, 28, 28, 0.08)' : 'var(--accent-teal-light, #F0FDFA)',
+                      border: `1px solid ${isRejected ? 'rgba(185, 28, 28, 0.25)' : 'rgba(15, 107, 92, 0.25)'}`,
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      color: isRejected ? 'rgba(185, 28, 28, 0.7)' : 'var(--accent-teal, #0F766E)',
+                    }}
+                  >
+                    {apps.length}
+                  </span>
+                  {isOpen ? (
+                    <ChevronUp size={16} color="var(--text-muted, #64748B)" />
+                  ) : (
+                    <ChevronDown size={16} color="var(--text-muted, #64748B)" />
+                  )}
+                </div>
+              </button>
+
+              {/* Accordion Body */}
+              {isOpen && (
+                <div style={{ padding: '0.85rem', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                  {apps.length === 0 ? (
+                    <div
+                      style={{
+                        padding: '2rem 0.75rem',
+                        textAlign: 'center',
+                        borderRadius: '6px',
+                        border: '1.5px dashed var(--border-default, #D1D5DB)',
+                        color: 'var(--text-muted, #9CA3AF)',
+                        fontSize: '0.8rem',
+                        fontWeight: 500,
+                        backgroundColor: 'rgba(0,0,0,0.01)',
+                      }}
+                    >
+                      Drop candidates here
+                    </div>
+                  ) : (
+                    apps.map((app) => (
+                      <DraggableCard
+                        key={app._id}
+                        application={app}
+                        onViewResume={onViewResume}
+                        onScheduleInterview={onScheduleInterview}
+                        onGenerateKit={onGenerateKit}
+                        job={job}
+                      />
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // Desktop Horizontal 6-Column Layout
   return (
     <DndContext
       sensors={sensors}

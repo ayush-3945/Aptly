@@ -41,13 +41,13 @@ const EXPERIENCE_LEVELS = ['Entry-Level', 'Mid-Level', 'Senior', 'Lead / Staff',
 
 const SAMPLE_JOB = {
   title: 'Senior Full-Stack MERN Systems Engineer',
-  company: 'CloudPulse Systems',
+  company: 'Razorpay',
   workplaceType: 'Remote',
-  location: 'Remote (US/Global)',
+  location: 'Remote (Bengaluru / Hybrid)',
   experienceLevel: 'Senior',
   skills: ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'Docker', 'REST API'],
   description: `About the Role:
-CloudPulse Systems is building next-generation clinical talent and hiring platforms. We are seeking a Senior Full-Stack MERN Systems Engineer to lead the architecture and implementation of our high-volume candidate evaluation pipeline.
+Razorpay is building next-generation financial checkout infrastructure and high-scale systems. We are seeking a Senior Full-Stack MERN Systems Engineer to lead the architecture and implementation of our high-volume candidate evaluation pipeline.
 
 Key Responsibilities:
 • Design and build scalable Node.js microservices and RESTful APIs connecting to MongoDB clusters.

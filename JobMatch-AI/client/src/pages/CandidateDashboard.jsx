@@ -42,8 +42,8 @@ const SAMPLE_APPLICATIONS = [
     job: {
       _id: 'job_fallback_1',
       title: 'Senior Full-Stack MERN Engineer',
-      company: 'TechPulse Solutions',
-      location: 'Remote',
+      company: 'Razorpay',
+      location: 'Bengaluru, India (Remote)',
     },
   },
   {
@@ -59,8 +59,8 @@ const SAMPLE_APPLICATIONS = [
     job: {
       _id: 'job_fallback_2',
       title: 'Frontend Interface Architect',
-      company: 'HyperScale Systems',
-      location: 'San Francisco, CA',
+      company: 'Zepto Tech',
+      location: 'Mumbai, India (Hybrid)',
     },
   },
 ];

@@ -93,6 +93,7 @@ const CandidateProfile = () => {
   const [showSuccessBanner, setShowSuccessBanner] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [newSkillInput, setNewSkillInput] = useState('');
+  const [parseError, setParseError] = useState('');
 
   // Load existing profile if available
   useEffect(() => {
@@ -198,6 +199,7 @@ const CandidateProfile = () => {
   // Upload and parse real PDF file
   const handleFileSelected = async (file) => {
     setIsParsing(true);
+    setParseError('');
     setParseProgressText('Uploading PDF and extracting document text...');
     setShowSuccessBanner(false);
 
@@ -218,10 +220,8 @@ const CandidateProfile = () => {
         throw new Error('No structured profile returned from parser.');
       }
     } catch (err) {
-      console.warn('Backend parse error or server offline, using fallback extraction:', err.message);
-      // Client-side fallback simulation for smooth testing
-      await new Promise((r) => setTimeout(r, 1200));
-      applyParsedData(SAMPLE_DEMO_DATA, file.name);
+      console.warn('Resume parse failed:', err.message);
+      setParseError('Could not parse resume — please fill in your details manually');
     } finally {
       setIsParsing(false);
       setParseProgressText('');
@@ -408,6 +408,7 @@ const CandidateProfile = () => {
         parseProgressText={parseProgressText}
         uploadedFileName={uploadedFileName}
         onUseDemoResume={handleUseDemoResume}
+        parseError={parseError}
       />
 
       {/* Success Notification Banner */}

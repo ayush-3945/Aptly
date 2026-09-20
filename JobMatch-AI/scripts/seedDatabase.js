@@ -52,8 +52,8 @@ async function seedDatabase() {
         email: 'recruiter@jobmatch.ai',
         password: hashedPassword,
         role: 'recruiter',
-        bio: 'Head of Technical Talent & Engineering Recruitment at TechPulse Solutions.',
-        location: 'San Francisco, CA',
+        bio: 'Head of Technical Talent & Engineering Recruitment at Razorpay.',
+        location: 'Bengaluru, India',
       },
       {
         name: 'Alex Morgan',
@@ -177,65 +177,65 @@ async function seedDatabase() {
     console.log('💼 Publishing production job openings...');
     const jobDefinitions = [
       {
-        title: 'Full-Stack MERN & AI Engineer',
-        company: 'TechPulse Solutions',
-        location: 'Remote (US/Global)',
-        requiredSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'Docker'],
+        title: 'Full-Stack MERN Systems Engineer',
+        company: 'Razorpay',
+        location: 'Bengaluru, India (Remote)',
+        requiredSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'Docker'],
         description: `About the Role:
-TechPulse Solutions is engineering next-generation intelligent HR and hiring platforms. We are seeking a Senior Full-Stack MERN & Gemini AI Engineer to lead the architecture and implementation of our candidate evaluation pipeline and AI matching services.
+Razorpay is engineering next-generation payment and fintech platforms. We are seeking a Senior Full-Stack MERN Systems Engineer to lead the architecture and implementation of our developer dashboards and automated candidate matching services.
 
 Key Responsibilities:
 • Design and build scalable Node.js microservices and RESTful APIs connecting to MongoDB clusters.
-• Integrate Google Gemini foundation models (Gemini 2.5 Flash) for automated resume analysis, skill gap detection, and ATS compatibility scoring.
-• Develop reactive, high-performance user interfaces using React 19, modern CSS Glassmorphism, and Vite.
+• Integrate semantic evaluation models for automated resume analysis, skill gap detection, and ATS compatibility scoring.
+• Develop reactive, high-performance user interfaces using React 19, modern CSS, and Vite.
 • Architect background job processing and secure multipart PDF parsing pipelines using Multer and pdf-parse.
-• Partner with product and engineering leaders to uphold 99.9% uptime and optimize database aggregations.
+• Partner with product and engineering leaders to uphold 99.99% uptime and optimize database aggregations.
 
 Requirements:
 • 4+ years of production experience building and deploying full-stack web applications in the MERN stack.
-• Proven hands-on experience integrating LLM APIs (Gemini, Claude, or OpenAI) with structured JSON outputs.
+• Proven hands-on experience designing REST APIs and microservice architectures.
 • Deep understanding of MongoDB schema design, indexing, and aggregation pipelines.
 • Familiarity with containerization (Docker) and cloud deployments.`,
         postedBy: recruiterUser._id,
       },
       {
         title: 'Senior Backend Architect - Node.js & Microservices',
-        company: 'CloudScale Systems',
-        location: 'San Francisco, CA (Hybrid)',
+        company: 'Slice',
+        location: 'Bengaluru, India (Hybrid)',
         requiredSkills: ['Node.js', 'Express', 'MongoDB', 'Redis', 'Docker', 'Microservices', 'Kubernetes'],
-        description: `Lead our backend infrastructure initiatives designing resilient, high-throughput microservices handling millions of daily events. You will optimize database throughput, implement distributed Redis caching, and maintain robust API gateways.`,
+        description: `Lead our backend infrastructure initiatives designing resilient, high-throughput microservices handling millions of daily payment transactions. You will optimize database throughput, implement distributed Redis caching, and maintain robust API gateways.`,
         postedBy: recruiterUser._id,
       },
       {
         title: 'Frontend React 19 Engineer',
-        company: 'Nexus Labs',
-        location: 'New York, NY',
+        company: 'Groww Engineering',
+        location: 'Bengaluru, India',
         requiredSkills: ['React', 'TypeScript', 'TailwindCSS', 'Next.js', 'CSS Modules', 'Web Vitals'],
-        description: `Join Nexus Labs to craft high-fidelity, component-driven user interfaces. You will build responsive web applications with React 19, CSS Glassmorphism, and optimized Core Web Vitals.`,
+        description: `Join Groww Engineering to craft high-fidelity, component-driven user interfaces. You will build responsive investment applications with React 19, accessible design systems, and optimized Core Web Vitals.`,
         postedBy: recruiterUser._id,
       },
       {
-        title: 'AI/ML Integration Specialist',
-        company: 'DeepMind Labs',
-        location: 'Remote',
-        requiredSkills: ['Python', 'Gemini AI', 'Node.js', 'REST API', 'Prompt Engineering', 'LangChain'],
-        description: `Drive foundation model adoption across production workflows. Build semantic search indices, agentic tool workflows, and structured JSON output pipelines using Google Gemini and LangChain.`,
-        postedBy: recruiterUser._id,
-      },
-      {
-        title: 'DevOps & Cloud Infrastructure Lead',
-        company: 'Orbit Technologies',
-        location: 'Austin, TX (Hybrid)',
+        title: 'Cloud Infrastructure & DevOps Lead',
+        company: 'BrowserStack',
+        location: 'Mumbai, India (Remote)',
         requiredSkills: ['Docker', 'Kubernetes', 'AWS', 'Terraform', 'CI/CD', 'GitHub Actions', 'Linux'],
         description: `Architect automated CI/CD pipelines, containerize backend microservices with Docker/Kubernetes, and manage multi-region AWS cloud infrastructure with Terraform.`,
         postedBy: recruiterUser._id,
       },
       {
-        title: 'Junior JavaScript Developer',
-        company: 'LaunchPad Digital',
-        location: 'Remote',
+        title: 'Platform API & Developer Tools Engineer',
+        company: 'Postman',
+        location: 'Bengaluru, India (Remote)',
+        requiredSkills: ['Node.js', 'Express', 'REST API', 'GraphQL', 'Docker', 'PostgreSQL'],
+        description: `Build high-throughput developer tooling, API governance systems, and developer workspace features used by millions of engineers globally.`,
+        postedBy: recruiterUser._id,
+      },
+      {
+        title: 'Junior Full-Stack Developer',
+        company: 'Zepto Tech',
+        location: 'Mumbai, India (Remote)',
         requiredSkills: ['JavaScript', 'HTML5', 'CSS3', 'React', 'Git', 'REST API'],
-        description: `Entry-level engineering position for ambitious web developers. Build reusable UI components, write unit tests, and collaborate with senior mentors on modern full-stack products.`,
+        description: `Entry-level engineering position for ambitious web developers. Build reusable UI components, write unit tests, and collaborate with senior mentors on modern full-stack logistics products.`,
         postedBy: recruiterUser._id,
       },
     ];
@@ -244,31 +244,31 @@ Requirements:
     const flagshipJob = createdJobs[0]; // Full-Stack MERN & AI Engineer
     console.log(`✔ Seeded ${createdJobs.length} production job requisitions.\n`);
 
-    // 6. Seed 8 Multi-Stage Candidate Applications
-    console.log('📋 Creating candidate applications with Gemini AI ATS match scorecards...');
+    // 6. Seed 8 Multi-Stage Candidate Applications with Realistic Bell-Curve Score Distribution
+    console.log('📋 Creating candidate applications with realistic ATS match scorecards...');
     const applicationDefinitions = [
       {
         job: flagshipJob._id,
         candidate: userMap['david.chen@example.com']._id,
         status: 'applied',
         resumeUrl: 'uploads/resumes/david-chen-resume.pdf',
-        aiMatchScore: 95,
+        aiMatchScore: 91,
         recommendation: 'Strong Match',
-        matchedSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'Docker'],
+        matchedSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'Docker', 'PostgreSQL'],
         missingSkills: [],
         experienceFit: '5+ years full-stack engineering with extensive microservices and container orchestration experience.',
-        fitSummary: 'Perfect 100% skill match across all required competencies. Top priority for recruiter screening.',
+        fitSummary: 'Exceptional technical alignment across all required competencies. Top candidate for recruiter screening.',
       },
       {
         job: flagshipJob._id,
         candidate: userMap['candidate@jobmatch.ai']._id, // Alex Morgan
         status: 'shortlisted',
         resumeUrl: 'uploads/resumes/alex-morgan-resume.pdf',
-        aiMatchScore: 92,
+        aiMatchScore: 87,
         recommendation: 'Strong Match',
-        matchedSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI'],
+        matchedSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL'],
         missingSkills: ['Docker'],
-        experienceFit: 'Demonstrated 4+ years architecting enterprise MERN applications with direct Gemini AI SDK integration.',
+        experienceFit: 'Demonstrated 4+ years architecting enterprise MERN applications with clean asynchronous pipelines.',
         fitSummary: 'Outstanding candidate profile. Senior engineering capabilities with deep full-stack alignment.',
       },
       {
@@ -276,23 +276,23 @@ Requirements:
         candidate: userMap['elena.rostova@example.com']._id,
         status: 'interview',
         resumeUrl: 'uploads/resumes/elena-rostova-resume.pdf',
-        aiMatchScore: 88,
-        recommendation: 'Strong Match',
+        aiMatchScore: 72,
+        recommendation: 'Moderate Match',
         matchedSkills: ['React', 'Node.js', 'Express', 'MongoDB'],
-        missingSkills: ['Gemini AI', 'Docker'],
-        experienceFit: 'Strong production MERN background; demonstrated ability to rapidly adopt foundation model APIs.',
-        fitSummary: 'Advanced to technical panel interview following impressive architecture portfolio review.',
+        missingSkills: ['Docker', 'PostgreSQL'],
+        experienceFit: 'Strong frontend-focused MERN background with practical microservices exposure.',
+        fitSummary: 'Advanced to technical interview following architecture review. Pairing support recommended on containerization.',
       },
       {
         job: flagshipJob._id,
         candidate: userMap['marcus.vance@example.com']._id,
         status: 'hired',
         resumeUrl: 'uploads/resumes/marcus-vance-resume.pdf',
-        aiMatchScore: 96,
+        aiMatchScore: 89,
         recommendation: 'Strong Match',
-        matchedSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'Docker'],
-        missingSkills: [],
-        experienceFit: 'Ex-Staff Engineer with verified track record leading scalable full-stack and AI product teams.',
+        matchedSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'Docker'],
+        missingSkills: ['PostgreSQL'],
+        experienceFit: 'Ex-Staff Engineer with verified track record leading scalable full-stack product teams.',
         fitSummary: 'Offer accepted. Successfully completed all hiring rounds with top-tier technical evaluation.',
       },
       {
@@ -300,23 +300,23 @@ Requirements:
         candidate: userMap['priya.sharma@example.com']._id,
         status: 'applied',
         resumeUrl: 'uploads/resumes/priya-sharma-resume.pdf',
-        aiMatchScore: 76,
-        recommendation: 'Moderate Match',
-        matchedSkills: ['React', 'Node.js', 'Express'],
-        missingSkills: ['MongoDB', 'Gemini AI', 'Docker'],
-        experienceFit: 'Solid mid-level frontend and Node.js developer with relational DB experience.',
-        fitSummary: 'Good technical foundation. Candidate would benefit from structured onboarding on MongoDB and LLMs.',
+        aiMatchScore: 52,
+        recommendation: 'Low Match',
+        matchedSkills: ['React', 'Node.js'],
+        missingSkills: ['MongoDB', 'Docker', 'Express', 'PostgreSQL'],
+        experienceFit: 'Mid-level frontend developer with limited server-side database exposure.',
+        fitSummary: 'Application under review. Notable gap in required database aggregations and container tooling.',
       },
       {
         job: flagshipJob._id,
         candidate: userMap['liam.walker@example.com']._id,
         status: 'interview',
         resumeUrl: 'uploads/resumes/liam-walker-resume.pdf',
-        aiMatchScore: 84,
+        aiMatchScore: 82,
         recommendation: 'Strong Match',
-        matchedSkills: ['Node.js', 'Express', 'MongoDB', 'Docker', 'Gemini AI'],
-        missingSkills: ['React'],
-        experienceFit: 'Exceptional backend and AI systems engineer; minor gap in advanced React 19 component design.',
+        matchedSkills: ['Node.js', 'Express', 'MongoDB', 'Docker'],
+        missingSkills: ['React', 'PostgreSQL'],
+        experienceFit: 'Exceptional backend systems engineer; minor gap in advanced React 19 component patterns.',
         fitSummary: 'Scheduled for system design interview. Strong algorithmic and API architecture depth.',
       },
       {
@@ -324,10 +324,10 @@ Requirements:
         candidate: userMap['sophie.martin@example.com']._id,
         status: 'offer',
         resumeUrl: 'uploads/resumes/sophie-martin-resume.pdf',
-        aiMatchScore: 89,
-        recommendation: 'Strong Match',
-        matchedSkills: ['React', 'Node.js', 'MongoDB', 'Docker', 'Express'],
-        missingSkills: ['Gemini AI'],
+        aiMatchScore: 68,
+        recommendation: 'Moderate Match',
+        matchedSkills: ['React', 'Node.js', 'MongoDB', 'Express'],
+        missingSkills: ['Docker', 'PostgreSQL'],
         experienceFit: '3.5 years of production web development across full-stack JavaScript architectures.',
         fitSummary: 'Formal offer extended following successful technical panel and system design rounds.',
       },
@@ -339,7 +339,7 @@ Requirements:
         aiMatchScore: 40,
         recommendation: 'Low Match',
         matchedSkills: ['React'],
-        missingSkills: ['Node.js', 'Express', 'MongoDB', 'Gemini AI', 'Docker'],
+        missingSkills: ['Node.js', 'Express', 'MongoDB', 'Docker', 'PostgreSQL'],
         experienceFit: 'Junior UI developer with HTML/CSS focus; lacks requisite backend microservices experience.',
         fitSummary: 'Application rejected due to significant gap in required server-side and database competencies.',
       },

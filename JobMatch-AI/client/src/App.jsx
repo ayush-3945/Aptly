@@ -14,6 +14,7 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import CandidateProfile from './pages/CandidateProfile';
+import Onboarding from './pages/Onboarding';
 import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
@@ -63,11 +64,7 @@ function App() {
                 />
                 <Route
                   path="/onboarding"
-                  element={
-                    <ProtectedRoute allowedRoles={['candidate']}>
-                      <CandidateProfile />
-                    </ProtectedRoute>
-                  }
+                  element={<Onboarding />}
                 />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />

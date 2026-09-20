@@ -1,16 +1,26 @@
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { UploadCloud, FileText, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { UploadCloud, FileText, Loader2, CheckCircle, AlertCircle, AlertTriangle } from 'lucide-react';
 
-const ResumeDropzone = ({ onFileSelected, isParsing, parseProgressText, uploadedFileName, onUseDemoResume }) => {
+const ResumeDropzone = ({
+  onFileSelected,
+  isParsing,
+  parseProgressText,
+  uploadedFileName,
+  onUseDemoResume,
+  parseError,
+}) => {
+  const [dropError, setDropError] = React.useState('');
+
   const onDrop = useCallback(
     (acceptedFiles, fileRejections) => {
+      setDropError('');
       if (fileRejections && fileRejections.length > 0) {
         const rejection = fileRejections[0];
         if (rejection.errors && rejection.errors[0]?.code === 'file-too-large') {
-          alert('File size exceeds the 5MB limit. Please upload a smaller PDF.');
+          setDropError('File size exceeds the 5MB limit. Please upload a smaller PDF.');
         } else {
-          alert('Invalid file format. Please upload a valid PDF resume.');
+          setDropError('Could not parse resume — please fill in your details manually');
         }
         return;
       }
@@ -243,6 +253,31 @@ const ResumeDropzone = ({ onFileSelected, isParsing, parseProgressText, uploaded
           </div>
         )}
       </div>
+
+      {/* Inline Parser Failure Alert with muted red left border */}
+      {(parseError || dropError) && (
+        <div
+          style={{
+            marginTop: '1.25rem',
+            padding: '0.85rem 1.15rem',
+            borderRadius: '4px',
+            backgroundColor: 'rgba(185, 28, 28, 0.05)',
+            borderLeft: '4px solid var(--semantic-red, #B91C1C)',
+            borderTop: '1px solid rgba(185, 28, 28, 0.15)',
+            borderRight: '1px solid rgba(185, 28, 28, 0.15)',
+            borderBottom: '1px solid rgba(185, 28, 28, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.65rem',
+            color: '#991B1B',
+            fontSize: '0.88rem',
+            fontWeight: 500,
+          }}
+        >
+          <AlertTriangle size={18} color="var(--semantic-red, #B91C1C)" style={{ flexShrink: 0 }} />
+          <span>{parseError || dropError}</span>
+        </div>
+      )}
     </div>
   );
 };

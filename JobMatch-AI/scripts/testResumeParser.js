@@ -15,11 +15,11 @@ Senior Full-Stack Engineer with 5+ years of experience building modern React and
 Core competencies include React, TypeScript, Node.js, Express, MongoDB, Docker, and Gemini AI.
 
 Experience:
-Senior Software Engineer - TechPulse Solutions (2022 - Present)
+Senior Software Engineer - Razorpay (2022 - Present)
 - Engineered scalable microservices in Node.js and Express.
-- Developed dynamic ATS interface using React and TailwindCSS.
+- Developed dynamic ATS interface using React and modern CSS.
 
-Software Developer - CloudScale Innovations (2019 - 2022)
+Software Developer - Slice (2019 - 2022)
 - Built RESTful APIs and optimized MongoDB queries.
 
 Education:

@@ -30,14 +30,6 @@ const Signup = () => {
     if (error) setError('');
   };
 
-  const handleRoleSelect = (selectedRole) => {
-    setFormData({
-      ...formData,
-      role: selectedRole,
-    });
-    if (error) setError('');
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -69,17 +61,13 @@ const Signup = () => {
         name: name.trim(),
         email: email.trim().toLowerCase(),
         password,
-        role,
+        role: 'candidate',
       });
 
-      showToast(`Welcome to Aptly AI, ${res.name || 'there'}! Account created.`, 'success');
+      showToast(`Welcome to Aptly, ${res.name || 'there'}! Account created.`, 'success');
 
-      // Role-based redirection
-      if (res.role === 'recruiter') {
-        navigate('/dashboard');
-      } else {
-        navigate('/jobs');
-      }
+      // Direct to intentional role-selection onboarding step
+      navigate('/onboarding');
     } catch (err) {
       console.error('Signup error:', err);
       const message = err.response?.data?.message || 'Registration failed. Please try again.';
@@ -136,84 +124,6 @@ const Signup = () => {
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginTop: '0.35rem' }}>
             Get started with AI-driven job matching and ATS resume intelligence
           </p>
-        </div>
-
-        {/* Role Switcher Pill */}
-        <div style={{ marginBottom: '1.75rem' }}>
-          <label className="form-label" style={{ marginBottom: '0.5rem' }}>
-            I am joining as:
-          </label>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '0.65rem',
-              background: 'var(--bg-secondary)',
-              padding: '0.35rem',
-              borderRadius: '6px',
-              border: '1px solid var(--border-default)',
-            }}
-          >
-            {/* Candidate Option */}
-            <button
-              type="button"
-              onClick={() => handleRoleSelect('candidate')}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '0.75rem 0.5rem',
-                borderRadius: '4px',
-                border: role === 'candidate' ? '1px solid var(--accent-teal)' : '1px solid transparent',
-                background: role === 'candidate' ? 'var(--accent-teal-light)' : 'transparent',
-                color: role === 'candidate' ? 'var(--accent-teal)' : 'var(--text-secondary)',
-                cursor: 'pointer',
-                transition: 'var(--transition)',
-              }}
-            >
-              <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>Candidate</span>
-              <span
-                style={{
-                  fontSize: '0.74rem',
-                  color: role === 'candidate' ? 'var(--accent-teal)' : 'var(--text-muted)',
-                  marginTop: '2px',
-                }}
-              >
-                Seek roles & match resume
-              </span>
-            </button>
-
-            {/* Recruiter Option */}
-            <button
-              type="button"
-              onClick={() => handleRoleSelect('recruiter')}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '0.75rem 0.5rem',
-                borderRadius: '4px',
-                border: role === 'recruiter' ? '1px solid var(--accent-teal)' : '1px solid transparent',
-                background: role === 'recruiter' ? 'var(--accent-teal-light)' : 'transparent',
-                color: role === 'recruiter' ? 'var(--accent-teal)' : 'var(--text-secondary)',
-                cursor: 'pointer',
-                transition: 'var(--transition)',
-              }}
-            >
-              <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>Recruiter</span>
-              <span
-                style={{
-                  fontSize: '0.74rem',
-                  color: role === 'recruiter' ? 'var(--accent-teal)' : 'var(--text-muted)',
-                  marginTop: '2px',
-                }}
-              >
-                Post jobs & screen candidates
-              </span>
-            </button>
-          </div>
         </div>
 
         {/* Error Alert Banner */}

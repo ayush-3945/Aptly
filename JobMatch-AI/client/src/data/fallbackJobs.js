@@ -2,16 +2,16 @@ export const FALLBACK_JOBS = [
   {
     _id: 'job_fallback_1',
     title: 'Senior Full-Stack MERN Systems Engineer',
-    company: 'TechPulse Solutions',
-    location: 'Remote',
+    company: 'Razorpay',
+    location: 'Bengaluru, India (Remote)',
     requiredSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'Docker'],
     description:
-      'We are looking for a Senior Full-Stack MERN Systems Engineer to build scalable web applications. You will architect Node.js microservices, build responsive React 19 frontends, and integrate semantic evaluation services for automated candidate matching.',
+      'We are looking for a Senior Full-Stack MERN Systems Engineer to build scalable payment infrastructure and web applications. You will architect Node.js microservices, build responsive React 19 frontends, and integrate semantic evaluation services for automated workflows.',
     responsibilities: [
-      'Architect, develop, and maintain high-throughput Node.js microservices handling millions of API requests.',
+      'Architect, develop, and maintain high-throughput Node.js microservices handling millions of API transactions.',
       'Design modern, component-driven user interfaces using React 19 and TailwindCSS.',
       'Construct complex MongoDB aggregation pipelines and optimize database query indexing.',
-      'Integrate semantic evaluation models for real-time document parsing, semantic search, and ATS resume scoring.',
+      'Integrate semantic evaluation models for real-time document parsing, semantic search, and resume scoring.',
       'Containerize application components with Docker and manage automated CI/CD deployment pipelines.',
     ],
     requirements: [
@@ -23,17 +23,17 @@ export const FALLBACK_JOBS = [
       'Hands-on experience with LLM APIs and prompt engineering is a major plus.',
     ],
     aboutCompany:
-      'TechPulse Solutions is an HRTech innovator engineering modern talent intelligence and automated applicant tracking systems for high-growth tech teams worldwide.',
+      'Razorpay is India’s leading full-stack financial services and payment gateway platform powering millions of businesses worldwide.',
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     _id: 'job_fallback_2',
     title: 'Frontend Interface Architect',
-    company: 'HyperScale Systems',
-    location: 'San Francisco, CA',
+    company: 'Zepto Tech',
+    location: 'Mumbai, India (Hybrid)',
     requiredSkills: ['React', 'TypeScript', 'TailwindCSS', 'PostgreSQL', 'Next.js'],
     description:
-      'Lead our frontend engineering initiatives building real-time data interfaces. Strong mastery of React component trees, responsive CSS, and high-performance streaming APIs required.',
+      'Lead our frontend engineering initiatives building high-frequency logistics and consumer interfaces. Strong mastery of React component trees, responsive CSS, and high-performance streaming APIs required.',
     responsibilities: [
       'Build ultra-responsive web interfaces with React, TypeScript, and modern design systems.',
       'Implement real-time token streaming and interactive data dashboards.',
@@ -47,14 +47,14 @@ export const FALLBACK_JOBS = [
       'Experience consuming streaming REST and WebSocket APIs.',
     ],
     aboutCompany:
-      'HyperScale Systems designs intuitive interfaces and productivity tools for enterprise engineering teams.',
+      'Zepto Tech is India’s fastest-growing quick-commerce network engineering low-latency delivery infrastructure and consumer experiences.',
     createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     _id: 'job_fallback_3',
     title: 'Backend Systems & API Engineer',
-    company: 'CloudCore Labs',
-    location: 'Remote',
+    company: 'Slice',
+    location: 'Bengaluru, India (Remote)',
     requiredSkills: ['Node.js', 'Express', 'MongoDB', 'Docker', 'Redis', 'Microservices'],
     description:
       'Architect robust backend services, secure authentication, and high-performance MongoDB aggregation pipelines. You will optimize database throughput and scale services handling millions of daily events.',
@@ -70,17 +70,17 @@ export const FALLBACK_JOBS = [
       'Experience deploying services inside Docker containers and running automated CI checks.',
     ],
     aboutCompany:
-      'CloudCore Labs provides mission-critical cloud infrastructure and data processing pipelines for enterprise logistics and fintech networks.',
+      'Slice is a consumer payments and fintech company redesigning modern financial products for the next generation.',
     createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     _id: 'job_fallback_4',
     title: 'Full-Stack Software Engineer',
-    company: 'DataSphere Analytics',
-    location: 'Austin, TX',
+    company: 'Groww Engineering',
+    location: 'Bengaluru, India',
     requiredSkills: ['React', 'Node.js', 'MongoDB', 'Python', 'REST API'],
     description:
-      'Join our product engineering team delivering modern data analytics dashboards. Build full-stack features from MERN interfaces to data pipelines and secure customer access controls.',
+      'Join our product engineering team delivering modern investment and analytics dashboards. Build full-stack features from MERN interfaces to data pipelines and secure customer access controls.',
     responsibilities: [
       'Develop end-to-end features spanning React dashboards and Express backend endpoints.',
       'Integrate Python analytics scripts and export pipelines into customer portals.',
@@ -92,17 +92,17 @@ export const FALLBACK_JOBS = [
       'Comfortable writing clean MongoDB queries and managing state across SPAs.',
     ],
     aboutCompany:
-      'DataSphere Analytics delivers real-time market intelligence and predictive analytics engines to Fortune 500 decision makers.',
+      'Groww Engineering builds transparent, high-speed investing and wealth management platforms for tens of millions of active users.',
     createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     _id: 'job_fallback_5',
     title: 'Cloud Infrastructure & DevOps Engineer',
-    company: 'InfraNexus',
-    location: 'New York, NY',
+    company: 'BrowserStack',
+    location: 'Mumbai, India (Remote)',
     requiredSkills: ['Docker', 'AWS', 'Kubernetes', 'CI/CD', 'Node.js'],
     description:
-      'Manage cloud infrastructure, automated deployment pipelines, and Docker container clusters for our AI microservices platform. Experience with continuous delivery and zero-downtime rollouts is essential.',
+      'Manage cloud infrastructure, automated deployment pipelines, and Docker container clusters for our distributed testing cloud. Experience with continuous delivery and zero-downtime rollouts is essential.',
     responsibilities: [
       'Configure and maintain AWS cloud infrastructure, VPC networks, and Kubernetes clusters.',
       'Automate deployment pipelines and environment provisioning using Docker and Terraform.',
@@ -114,29 +114,29 @@ export const FALLBACK_JOBS = [
       'Firm grasp of security standards, network topologies, and secrets management.',
     ],
     aboutCompany:
-      'InfraNexus provides automated cloud reliability and DevOps orchestration platforms for global software engineering teams.',
+      'BrowserStack is the global leader in software testing infrastructure, enabling millions of developers to test web and mobile apps at scale.',
     createdAt: new Date(Date.now() - 11 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     _id: 'job_fallback_6',
     title: 'Junior Full-Stack Web Developer',
-    company: 'Apex Code Ventures',
-    location: 'Remote',
+    company: 'Swiggy',
+    location: 'Bengaluru, India (Hybrid)',
     requiredSkills: ['React', 'JavaScript', 'Express', 'MongoDB', 'Git'],
     description:
-      'Great opportunity for a rising full-stack developer to contribute to our MERN platform. You will build user-facing components, write API endpoints, and learn automated ATS workflows.',
+      'Great opportunity for a rising full-stack developer to contribute to our consumer engineering platform. You will build user-facing components, write API endpoints, and learn automated production workflows.',
     responsibilities: [
-      'Build reusable React components adhering to Figma mockups and accessibility standards.',
+      'Build reusable React components adhering to design systems and accessibility standards.',
       'Create CRUD endpoints in Node.js/Express and write database migrations.',
       'Collaborate with senior engineers to diagnose bugs and improve application responsiveness.',
     ],
     requirements: [
       '1+ years of experience with JavaScript, React, and Node.js (including personal or academic projects).',
       'Familiarity with Git branching, pull requests, and code review etiquette.',
-      'Eager curiosity to learn generative AI integrations and production DevOps tools.',
+      'Eager curiosity to learn modern API integrations and production DevOps tools.',
     ],
     aboutCompany:
-      'Apex Code Ventures incubates early-stage digital products and open-source developer tooling for the global engineering community.',
+      'Swiggy is India’s pioneering on-demand convenience platform connecting consumers with millions of restaurants and partner stores.',
     createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
   },
 ];

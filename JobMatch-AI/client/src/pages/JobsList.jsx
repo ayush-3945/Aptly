@@ -546,8 +546,93 @@ const JobsList = () => {
               Analyzing clinical competence registry and compiling matching roles...
             </p>
           </div>
+        ) : jobs.length === 0 ? (
+          /* Empty State — 0 Total Roles Posted */
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '4.5rem 1.5rem',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '12px',
+              border: '1px solid #E2E8F0',
+              boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)',
+            }}
+          >
+            {/* Centered Document with Magnifying Glass SVG Illustration in Teal */}
+            <svg
+              width="68"
+              height="68"
+              viewBox="0 0 64 64"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ margin: '0 auto 1.25rem', display: 'block' }}
+            >
+              <rect
+                x="14"
+                y="8"
+                width="36"
+                height="48"
+                rx="5"
+                fill="#F0FDFA"
+                stroke="#0D9488"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <line x1="22" y1="20" x2="38" y2="20" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" />
+              <line x1="22" y1="28" x2="38" y2="28" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" />
+              <line x1="22" y1="36" x2="30" y2="36" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" />
+              <circle cx="42" cy="42" r="10" fill="#FFFFFF" stroke="#0F766E" strokeWidth="2.5" />
+              <line x1="49" y1="49" x2="57" y2="57" stroke="#0F766E" strokeWidth="3" strokeLinecap="round" />
+            </svg>
+
+            <h3
+              style={{
+                fontFamily: "'Newsreader', Georgia, serif",
+                fontSize: '1.45rem',
+                fontWeight: 700,
+                color: '#0F172A',
+                marginBottom: '0.4rem',
+              }}
+            >
+              No roles posted yet
+            </h3>
+            <p
+              style={{
+                color: '#64748B',
+                fontSize: '0.92rem',
+                margin: '0 auto 1.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.45rem',
+                flexWrap: 'wrap',
+              }}
+            >
+              <span>Check back soon or</span>
+              <button
+                type="button"
+                onClick={() =>
+                  showToast('Preference saved! We will notify you as soon as new positions open up.', 'success')
+                }
+                className="btn btn-ghost"
+                style={{
+                  padding: '0.2rem 0.65rem',
+                  fontSize: '0.84rem',
+                  fontWeight: 600,
+                  color: '#0F766E',
+                  backgroundColor: '#F0FDFA',
+                  border: '1px solid #CCFBF1',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                }}
+              >
+                Notify me
+              </button>
+            </p>
+          </div>
         ) : filteredJobs.length === 0 ? (
-          /* Empty State */
+          /* Filtered Empty State */
           <div
             style={{
               textAlign: 'center',

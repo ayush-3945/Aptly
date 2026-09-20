@@ -132,9 +132,9 @@ const JobApplicants = () => {
         currentJob =
           FALLBACK_JOBS.find((j) => j._id === jobId) || {
             _id: jobId,
-            title: 'Senior Full-Stack MERN Engineer',
-            company: 'TechPulse Solutions',
-            location: 'Remote',
+            title: 'Senior Full-Stack MERN Systems Engineer',
+            company: 'Razorpay',
+            location: 'Bengaluru, India (Remote)',
             requiredSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL'],
           };
       }

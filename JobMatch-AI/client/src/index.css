@@ -677,4 +677,48 @@ a {
   border-radius: 6px;
 }
 
+/* =========================================================================
+   Mobile Navigation & Responsive Breakpoints (<= 768px)
+   ========================================================================= */
+.mobile-toggle-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Navbar adjustments */
+  .desktop-nav,
+  .desktop-auth {
+    display: none !important;
+  }
+
+  .mobile-toggle-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Post Job 60/40 grid strictly stacks to 1 column */
+  .post-job-grid-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  .jd-quality-panel {
+    position: static !important;
+    top: auto !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+    margin-top: 1.5rem !important;
+  }
+
+  /* Recruiter Analytics grids stack to single column */
+  .analytics-metrics-grid,
+  .analytics-charts-grid,
+  .analytics-insights-grid,
+  .analytics-recommendations-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
 

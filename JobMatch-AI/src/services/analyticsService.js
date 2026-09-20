@@ -8,9 +8,10 @@ const { getGeminiClient, isGeminiConfigured, DEFAULT_MODEL } = require('../confi
 const DEFAULT_BASELINE_TELEMETRY = {
   totalApplicants: 48,
   totalJobs: 4,
-  conversionRate: 58.3,
-  conversionTrend: '+8.2% vs last week',
-  avgAiMatchScore: 81.4,
+  conversionRate: 8.3,
+  hasHistoricalData: false,
+  conversionTrend: null,
+  avgAiMatchScore: 78.4,
   screeningVelocity: '< 2.5s',
   avgDaysToHire: 18,
   industryAvgDays: 23,
@@ -33,24 +34,24 @@ const DEFAULT_BASELINE_TELEMETRY = {
     {
       tier: 'strong',
       label: 'Strong Match (≥ 75%)',
-      count: 30,
-      percentage: 62.5,
+      count: 24,
+      percentage: 50.0,
       color: '#2D7A3A',
       desc: 'High technical alignment with core required skills and experience.',
     },
     {
       tier: 'moderate',
       label: 'Moderate Match (50% – 74%)',
-      count: 14,
-      percentage: 29.2,
+      count: 18,
+      percentage: 37.5,
       color: '#B45309',
       desc: 'Solid foundations with 1–2 minor gaps in specific platform tools.',
     },
     {
       tier: 'low',
       label: 'Low Match (< 50%)',
-      count: 4,
-      percentage: 8.3,
+      count: 6,
+      percentage: 12.5,
       color: '#B91C1C',
       desc: 'Significant divergence from required technical stack.',
     },
@@ -293,8 +294,11 @@ const aggregatePipelineData = async () => {
       },
     ];
 
-    const avgAiMatchScore = scoredCount > 0 ? Number((totalScore / scoredCount).toFixed(1)) : 81.4;
-    const conversionRate = Number((((shortlistedVol + interviewVol) / (totalApplicants || 1)) * 100).toFixed(1));
+    const avgAiMatchScore = scoredCount > 0 ? Number((totalScore / scoredCount).toFixed(1)) : 78.4;
+    const conversionRate =
+      totalApplicants > 0
+        ? Math.min(99.0, Number(((hiredVol / totalApplicants) * 100).toFixed(1)))
+        : 0;
 
     // Quality tiers
     const qualityDenominator = scoredCount || totalApplicants || 1;
@@ -346,8 +350,9 @@ const aggregatePipelineData = async () => {
     return {
       totalApplicants,
       totalJobs,
-      conversionRate: conversionRate || 58.3,
-      conversionTrend: '+8.2% vs last week',
+      conversionRate: conversionRate || 0,
+      hasHistoricalData: false,
+      conversionTrend: null,
       avgAiMatchScore,
       screeningVelocity: '< 2.5s',
       avgDaysToHire: 18,

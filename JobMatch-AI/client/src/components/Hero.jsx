@@ -17,7 +17,7 @@ const SAMPLE_EVALUATION = {
   aiMatchScore: 88,
   recommendation: 'Strong Match',
   fitSummary:
-    'Subject candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and REST services. The candidate exhibits strong alignment with TechPulse Solutions requirements.',
+    'Subject candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and REST services. The candidate exhibits strong alignment with Razorpay requirements.',
   matchedSkills: ['React.js', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'REST APIs', 'Git'],
   missingSkills: ['Docker Containerization', 'Kubernetes Orchestration'],
   experienceFit:
@@ -156,7 +156,7 @@ const Hero = () => {
                       letterSpacing: '0.01em',
                     }}
                   >
-                    Evaluation: Ayush Kumar Pandey • TechPulse Solutions •{' '}
+                    Evaluation: Ayush Kumar Pandey • Razorpay •{' '}
                     <span style={{ color: 'var(--accent-teal)', fontWeight: 600 }}>Click to inspect</span>
                   </div>
                 </div>
@@ -298,7 +298,7 @@ const Hero = () => {
               >
                 Evaluation synthesis:
               </span>
-              Candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and REST services. The candidate exhibits strong alignment with TechPulse Solutions requirements.
+              Candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and REST services. The candidate exhibits strong alignment with Razorpay requirements.
             </div>
 
             {/* Interactive Card Action Bar */}

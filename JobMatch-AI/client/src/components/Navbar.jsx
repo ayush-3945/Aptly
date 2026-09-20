@@ -227,7 +227,6 @@ const Navbar = () => {
           aria-label={mobileOpen ? 'Close menu' : 'Open navigation menu'}
           aria-expanded={mobileOpen}
           style={{
-            display: 'none',
             background: 'transparent',
             border: 'none',
             cursor: 'pointer',
@@ -378,6 +377,28 @@ const Navbar = () => {
                 >
                   <PlusCircle size={16} />
                   <span>Post a Job Opening</span>
+                </Link>
+              )}
+
+              {user?.role === 'candidate' && (
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileOpen(false)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.65rem',
+                    padding: '0.75rem 0.85rem',
+                    borderRadius: '6px',
+                    fontSize: '0.9rem',
+                    fontWeight: 600,
+                    color: isActive('/profile') ? 'var(--accent-teal)' : 'var(--text-primary)',
+                    background: isActive('/profile') ? 'var(--accent-teal-light)' : 'transparent',
+                    border: `1px solid ${isActive('/profile') ? 'rgba(15, 107, 92, 0.25)' : 'transparent'}`,
+                  }}
+                >
+                  <User size={16} />
+                  <span>Profile & Resume</span>
                 </Link>
               )}
             </div>

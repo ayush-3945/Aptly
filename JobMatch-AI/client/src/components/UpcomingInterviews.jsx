@@ -23,11 +23,11 @@ const SAMPLE_INTERVIEWS = [
   {
     _id: 'demo_int_1',
     candidateId: { name: 'Elena Rostova', email: 'elena.rostova@gmail.com' },
-    recruiterId: { name: 'Dr. Sarah Lin', email: 'sarah@techpulse.io' },
+    recruiterId: { name: 'Dr. Sarah Lin', email: 'sarah@razorpay.com' },
     jobId: {
       title: 'Senior Full-Stack MERN Systems Engineer',
-      company: 'TechPulse Solutions',
-      location: 'Remote',
+      company: 'Razorpay',
+      location: 'Bengaluru, India (Remote)',
     },
     scheduledAt: new Date(Date.now() + 26 * 60 * 60 * 1000).toISOString(),
     duration: 45,
@@ -39,11 +39,11 @@ const SAMPLE_INTERVIEWS = [
   {
     _id: 'demo_int_2',
     candidateId: { name: 'Marcus Chen', email: 'marcus.chen@outlook.com' },
-    recruiterId: { name: 'Dr. Sarah Lin', email: 'sarah@techpulse.io' },
+    recruiterId: { name: 'Dr. Sarah Lin', email: 'sarah@razorpay.com' },
     jobId: {
       title: 'Frontend Interface Architect',
-      company: 'HyperScale Systems',
-      location: 'San Francisco, CA',
+      company: 'Zepto Tech',
+      location: 'Mumbai, India (Hybrid)',
     },
     scheduledAt: new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),
     duration: 60,
