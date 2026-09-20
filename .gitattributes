@@ -1,0 +1,15 @@
+# Exclude from language stats
+node_modules/ linguist-vendored
+dist/ linguist-vendored
+build/ linguist-vendored
+public/ linguist-documentation
+*.min.js linguist-vendored
+
+# Mark generated files
+package-lock.json linguist-generated
+yarn.lock linguist-generated
+
+# Explicit language overrides
+*.jsx linguist-language=JavaScript
+*.css linguist-language=CSS
+*.json linguist-language=JSON
