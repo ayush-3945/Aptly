@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   Briefcase,
-  Sparkles,
+  ArrowRight,
   CheckCircle2,
   AlertTriangle,
   Clock,
@@ -35,13 +35,13 @@ const SAMPLE_APPLICATIONS = [
     appliedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     aiMatchScore: 88,
     recommendation: 'Strong Match',
-    matchedSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI'],
+    matchedSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL'],
     missingSkills: ['Docker'],
     experienceFit: 'Candidate exhibits 4+ years of relevant MERN production engineering.',
-    fitSummary: 'Strong candidate profile with proven Full-Stack engineering depth and AI integration capabilities.',
+    fitSummary: 'Strong candidate profile with proven Full-Stack engineering depth and scalable API architectures.',
     job: {
       _id: 'job_fallback_1',
-      title: 'Senior Full-Stack MERN & AI Engineer',
+      title: 'Senior Full-Stack MERN Engineer',
       company: 'TechPulse Solutions',
       location: 'Remote',
     },
@@ -53,13 +53,13 @@ const SAMPLE_APPLICATIONS = [
     aiMatchScore: 72,
     recommendation: 'Moderate Match',
     matchedSkills: ['React', 'TypeScript', 'TailwindCSS'],
-    missingSkills: ['Gemini AI', 'Next.js'],
-    experienceFit: 'Solid frontend capabilities with minor gap in foundation model SDK integrations.',
-    fitSummary: 'Moderate candidate alignment. Capable frontend specialist who could quickly ramp up on Gemini APIs.',
+    missingSkills: ['PostgreSQL', 'Next.js'],
+    experienceFit: 'Solid frontend capabilities with minor gap in relational database architectures.',
+    fitSummary: 'Moderate candidate alignment. Capable frontend specialist who could quickly ramp up on full-stack technologies.',
     job: {
       _id: 'job_fallback_2',
-      title: 'Frontend AI Interface Architect',
-      company: 'HyperScale AI',
+      title: 'Frontend Interface Architect',
+      company: 'HyperScale Systems',
       location: 'San Francisco, CA',
     },
   },
@@ -273,7 +273,7 @@ const CandidateDashboard = () => {
                 color: 'var(--text-primary)',
               }}
             >
-              My Applications & AI Match Tracker
+              My Applications & Match Tracker
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginTop: '0.25rem' }}>
               Real-time telemetry on your submitted applications, ATS status changes, and semantic match breakdowns.
@@ -281,7 +281,7 @@ const CandidateDashboard = () => {
           </div>
 
           <Link to="/jobs" className="btn btn-primary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.9rem' }}>
-            <Sparkles size={16} />
+            <ArrowRight size={16} />
             <span>Apply to New Roles</span>
           </Link>
         </div>
@@ -508,10 +508,10 @@ const CandidateDashboard = () => {
               <Briefcase size={40} color="var(--text-muted)" style={{ margin: '0 auto 1rem' }} />
               <h3 style={{ fontSize: '1.35rem', marginBottom: '0.5rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>No Applications Yet</h3>
               <p style={{ color: 'var(--text-secondary)', maxWidth: '420px', margin: '0 auto 1.75rem', fontSize: '0.92rem' }}>
-                You haven't applied to any roles yet. Explore our open positions and benchmark your resume against hiring requirements with Gemini AI.
+                You haven't applied to any roles yet. Explore our open positions and benchmark your resume against hiring requirements.
               </p>
               <Link to="/jobs" className="btn btn-primary">
-                <Sparkles size={16} />
+                <ArrowRight size={16} />
                 <span>Explore Jobs & Apply</span>
               </Link>
             </div>
@@ -608,7 +608,6 @@ const CandidateDashboard = () => {
                             borderRadius: '4px',
                           }}
                         >
-                          <Sparkles size={14} color="var(--accent-teal)" />
                           <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--accent-teal)' }}>
                             {matchScore}% Fit
                           </span>
@@ -618,7 +617,7 @@ const CandidateDashboard = () => {
 
                     {/* Quick Summary Preview */}
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.25rem', lineHeight: 1.5 }}>
-                      {app.fitSummary || 'Resume processed through Gemini ATS semantic evaluation engine.'}
+                      {app.fitSummary || 'Resume processed through ATS semantic evaluation engine.'}
                     </p>
 
                     {/* Card Bottom Controls */}
@@ -716,7 +715,7 @@ const CandidateDashboard = () => {
                                       border: '1px solid rgba(15, 107, 92, 0.2)',
                                     }}
                                   >
-                                    ✓ {s}
+                                    {s}
                                   </span>
                                 ))
                               ) : (
@@ -745,7 +744,7 @@ const CandidateDashboard = () => {
                                       border: '1px solid rgba(185, 28, 28, 0.2)',
                                     }}
                                   >
-                                    ✕ {s}
+                                    {s}
                                   </span>
                                 ))
                               ) : (
@@ -977,8 +976,8 @@ const CandidateDashboard = () => {
                         gap: '0.45rem',
                       }}
                     >
-                      <Sparkles size={15} />
-                      <span>Apply & Check AI Match</span>
+                      <ArrowRight size={15} />
+                      <span>Apply & View Match</span>
                     </button>
                   </div>
                 </div>

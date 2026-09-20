@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   X,
-  Sparkles,
+  FileCheck,
   Upload,
   FileText,
   CheckCircle2,
@@ -176,7 +176,7 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
 
     if (isDemo) {
       matched = required.filter((s) =>
-        ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'Docker', 'JavaScript', 'REST APIs', 'Git'].some(
+        ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'Docker', 'JavaScript', 'REST APIs', 'Git'].some(
           (m) => m.toLowerCase() === s.toLowerCase()
         )
       );
@@ -221,10 +221,10 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
       setSubmitStep('Uploading PDF resume & parsing document text...');
       await new Promise((r) => setTimeout(r, 600));
 
-      setSubmitStep('Passing extracted text to Google Gemini 2.5 Flash ATS engine...');
+      setSubmitStep('Evaluating profile alignment with ATS requirements...');
       await new Promise((r) => setTimeout(r, 900));
 
-      setSubmitStep('Synthesizing match score, skills alignment, & recruiter takeaway...');
+      setSubmitStep('Synthesizing match score, skills alignment, & evaluation report...');
 
       let evaluationData = null;
 
@@ -244,9 +244,9 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
           }
         } else if (useDemoResume) {
           resumeText = `Alex Morgan
-Senior Full-Stack MERN & AI Engineer
+Senior Full-Stack MERN Systems Engineer
 Email: candidate@jobmatch.ai | Location: San Francisco, CA
-Skills: React, Node.js, Express, MongoDB, Gemini AI, Docker, JavaScript, REST APIs, Git`;
+Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST APIs, Git`;
         }
 
         const applyRes = await api.post('/applications', {
@@ -326,7 +326,7 @@ Skills: React, Node.js, Express, MongoDB, Gemini AI, Docker, JavaScript, REST AP
             </div>
             <div>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
-                {evaluationResult ? 'Gemini AI Match Scorecard' : 'Apply with AI Semantic Match'}
+                {evaluationResult ? 'Match Scorecard' : 'Application & Semantic Evaluation'}
               </h3>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                 {job.title} • {job.company}
@@ -524,7 +524,7 @@ Skills: React, Node.js, Express, MongoDB, Gemini AI, Docker, JavaScript, REST AP
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <Sparkles size={18} color="var(--accent-teal)" />
+                      <FileCheck size={18} color="var(--accent-teal)" />
                       <h4
                         style={{
                           margin: 0,
@@ -534,7 +534,7 @@ Skills: React, Node.js, Express, MongoDB, Gemini AI, Docker, JavaScript, REST AP
                           color: 'var(--text-primary)',
                         }}
                       >
-                        AI Match Score Preview
+                        Match Score Preview
                       </h4>
                     </div>
 
@@ -671,7 +671,7 @@ Skills: React, Node.js, Express, MongoDB, Gemini AI, Docker, JavaScript, REST AP
                             color: 'var(--accent-teal)',
                           }}
                         >
-                          ✓ Matched skills ({previewMatchData.matchedSkills?.length || 0})
+                          Matched skills ({previewMatchData.matchedSkills?.length || 0})
                         </span>
                       </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
@@ -725,7 +725,7 @@ Skills: React, Node.js, Express, MongoDB, Gemini AI, Docker, JavaScript, REST AP
                             color: 'var(--semantic-red)',
                           }}
                         >
-                          ✗ Missing skills ({previewMatchData.missingSkills?.length || 0})
+                          Missing skills ({previewMatchData.missingSkills?.length || 0})
                         </span>
                       </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
@@ -937,7 +937,7 @@ Skills: React, Node.js, Express, MongoDB, Gemini AI, Docker, JavaScript, REST AP
                           Or use 1-Click Verified Demo CV
                         </div>
                         <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
-                          Pre-loaded Senior MERN & AI engineer profile for instant testing
+                          Pre-loaded Senior MERN engineer profile for instant testing
                         </div>
                       </div>
                     </div>
@@ -946,7 +946,7 @@ Skills: React, Node.js, Express, MongoDB, Gemini AI, Docker, JavaScript, REST AP
                       className={useDemoResume ? 'btn btn-primary' : 'btn btn-secondary'}
                       style={{ fontSize: '0.78rem', padding: '0.35rem 0.75rem' }}
                     >
-                      {useDemoResume ? 'Selected ✓' : 'Use Demo CV'}
+                      {useDemoResume ? 'Selected' : 'Use Demo CV'}
                     </button>
                   </div>
 
@@ -981,7 +981,7 @@ Skills: React, Node.js, Express, MongoDB, Gemini AI, Docker, JavaScript, REST AP
                         </>
                       ) : (
                         <>
-                          <Sparkles size={16} color="var(--accent-teal)" />
+                          <FileCheck size={16} color="var(--accent-teal)" />
                           <span>Check your match first</span>
                         </>
                       )}
@@ -1157,7 +1157,7 @@ Skills: React, Node.js, Express, MongoDB, Gemini AI, Docker, JavaScript, REST AP
                     Gaps Identified
                   </div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    <strong style={{ color: 'var(--accent-teal)' }}>Gemini 2.5</strong> Scored
+                    <strong style={{ color: 'var(--accent-teal)' }}>ATS</strong> Verified
                   </div>
                 </div>
               </div>
@@ -1210,7 +1210,7 @@ Skills: React, Node.js, Express, MongoDB, Gemini AI, Docker, JavaScript, REST AP
                             fontWeight: 500,
                           }}
                         >
-                          ✓ {skill}
+                          {skill}
                         </span>
                       ))
                     ) : (
@@ -1265,8 +1265,7 @@ Skills: React, Node.js, Express, MongoDB, Gemini AI, Docker, JavaScript, REST AP
                             transition: 'var(--transition)',
                           }}
                         >
-                          <span>✕ {skill}</span>
-                          <Sparkles size={11} color="var(--semantic-red)" />
+                          <span>{skill}</span>
                         </button>
                       ))
                     ) : (
@@ -1275,7 +1274,7 @@ Skills: React, Node.js, Express, MongoDB, Gemini AI, Docker, JavaScript, REST AP
                   </div>
                   {evaluationResult.missingSkills?.length > 0 && (
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.6rem' }}>
-                      💡 Tip: Click any missing skill above to generate an AI interview prep recovery strategy.
+                      Tip: Click any missing skill above to view interview recovery strategies.
                     </div>
                   )}
                 </div>

@@ -8,7 +8,7 @@ import {
   MapPin,
   Building2,
   Calendar,
-  Sparkles,
+  Award,
   ExternalLink,
   AlertTriangle,
   CheckCircle2,
@@ -218,7 +218,7 @@ const RecruiterJobs = () => {
             Active Requisitions & ATS Pipeline
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', maxWidth: '650px', lineHeight: 1.5 }}>
-            Publish new engineering roles, manage active listings, and review incoming candidate scorecards powered by the Gemini AI semantic matching engine.
+            Publish new engineering roles, manage active listings, and review incoming candidate scorecards with transparent skill evaluations.
           </p>
         </div>
 
@@ -300,7 +300,7 @@ const RecruiterJobs = () => {
 
         <div className="paper-card" style={{ padding: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
           <div style={{ marginBottom: '0.6rem' }}>
-            <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Avg Gemini ATS Match</span>
+            <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Avg Match Score</span>
           </div>
           <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--accent-teal)' }}>
             {metrics.avgScore}%
@@ -393,7 +393,7 @@ const RecruiterJobs = () => {
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', maxWidth: '480px', margin: '0 auto' }}>
               {searchTerm
                 ? `No jobs match "${searchTerm}". Clear your search query to see all open listings.`
-                : 'You have not published any job listings yet. Create your first role to start accepting candidates and running Gemini ATS evaluations.'}
+                : 'You have not published any job listings yet. Create your first role to start accepting candidates and reviewing applicant evaluations.'}
             </p>
           </div>
           {searchTerm ? (
@@ -600,9 +600,9 @@ const RecruiterJobs = () => {
                       <span style={{ color: 'var(--text-muted)' }}>Applicants</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
-                      <Sparkles size={16} color="var(--accent-teal)" />
+                      <Award size={16} color="var(--accent-teal)" />
                       <strong style={{ color: 'var(--text-primary)' }}>{job.avgAiScore || 82}%</strong>
-                      <span style={{ color: 'var(--text-muted)' }}>Avg AI Match</span>
+                      <span style={{ color: 'var(--text-muted)' }}>Avg Match</span>
                     </div>
                   </div>
 

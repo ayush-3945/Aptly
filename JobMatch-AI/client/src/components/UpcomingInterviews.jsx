@@ -25,7 +25,7 @@ const SAMPLE_INTERVIEWS = [
     candidateId: { name: 'Elena Rostova', email: 'elena.rostova@gmail.com' },
     recruiterId: { name: 'Dr. Sarah Lin', email: 'sarah@techpulse.io' },
     jobId: {
-      title: 'Senior Full-Stack MERN & AI Engineer',
+      title: 'Senior Full-Stack MERN Systems Engineer',
       company: 'TechPulse Solutions',
       location: 'Remote',
     },
@@ -33,7 +33,7 @@ const SAMPLE_INTERVIEWS = [
     duration: 45,
     format: 'Video Call',
     meetingLink: 'https://meet.google.com/aptly-mern-round',
-    notes: 'Technical architecture deep-dive and live Gemini model prompt integration.',
+    notes: 'Technical architecture pairing and system design review.',
     status: 'Scheduled',
   },
   {
@@ -41,8 +41,8 @@ const SAMPLE_INTERVIEWS = [
     candidateId: { name: 'Marcus Chen', email: 'marcus.chen@outlook.com' },
     recruiterId: { name: 'Dr. Sarah Lin', email: 'sarah@techpulse.io' },
     jobId: {
-      title: 'Frontend AI Interface Architect',
-      company: 'HyperScale AI',
+      title: 'Frontend Interface Architect',
+      company: 'HyperScale Systems',
       location: 'San Francisco, CA',
     },
     scheduledAt: new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),

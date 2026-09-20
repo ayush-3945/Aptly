@@ -172,7 +172,7 @@ const Signup = () => {
                 transition: 'var(--transition)',
               }}
             >
-              <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>🎯 Candidate</span>
+              <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>Candidate</span>
               <span
                 style={{
                   fontSize: '0.74rem',
@@ -202,7 +202,7 @@ const Signup = () => {
                 transition: 'var(--transition)',
               }}
             >
-              <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>🏢 Recruiter</span>
+              <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>Recruiter</span>
               <span
                 style={{
                   fontSize: '0.74rem',

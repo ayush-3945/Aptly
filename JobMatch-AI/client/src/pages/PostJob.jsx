@@ -5,14 +5,13 @@ import {
   Briefcase,
   Building2,
   MapPin,
-  Sparkles,
   Plus,
   X,
   ArrowLeft,
   CheckCircle2,
   AlertCircle,
   Loader2,
-  Wand2,
+  FileCheck,
   Layers,
   Globe,
   FileText,
@@ -27,7 +26,7 @@ const POPULAR_SKILLS = [
   'Node.js',
   'Express',
   'MongoDB',
-  'Gemini AI',
+  'PostgreSQL',
   'TypeScript',
   'Docker',
   'Python',
@@ -41,18 +40,18 @@ const WORKPLACE_TYPES = ['Remote', 'Hybrid', 'Onsite'];
 const EXPERIENCE_LEVELS = ['Entry-Level', 'Mid-Level', 'Senior', 'Lead / Staff', 'Executive'];
 
 const SAMPLE_JOB = {
-  title: 'Senior Full-Stack MERN & Gemini AI Engineer',
-  company: 'CloudPulse AI Systems',
+  title: 'Senior Full-Stack MERN Systems Engineer',
+  company: 'CloudPulse Systems',
   workplaceType: 'Remote',
   location: 'Remote (US/Global)',
   experienceLevel: 'Senior',
-  skills: ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'Docker', 'REST API'],
+  skills: ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'Docker', 'REST API'],
   description: `About the Role:
-CloudPulse AI Systems is building next-generation intelligent HR and hiring platforms. We are seeking a Senior Full-Stack MERN & Gemini AI Engineer to lead the architecture and implementation of our high-volume candidate evaluation pipeline and AI matching services.
+CloudPulse Systems is building next-generation clinical talent and hiring platforms. We are seeking a Senior Full-Stack MERN Systems Engineer to lead the architecture and implementation of our high-volume candidate evaluation pipeline.
 
 Key Responsibilities:
 • Design and build scalable Node.js microservices and RESTful APIs connecting to MongoDB clusters.
-• Integrate Google Gemini foundation models (Gemini 2.5 Flash) for automated resume analysis, skill gap detection, and ATS compatibility scoring.
+• Integrate semantic evaluation services for automated resume analysis, skill gap detection, and ATS compatibility scoring.
 • Develop reactive, high-performance user interfaces using React 19 and modern CSS.
 • Architect background job processing and secure multipart PDF parsing pipelines using Multer and pdf-parse.
 • Partner with product and engineering leaders to uphold 99.9% uptime, write automated tests, and optimize database aggregations.
@@ -61,10 +60,10 @@ Compensation & Benefits:
 • $145,000 - $180,000 base salary + equity options.
 • Comprehensive medical, dental, vision coverage, 401(k) matching, and annual remote work equipment stipend.`,
   requirements: `• 4+ years of production experience building and deploying full-stack web applications in the MERN stack.
-• Proven hands-on experience integrating LLM APIs (Gemini, Claude, or OpenAI) with structured JSON outputs.
+• Proven hands-on experience integrating LLM APIs with structured JSON outputs.
 • Deep understanding of MongoDB schema design, indexing, and aggregation pipelines.
 • Familiarity with containerization (Docker) and cloud deployments (AWS, Vercel, Render).
-• Strong communication skills and a passion for engineering high-velocity AI products.`,
+• Strong communication skills and a passion for engineering high-velocity products.`,
 };
 
 const PostJob = () => {
@@ -365,7 +364,6 @@ const PostJob = () => {
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '0.35rem',
                   fontSize: '0.72rem',
                   fontWeight: 700,
                   letterSpacing: '0.01em',
@@ -376,10 +374,7 @@ const PostJob = () => {
                   border: '1px solid rgba(15, 107, 92, 0.25)',
                 }}
               >
-                ATS requisition studio
-              </span>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Powered by Gemini 2.5 Flash live quality analyzer
+                Requisition Studio
               </span>
             </div>
             <h1
@@ -395,7 +390,7 @@ const PostJob = () => {
               Create New Job Opening
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', maxWidth: '680px', lineHeight: 1.5, margin: 0 }}>
-              Draft role responsibilities and qualifications. The real-time AI scorer will evaluate your description's clarity, competitiveness, and screen for biased wording.
+              Draft role responsibilities and qualifications. The real-time quality scorer will evaluate clarity, competitiveness, and screen for biased wording.
             </p>
           </div>
 
@@ -416,7 +411,7 @@ const PostJob = () => {
             }}
             title="Populate complete sample engineering role"
           >
-            <Wand2 size={15} />
+            <FileCheck size={15} />
             <span>Pre-fill Sample Job</span>
           </button>
         </div>
@@ -486,7 +481,7 @@ const PostJob = () => {
               </label>
               <input
                 type="text"
-                placeholder="e.g. Senior Full-Stack MERN & Gemini AI Engineer"
+                placeholder="e.g. Senior Full-Stack Engineer"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="form-input"
@@ -611,7 +606,7 @@ const PostJob = () => {
               <div style={{ display: 'flex', gap: '0.65rem' }}>
                 <input
                   type="text"
-                  placeholder="Type a skill (e.g. React, Docker, Gemini AI) and press Enter or Comma..."
+                  placeholder="Type a skill (e.g. React, Docker, Python) and press Enter or Comma..."
                   value={skillInput}
                   onChange={(e) => setSkillInput(e.target.value)}
                   onKeyDown={handleSkillKeyDown}
@@ -708,7 +703,7 @@ const PostJob = () => {
                           transition: 'var(--transition)',
                         }}
                       >
-                        {isAdded ? `✓ ${popSkill}` : `+ ${popSkill}`}
+                        {isAdded ? popSkill : `+ ${popSkill}`}
                       </button>
                     );
                   })}
@@ -802,9 +797,9 @@ const PostJob = () => {
                   borderColor: 'var(--accent-teal)',
                   color: 'var(--accent-teal)',
                 }}
-                title="Trigger immediate AI quality re-analysis"
+                title="Trigger immediate quality re-analysis"
               >
-                {scoringLoading ? <Loader2 className="spin" size={13} /> : <Wand2 size={13} />}
+                {scoringLoading ? <Loader2 className="spin" size={13} /> : <FileCheck size={13} />}
                 <span>Analyze Now</span>
               </button>
             </div>
@@ -863,7 +858,7 @@ const PostJob = () => {
                     </>
                   ) : (
                     <>
-                      <Sparkles size={18} />
+                      <Plus size={18} />
                       <span>Publish Job Opening</span>
                     </>
                   )}

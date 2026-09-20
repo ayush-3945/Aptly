@@ -5,7 +5,7 @@ import {
   Building2,
   MapPin,
   Calendar,
-  Sparkles,
+  FileCheck,
   CheckCircle2,
   ShieldCheck,
   Zap,
@@ -269,8 +269,8 @@ const JobDetail = () => {
                 className="btn btn-primary"
                 style={{ fontSize: '0.95rem', padding: '0.75rem 1.6rem' }}
               >
-                <Sparkles size={16} />
-                <span>Apply & Check AI Match</span>
+                <FileCheck size={16} />
+                <span>Apply & View Match</span>
               </button>
             )}
           </div>
@@ -285,91 +285,61 @@ const JobDetail = () => {
           <div
             className="paper-card"
             style={{
-              padding: '2rem',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-default)',
+              padding: '1.75rem',
               borderRadius: '8px',
+              border: '1px solid var(--border-default)',
+              background: 'var(--bg-card)',
             }}
           >
-            <h3 style={{ fontSize: '1.3rem', marginBottom: '1rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
               Role Overview
             </h3>
-            <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7, fontSize: '0.96rem' }}>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: 1.65, fontSize: '0.94rem', whiteSpace: 'pre-line' }}>
               {job.description}
             </p>
           </div>
 
-          {/* Responsibilities */}
-          <div
-            className="paper-card"
-            style={{
-              padding: '2rem',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-default)',
-              borderRadius: '8px',
-            }}
-          >
-            <h3 style={{ fontSize: '1.3rem', marginBottom: '1.25rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
-              Key Responsibilities
-            </h3>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-              {responsibilities.map((resp, idx) => (
-                <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', fontSize: '0.94rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-                  <span style={{ color: 'var(--accent-teal)', flexShrink: 0, marginTop: '2px' }}>
-                    <CheckCircle2 size={16} />
-                  </span>
-                  <span>{resp}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Technical Requirements */}
-          <div
-            className="paper-card"
-            style={{
-              padding: '2rem',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-default)',
-              borderRadius: '8px',
-            }}
-          >
-            <h3 style={{ fontSize: '1.3rem', marginBottom: '1.25rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
-              Qualifications & Requirements
-            </h3>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-              {requirements.map((req, idx) => (
-                <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', fontSize: '0.94rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-                  <span style={{ color: 'var(--accent-teal)', flexShrink: 0, marginTop: '2px' }}>
-                    <Check size={16} />
-                  </span>
-                  <span>{req}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Requirements & Qualifications */}
+          {job.requirements && (
+            <div
+              className="paper-card"
+              style={{
+                padding: '1.75rem',
+                borderRadius: '8px',
+                border: '1px solid var(--border-default)',
+                background: 'var(--bg-card)',
+              }}
+            >
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
+                Key Qualifications & Expectations
+              </h3>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.65, fontSize: '0.94rem', whiteSpace: 'pre-line' }}>
+                {job.requirements}
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* Right Column: Company info, Skills list & AI Match Teaser */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {/* AI ATS Teaser Card */}
+        {/* Right Column: AI Match Score Simulator & Sidebar Controls */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '90px' }}>
+          {/* Benchmark Your Resume Widget */}
           <div
             className="paper-card"
             style={{
-              padding: '1.75rem',
+              padding: '1.5rem',
               background: 'var(--accent-teal-light)',
               border: '1px solid rgba(15, 107, 92, 0.25)',
               borderRadius: '8px',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-              <Sparkles size={18} color="var(--accent-teal)" />
+              <FileCheck size={18} color="var(--accent-teal)" />
               <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--accent-teal)' }}>
-                AI Resume Matcher
+                Resume Fit Evaluation
               </h4>
             </div>
             <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '1.25rem' }}>
-              Submit your resume to benchmark your qualifications against this role using Google Gemini AI.
+              Submit your resume to benchmark your qualifications against this role with instant gap analysis.
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem', fontSize: '0.82rem', color: 'var(--text-primary)' }}>
@@ -393,7 +363,7 @@ const JobDetail = () => {
                 className="btn btn-primary"
                 style={{ width: '100%', padding: '0.7rem', fontSize: '0.92rem' }}
               >
-                <Sparkles size={16} />
+                <FileCheck size={16} />
                 <span>Test Your Resume Fit</span>
               </button>
             )}

@@ -44,7 +44,7 @@ const Dashboard = () => {
           </h2>
         </div>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2rem', maxWidth: '800px' }}>
-          JobMatch AI uses the Gemini 2.5 Flash semantic engine to analyze incoming resumes against technical requirements, providing recruiters with instant multi-point scorecards, skill gap breakdowns, and automated status transitions.
+          Aptly uses a structured semantic evaluation engine to analyze incoming resumes against technical requirements, providing recruiters with instant multi-point scorecards, skill gap breakdowns, and streamlined status transitions.
         </p>
 
         {/* State Machine Stages */}
@@ -57,7 +57,7 @@ const Dashboard = () => {
         >
           {[
             { stage: 'Applied', count: 18, color: 'var(--accent-teal)', desc: 'Fresh submissions awaiting recruiter review' },
-            { stage: 'Shortlisted', count: 14, color: 'var(--accent-teal-mid)', desc: 'Passed automated Gemini AI match criteria' },
+            { stage: 'Shortlisted', count: 14, color: 'var(--accent-teal-mid)', desc: 'Passed automated match threshold criteria' },
             { stage: 'Interview', count: 10, color: 'var(--semantic-amber)', desc: 'Technical & behavioral rounds in progress' },
             { stage: 'Hired', count: 4, color: 'var(--semantic-green)', desc: 'Offer extended and accepted' },
             { stage: 'Rejected', count: 2, color: 'var(--semantic-red)', desc: 'Candidate archived with constructive feedback' },

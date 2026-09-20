@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Sparkles,
   TrendingUp,
   RefreshCw,
   Clock,
@@ -90,7 +89,7 @@ const RecruiterAnalytics = () => {
             { skill: 'React', count: 42, frequency: 88, demandScore: 94, trend: 'rising' },
             { skill: 'Node.js', count: 37, frequency: 78, demandScore: 88, trend: 'stable' },
             { skill: 'REST API', count: 40, frequency: 84, demandScore: 86, trend: 'stable' },
-            { skill: 'Gemini AI / LLMs', count: 30, frequency: 62, demandScore: 92, trend: 'rising' },
+            { skill: 'Cloud Architecture & LLMs', count: 30, frequency: 62, demandScore: 92, trend: 'rising' },
             { skill: 'MongoDB', count: 33, frequency: 68, demandScore: 78, trend: 'stable' },
             { skill: 'TypeScript', count: 27, frequency: 56, demandScore: 84, trend: 'rising' },
             { skill: 'Docker', count: 22, frequency: 46, demandScore: 72, trend: 'stable' },
@@ -119,10 +118,10 @@ const RecruiterAnalytics = () => {
             },
             {
               type: 'opportunity',
-              title: 'Surging Demand for Gemini AI & LLM Skills',
+              title: 'Surging Demand for Generative & LLM Skills',
               description: 'Candidate requisitions specifying LLM integration and structured outputs convert 35% faster.',
               metric: '92% Demand Index',
-              action: 'Incorporate AI architectural questions in the technical interview scorecard.',
+              action: 'Incorporate modern architectural questions in the technical interview scorecard.',
             },
             {
               type: 'warning',
@@ -147,7 +146,7 @@ const RecruiterAnalytics = () => {
           },
           skillDemandTrends: [
             { skill: 'React & Frontend Frameworks', demandScore: 94, trend: 'rising' },
-            { skill: 'Gemini AI & LLM Integration', demandScore: 92, trend: 'rising' },
+            { skill: 'Generative AI & LLM Integration', demandScore: 92, trend: 'rising' },
             { skill: 'Node.js & Express Microservices', demandScore: 88, trend: 'stable' },
             { skill: 'TypeScript & Type Safety', demandScore: 84, trend: 'rising' },
             { skill: 'MongoDB Aggregations', demandScore: 78, trend: 'stable' },
@@ -158,7 +157,7 @@ const RecruiterAnalytics = () => {
           hiringVelocity: {
             avgDaysToHire: 18,
             benchmark: '23 days industry standard',
-            assessment: 'Hiring velocity is 22% faster than industry standard, powered by automated ATS screening.',
+            assessment: 'Hiring velocity is 22% faster than industry standard with automated ATS screening.',
           },
           recommendations: [
             {
@@ -381,7 +380,6 @@ const RecruiterAnalytics = () => {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.35rem',
                 fontSize: '0.72rem',
                 fontWeight: 700,
                 letterSpacing: '0.01em',
@@ -392,8 +390,7 @@ const RecruiterAnalytics = () => {
                 border: '1px solid rgba(15, 107, 92, 0.25)',
               }}
             >
-              <Sparkles size={11} />
-              Gemini 2.5 Flash Telemetry
+              Pipeline Intelligence
             </span>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               Updated {formatTime(lastUpdated)}
@@ -413,7 +410,7 @@ const RecruiterAnalytics = () => {
             Talent Pipeline Intelligence
           </h2>
           <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.86rem', color: 'var(--text-secondary)' }}>
-            Real-time candidate conversion funnel, skill demand velocity, and AI strategic recommendations.
+            Real-time candidate conversion funnel, skill demand velocity, and strategic recommendations.
           </p>
         </div>
 
@@ -466,7 +463,7 @@ const RecruiterAnalytics = () => {
               transition: 'all 0.15s ease',
               boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
             }}
-            title="Re-aggregate pipeline metrics and rerun Gemini 2.5 Flash intelligence"
+            title="Re-aggregate pipeline metrics and rerun intelligence analysis"
           >
             <RefreshCw size={13} className={refreshing ? 'spin' : ''} />
             <span>{refreshing ? 'Analyzing...' : 'Refresh Insights'}</span>
@@ -648,29 +645,13 @@ const RecruiterAnalytics = () => {
       >
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <div
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '6px',
-                background: 'var(--accent-teal-light)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--accent-teal)',
-              }}
-            >
-              <Sparkles size={17} />
-            </div>
-            <div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
-                AI-Generated Insights
-              </h3>
-              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Synthesized by Gemini 2.5 Flash from active applicant patterns
-              </span>
-            </div>
+          <div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
+              Pipeline Insights
+            </h3>
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+              Synthesized from active applicant patterns
+            </span>
           </div>
 
           {refreshing && (
@@ -684,7 +665,7 @@ const RecruiterAnalytics = () => {
                 fontWeight: 600,
               }}
             >
-              <RefreshCw size={13} className="spin" /> Generating AI insights...
+              <RefreshCw size={13} className="spin" /> Generating insights...
             </span>
           )}
         </div>
@@ -803,7 +784,7 @@ const RecruiterAnalytics = () => {
                   <strong style={{ color: 'var(--text-primary)' }}>Why it happens:</strong> {aiInsights.bottleneck.reason}
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', color: 'var(--accent-teal)', fontWeight: 600 }}>
-                  <Sparkles size={14} />
+                  <ArrowRight size={14} />
                   <span>Strategic Fix: {aiInsights.bottleneck.suggestion}</span>
                 </div>
               </div>
@@ -913,11 +894,11 @@ const RecruiterAnalytics = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
               <Award size={18} color="var(--accent-teal)" />
               <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
-                AI Match Quality Tiers
+                Match Quality Tiers
               </h3>
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: '0 0 1.5rem 0' }}>
-              Gemini ATS compatibility scoring distribution across resumes.
+              Candidate evaluation scoring distribution across applicants.
             </p>
 
             {/* Quality Tier Bars */}

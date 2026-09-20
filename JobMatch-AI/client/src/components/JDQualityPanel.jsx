@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Sparkles,
+  FileCheck,
   Users,
   AlertTriangle,
   CheckCircle2,
@@ -13,7 +13,6 @@ import {
   HelpCircle,
   ShieldAlert,
   ArrowRight,
-  Wand2,
 } from 'lucide-react';
 
 const CATEGORY_NAMES = {
@@ -69,7 +68,7 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-          <Sparkles size={16} color="var(--accent-teal)" />
+          <FileCheck size={16} color="var(--accent-teal)" />
           <h3
             style={{
               fontSize: '1rem',
@@ -84,7 +83,7 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          {loading ? (
+          {loading && (
             <span
               style={{
                 fontSize: '0.72rem',
@@ -97,19 +96,6 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
             >
               <Loader2 className="spin" size={12} />
               Analyzing...
-            </span>
-          ) : (
-            <span
-              style={{
-                fontSize: '0.68rem',
-                padding: '0.15rem 0.45rem',
-                borderRadius: '3px',
-                background: 'var(--accent-teal-light)',
-                color: 'var(--accent-teal)',
-                fontWeight: 700,
-              }}
-            >
-              Real-time AI
             </span>
           )}
         </div>
@@ -143,7 +129,7 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
           </div>
           <div>
             <p style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--text-primary)', margin: '0 0 0.35rem 0' }}>
-              Gemini AI is analyzing your job description...
+              Analyzing job description...
             </p>
             <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.4, display: 'block' }}>
               Evaluating clarity, market competitiveness, and scanning for biased wording.
@@ -183,7 +169,7 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
               Start writing your job description
             </p>
             <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.4, display: 'block' }}>
-              Gemini AI will score your clarity, technical specificity, and scan for exclusionary bias terms as you type.
+              Evaluates clarity, technical specificity, and scans for exclusionary bias terms as you type.
             </span>
           </div>
 
@@ -196,7 +182,7 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
                 style={{ fontSize: '0.8rem', padding: '0.45rem 1rem' }}
                 title="Click to analyze current text"
               >
-                <Sparkles size={13} />
+                <FileText size={13} />
                 Analyze Current Text
               </button>
             )}
@@ -221,7 +207,7 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
                 }}
                 title="Populate complete sample requisition & run instant analysis"
               >
-                <Wand2 size={13} />
+                <FileCheck size={13} />
                 Pre-fill Sample Job & Score
               </button>
             )}
@@ -477,7 +463,7 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
                   marginBottom: '0.6rem',
                 }}
               >
-                <span>⚠️</span>
+                <AlertTriangle size={14} color="#B91C1C" />
                 <span>Biased language detected ({scoreData.biasFlags.length})</span>
               </div>
 
@@ -566,7 +552,7 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
                     const isCritical = issue.severity === 'critical';
                     const isWarning = issue.severity === 'warning';
                     const borderColor = isCritical ? '#B91C1C' : isWarning ? '#B45309' : 'var(--accent-teal)';
-                    const icon = isCritical ? '🔴' : isWarning ? '🟡' : '💡';
+                    const dotColor = isCritical ? '#B91C1C' : isWarning ? '#B45309' : 'var(--accent-teal)';
 
                     return (
                       <div
@@ -581,11 +567,20 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
                           color: 'var(--text-secondary)',
                           lineHeight: 1.45,
                           display: 'flex',
-                          gap: '0.4rem',
+                          gap: '0.55rem',
                           alignItems: 'flex-start',
                         }}
                       >
-                        <span style={{ fontSize: '0.8rem' }}>{icon}</span>
+                        <span
+                          style={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: '50%',
+                            background: dotColor,
+                            flexShrink: 0,
+                            marginTop: '0.42rem',
+                          }}
+                        />
                         <span>{issue.text}</span>
                       </div>
                     );
@@ -629,7 +624,7 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
               {improvementsOpen && (
                 <div style={{ padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
                   {scoreData.improvements.map((imp, idx) => {
-                    const dot = imp.priority === 'high' ? '🔴' : imp.priority === 'medium' ? '🟡' : '🟢';
+                    const dotColor = imp.priority === 'high' ? '#B91C1C' : imp.priority === 'medium' ? '#B45309' : '#2D7A3A';
 
                     return (
                       <div
@@ -648,11 +643,19 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
                             color: 'var(--text-primary)',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '0.35rem',
+                            gap: '0.45rem',
                             marginBottom: '0.35rem',
                           }}
                         >
-                          <span>{dot}</span>
+                          <span
+                            style={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: '50%',
+                              background: dotColor,
+                              flexShrink: 0,
+                            }}
+                          />
                           <span>{imp.action}</span>
                         </div>
 

@@ -16,7 +16,6 @@ import {
   AlertCircle,
   Plus,
   Trash2,
-  Sparkles,
   X,
   FileCheck,
 } from 'lucide-react';
@@ -38,7 +37,7 @@ const SAMPLE_DEMO_DATA = {
     'Node.js',
     'Express',
     'MongoDB',
-    'Gemini AI',
+    'PostgreSQL',
     'Docker',
     'REST APIs',
     'Git',
@@ -56,7 +55,7 @@ const SAMPLE_DEMO_DATA = {
       company: 'Apex Systems',
       role: 'Senior Full-Stack Engineer',
       duration: '2022 - Present',
-      description: 'Architected responsive React frontends and Node.js microservices with Gemini API integrations.',
+      description: 'Architected responsive React frontends and Node.js microservices with distributed API integrations.',
     },
     {
       company: 'NextWave Digital',
@@ -206,7 +205,7 @@ const CandidateProfile = () => {
     data.append('resume', file);
 
     try {
-      setParseProgressText('Analyzing resume semantics with Google Gemini API...');
+      setParseProgressText('Analyzing resume semantics and extracting profile...');
       const response = await api.post('/candidate/parse-resume', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -232,7 +231,7 @@ const CandidateProfile = () => {
   // 1-Click sample resume test
   const handleUseDemoResume = async () => {
     setIsParsing(true);
-    setParseProgressText('Parsing demo PDF with Gemini 2.5 Flash ATS engine...');
+    setParseProgressText('Parsing demo PDF and verifying credentials...');
     setShowSuccessBanner(false);
 
     await new Promise((r) => setTimeout(r, 1000));
@@ -508,7 +507,7 @@ const CandidateProfile = () => {
                 <label style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                   Full name
                 </label>
-                {aiFilledFields.has('fullName') && <span className="ai-tag-indicator">✦ AI auto-filled</span>}
+                {aiFilledFields.has('fullName') && <span className="ai-tag-indicator">Auto-filled</span>}
               </div>
               <input
                 type="text"
@@ -526,7 +525,7 @@ const CandidateProfile = () => {
                 <label style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                   Email address
                 </label>
-                {aiFilledFields.has('email') && <span className="ai-tag-indicator">✦ AI auto-filled</span>}
+                {aiFilledFields.has('email') && <span className="ai-tag-indicator">Auto-filled</span>}
               </div>
               <input
                 type="email"
@@ -544,7 +543,7 @@ const CandidateProfile = () => {
                 <label style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                   Phone number
                 </label>
-                {aiFilledFields.has('phone') && <span className="ai-tag-indicator">✦ AI auto-filled</span>}
+                {aiFilledFields.has('phone') && <span className="ai-tag-indicator">Auto-filled</span>}
               </div>
               <input
                 type="tel"
@@ -562,7 +561,7 @@ const CandidateProfile = () => {
                 <label style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                   Location / Region
                 </label>
-                {aiFilledFields.has('location') && <span className="ai-tag-indicator">✦ AI auto-filled</span>}
+                {aiFilledFields.has('location') && <span className="ai-tag-indicator">Auto-filled</span>}
               </div>
               <input
                 type="text"
@@ -609,7 +608,7 @@ const CandidateProfile = () => {
                 <label style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                   Current or target role
                 </label>
-                {aiFilledFields.has('currentRole') && <span className="ai-tag-indicator">✦ AI auto-filled</span>}
+                {aiFilledFields.has('currentRole') && <span className="ai-tag-indicator">Auto-filled</span>}
               </div>
               <input
                 type="text"
@@ -627,7 +626,7 @@ const CandidateProfile = () => {
                 <label style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                   Total professional experience
                 </label>
-                {aiFilledFields.has('totalExperience') && <span className="ai-tag-indicator">✦ AI auto-filled</span>}
+                {aiFilledFields.has('totalExperience') && <span className="ai-tag-indicator">Auto-filled</span>}
               </div>
               <input
                 type="text"
@@ -667,7 +666,7 @@ const CandidateProfile = () => {
                 Skills & Technical Competencies
               </h2>
             </div>
-            {aiFilledFields.has('skills') && <span className="ai-tag-indicator">✦ AI auto-filled</span>}
+            {aiFilledFields.has('skills') && <span className="ai-tag-indicator">Auto-filled</span>}
           </div>
 
           {/* Add Skill Input */}
@@ -793,7 +792,7 @@ const CandidateProfile = () => {
               </h2>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              {aiFilledFields.has('workHistory') && <span className="ai-tag-indicator">✦ AI auto-filled</span>}
+              {aiFilledFields.has('workHistory') && <span className="ai-tag-indicator">Auto-filled</span>}
               <button
                 type="button"
                 onClick={handleAddWorkHistory}
@@ -960,7 +959,7 @@ const CandidateProfile = () => {
               </h2>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              {aiFilledFields.has('education') && <span className="ai-tag-indicator">✦ AI auto-filled</span>}
+              {aiFilledFields.has('education') && <span className="ai-tag-indicator">Auto-filled</span>}
               <button
                 type="button"
                 onClick={handleAddEducation}
@@ -1110,7 +1109,7 @@ const CandidateProfile = () => {
                 <label style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                   LinkedIn URL
                 </label>
-                {aiFilledFields.has('linkedinUrl') && <span className="ai-tag-indicator">✦ AI auto-filled</span>}
+                {aiFilledFields.has('linkedinUrl') && <span className="ai-tag-indicator">Auto-filled</span>}
               </div>
               <input
                 type="url"
@@ -1128,7 +1127,7 @@ const CandidateProfile = () => {
                 <label style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                   GitHub profile URL
                 </label>
-                {aiFilledFields.has('githubUrl') && <span className="ai-tag-indicator">✦ AI auto-filled</span>}
+                {aiFilledFields.has('githubUrl') && <span className="ai-tag-indicator">Auto-filled</span>}
               </div>
               <input
                 type="url"

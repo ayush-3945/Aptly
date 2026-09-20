@@ -20,7 +20,6 @@ import {
   Gift,
   CheckCircle2,
   XCircle,
-  Sparkles,
   FileText,
   GripVertical,
   Calendar,
@@ -227,14 +226,10 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, onGener
             color: scoreColor,
             fontSize: '0.72rem',
             fontWeight: 800,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.2rem',
             whiteSpace: 'nowrap',
             flexShrink: 0,
           }}
         >
-          <Sparkles size={10} />
           {score}%
         </span>
       </div>
@@ -266,7 +261,7 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, onGener
               className="kanban-kit-btn"
               title="Generate Interview Kit"
             >
-              <Sparkles size={11} style={{ flexShrink: 0 }} />
+              <FileText size={11} style={{ flexShrink: 0 }} />
               {!hasScheduleBtn && <span style={{ whiteSpace: 'nowrap' }}>Kit</span>}
             </button>
           )}

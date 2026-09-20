@@ -5,7 +5,6 @@ import {
   Briefcase,
   Building2,
   Users,
-  Sparkles,
   Star,
   MessageSquare,
   CheckCircle2,
@@ -133,10 +132,10 @@ const JobApplicants = () => {
         currentJob =
           FALLBACK_JOBS.find((j) => j._id === jobId) || {
             _id: jobId,
-            title: 'Senior Full-Stack MERN & AI Engineer',
+            title: 'Senior Full-Stack MERN Engineer',
             company: 'TechPulse Solutions',
             location: 'Remote',
-            requiredSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI'],
+            requiredSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL'],
           };
       }
       setJob(currentJob);
@@ -310,10 +309,7 @@ const JobApplicants = () => {
                   border: '1px solid rgba(15, 107, 92, 0.25)',
                 }}
               >
-                ATS candidate pipeline
-              </span>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Powered by Gemini 2.5 Flash
+                Candidate Pipeline
               </span>
             </div>
 
@@ -521,8 +517,7 @@ const JobApplicants = () => {
                 gap: '0.3rem',
               }}
             >
-              <Sparkles size={13} />
-              AI Fit
+              Match Score
             </button>
             <button
               onClick={() => setSortBy('date')}
@@ -942,9 +937,8 @@ const CandidateCard = ({
             gap: '0.3rem',
             whiteSpace: 'nowrap',
           }}
-          title={`Gemini AI Match Score: ${score}%`}
+          title={`Match Score: ${score}%`}
         >
-          <Sparkles size={12} />
           <span>{score}% Fit</span>
         </div>
       </div>
@@ -974,7 +968,7 @@ const CandidateCard = ({
                   fontWeight: 600,
                 }}
               >
-                ✓ {skill}
+                {skill}
               </span>
             ))}
             {application.matchedSkills.length > 3 && (
@@ -1000,7 +994,7 @@ const CandidateCard = ({
                   color: 'var(--semantic-red)',
                 }}
               >
-                ✕ {skill}
+                {skill}
               </span>
             ))}
           </div>
@@ -1303,10 +1297,9 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInte
           }}
         >
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.3rem' }}>
-              <Sparkles size={16} color="var(--accent-teal)" />
+            <div style={{ marginBottom: '0.3rem' }}>
               <span style={{ fontSize: '0.82rem', fontWeight: 700, letterSpacing: '0.01em', color: 'var(--accent-teal)' }}>
-                Gemini ATS evaluation
+                Candidate Evaluation
               </span>
             </div>
             <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
@@ -1339,7 +1332,7 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInte
         {/* Matched Skills */}
         <div style={{ marginBottom: '1.5rem' }}>
           <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.6rem', color: 'var(--semantic-green)' }}>
-            ✓ Verified Matched Skills ({candidateApp.matchedSkills?.length || 0})
+            Verified Matched Skills ({candidateApp.matchedSkills?.length || 0})
           </h4>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
             {candidateApp.matchedSkills && candidateApp.matchedSkills.length > 0 ? (
@@ -1356,7 +1349,7 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInte
                     fontWeight: 600,
                   }}
                 >
-                  ✓ {s}
+                  {s}
                 </span>
               ))
             ) : (
@@ -1368,7 +1361,7 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInte
         {/* Missing / Gap Skills */}
         <div style={{ marginBottom: '1.5rem' }}>
           <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.6rem', color: 'var(--semantic-red)' }}>
-            ✕ Identified Skill Gaps ({candidateApp.missingSkills?.length || 0})
+            Identified Skill Gaps ({candidateApp.missingSkills?.length || 0})
           </h4>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
             {candidateApp.missingSkills && candidateApp.missingSkills.length > 0 ? (
@@ -1384,7 +1377,7 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInte
                     fontSize: '0.8rem',
                   }}
                 >
-                  ✕ {s}
+                  {s}
                 </span>
               ))
             ) : (
@@ -1480,9 +1473,9 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInte
                 gap: '0.4rem',
                 fontWeight: 600,
               }}
-              title="Generate personalized AI interview kit based on skills & gaps"
+              title="Generate personalized interview kit based on skills & gaps"
             >
-              <Sparkles size={14} />
+              <FileText size={14} />
               Generate Interview Kit
             </button>
 
@@ -1499,7 +1492,7 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInte
                 color: 'var(--accent-teal)',
               }}
             >
-              ⭐ Shortlist
+              Shortlist
             </button>
 
             {candidateApp.status === 'shortlisted' ? (
@@ -1539,7 +1532,7 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInte
                   color: 'var(--semantic-amber)',
                 }}
               >
-                💬 Interview
+                Schedule Interview
               </button>
             )}
             <button
@@ -1550,7 +1543,7 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInte
               className="btn btn-primary"
               style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}
             >
-              🎉 Hire Candidate
+              Hire Candidate
             </button>
           </div>
         </div>

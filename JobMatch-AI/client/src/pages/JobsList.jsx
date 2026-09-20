@@ -12,8 +12,8 @@ import {
   LayoutDashboard,
   Filter,
   Loader2,
-  Sparkles,
-  Activity,
+  FileCheck,
+  ArrowRight,
   X,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -23,7 +23,7 @@ import ApplyModal from '../components/ApplyModal';
 import { useSavedJobs } from '../utils/savedJobs';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
 
-const POPULAR_SKILLS = ['All', 'React', 'Node.js', 'MongoDB', 'Gemini AI', 'Docker', 'Python', 'TypeScript'];
+const POPULAR_SKILLS = ['All', 'React', 'Node.js', 'MongoDB', 'PostgreSQL', 'Docker', 'Python', 'TypeScript'];
 const LOCATIONS = ['All Locations', 'Remote', 'San Francisco, CA', 'Austin, TX', 'New York, NY'];
 
 const JobsList = () => {
@@ -82,7 +82,7 @@ const JobsList = () => {
       return user.skills;
     }
     // Default engineering baseline for prospective candidates
-    return ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'TypeScript'];
+    return ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'TypeScript'];
   }, [user]);
 
   // Enrich each job with real-time diagnostic match calculations
@@ -269,7 +269,7 @@ const JobsList = () => {
                   lineHeight: 1.55,
                 }}
               >
-                Browse verified positions and compare your clinical competencies against role requirements with Gemini ATS diagnostics.
+                Browse verified positions and compare your competencies against role requirements with transparent match evaluations.
               </p>
             </div>
           </div>
@@ -646,7 +646,6 @@ const JobsList = () => {
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '0.35rem',
                             fontSize: '0.72rem',
                             fontWeight: 700,
                             letterSpacing: '0.01em',
@@ -657,7 +656,7 @@ const JobsList = () => {
                             border: '1px solid #CCFBF1',
                           }}
                         >
-                          <span>✦</span> Top match for your profile
+                          Top match for your profile
                         </span>
                       </div>
                     )}
@@ -989,7 +988,7 @@ const JobsList = () => {
                             e.currentTarget.style.borderColor = '#CCFBF1';
                           }}
                         >
-                          <Sparkles size={13} color="#0d9488" />
+                          <FileCheck size={13} color="#0d9488" />
                           <span>Check match</span>
                         </button>
                       </>

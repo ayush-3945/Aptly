@@ -12,7 +12,6 @@ import {
   CheckCircle2,
   User,
   Building2,
-  Sparkles,
 } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';

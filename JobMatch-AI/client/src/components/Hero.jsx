@@ -8,7 +8,6 @@ import {
   Target,
   Terminal,
   ExternalLink,
-  Sparkles,
   FileCheck,
 } from 'lucide-react';
 import ApplyModal from './ApplyModal';
@@ -18,11 +17,11 @@ const SAMPLE_EVALUATION = {
   aiMatchScore: 88,
   recommendation: 'Strong Match',
   fitSummary:
-    'Subject candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and Gemini AI SDK integration. The candidate exhibits strong alignment with TechPulse Solutions requirements.',
-  matchedSkills: ['React.js', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'REST APIs', 'Git'],
+    'Subject candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and REST services. The candidate exhibits strong alignment with TechPulse Solutions requirements.',
+  matchedSkills: ['React.js', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'REST APIs', 'Git'],
   missingSkills: ['Docker Containerization', 'Kubernetes Orchestration'],
   experienceFit:
-    'Candidate exhibits 4+ years of relevant MERN production engineering with deep LLM API integration experience. Missing containerization competencies are easily bridgeable on the job.',
+    'Candidate exhibits 4+ years of relevant MERN production engineering with deep API integration experience. Missing containerization competencies are easily bridgeable on the job.',
 };
 
 const Hero = () => {
@@ -97,7 +96,7 @@ const Hero = () => {
               }}
             >
               <FileCheck size={16} color="var(--accent-teal)" />
-              <span>View Sample Match Report ↗</span>
+              <span>View Sample Match Report</span>
             </button>
           </div>
         </div>
@@ -148,7 +147,7 @@ const Hero = () => {
                 </div>
                 <div>
                   <h4 style={{ fontSize: '1.1rem', marginBottom: '0.2rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                    Full-Stack MERN & AI Engineer
+                    Full-Stack MERN Systems Engineer
                   </h4>
                   <div
                     style={{
@@ -157,7 +156,7 @@ const Hero = () => {
                       letterSpacing: '0.01em',
                     }}
                   >
-                    Diagnostic: Ayush Kumar Pandey • TechPulse Solutions •{' '}
+                    Evaluation: Ayush Kumar Pandey • TechPulse Solutions •{' '}
                     <span style={{ color: 'var(--accent-teal)', fontWeight: 600 }}>Click to inspect</span>
                   </div>
                 </div>
@@ -222,7 +221,7 @@ const Hero = () => {
                   Matched core competencies
                 </span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginTop: '0.6rem' }}>
-                  {['React.js', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'REST APIs', 'Git'].map((skill) => (
+                  {['React.js', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'REST APIs', 'Git'].map((skill) => (
                     <span
                       key={skill}
                       style={{
@@ -235,7 +234,7 @@ const Hero = () => {
                         fontWeight: 500,
                       }}
                     >
-                      ✓ {skill}
+                      {skill}
                     </span>
                   ))}
                 </div>
@@ -266,7 +265,7 @@ const Hero = () => {
                         fontWeight: 500,
                       }}
                     >
-                      ✕ {skill}
+                      {skill}
                     </span>
                   ))}
                 </div>
@@ -297,9 +296,9 @@ const Hero = () => {
                   marginBottom: '0.3rem',
                 }}
               >
-                Diagnostic synthesis:
+                Evaluation synthesis:
               </span>
-              Candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and Gemini AI SDK integration. The candidate exhibits strong alignment with TechPulse Solutions requirements.
+              Candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and REST services. The candidate exhibits strong alignment with TechPulse Solutions requirements.
             </div>
 
             {/* Interactive Card Action Bar */}
@@ -336,7 +335,7 @@ const Hero = () => {
                   style={{ fontSize: '0.82rem', padding: '0.45rem 0.95rem' }}
                 >
                   <ExternalLink size={14} color="var(--accent-teal)" />
-                  <span>Open Full Scorecard ↗</span>
+                  <span>Open Full Scorecard</span>
                 </button>
                 <button
                   type="button"
@@ -348,7 +347,7 @@ const Hero = () => {
                     fontWeight: 600,
                   }}
                 >
-                  <Sparkles size={14} />
+                  <ArrowRight size={14} />
                   <span>Benchmark Your CV</span>
                 </button>
               </div>
@@ -413,7 +412,7 @@ const Hero = () => {
                 marginTop: '0.2rem',
               }}
             >
-              Gemini 2.5 Latency
+              Screening Latency
             </div>
           </div>
           <div>

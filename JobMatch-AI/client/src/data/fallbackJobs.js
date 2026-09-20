@@ -1,17 +1,17 @@
 export const FALLBACK_JOBS = [
   {
     _id: 'job_fallback_1',
-    title: 'Senior Full-Stack MERN & AI Engineer',
+    title: 'Senior Full-Stack MERN Systems Engineer',
     company: 'TechPulse Solutions',
     location: 'Remote',
-    requiredSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'Docker'],
+    requiredSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'Docker'],
     description:
-      'We are looking for a Senior Full-Stack MERN & AI Engineer to build scalable web applications. You will architect Node.js microservices, build responsive React 19 frontends, and integrate Google Gemini AI for automated candidate matching.',
+      'We are looking for a Senior Full-Stack MERN Systems Engineer to build scalable web applications. You will architect Node.js microservices, build responsive React 19 frontends, and integrate semantic evaluation services for automated candidate matching.',
     responsibilities: [
       'Architect, develop, and maintain high-throughput Node.js microservices handling millions of API requests.',
       'Design modern, component-driven user interfaces using React 19 and TailwindCSS.',
       'Construct complex MongoDB aggregation pipelines and optimize database query indexing.',
-      'Integrate Gemini AI models for real-time document parsing, semantic search, and ATS resume scoring.',
+      'Integrate semantic evaluation models for real-time document parsing, semantic search, and ATS resume scoring.',
       'Containerize application components with Docker and manage automated CI/CD deployment pipelines.',
     ],
     requirements: [
@@ -20,23 +20,23 @@ export const FALLBACK_JOBS = [
       'Strong proficiency in React 19, modern state management, and responsive CSS architectures.',
       'Solid experience with MongoDB schema design, indexing, and transactional operations.',
       'Familiarity with containerization (Docker) and RESTful API security (JWT, rate limiting, sanitization).',
-      'Hands-on experience with LLM APIs (Gemini AI, OpenAI) and prompt engineering is a major plus.',
+      'Hands-on experience with LLM APIs and prompt engineering is a major plus.',
     ],
     aboutCompany:
-      'TechPulse Solutions is an AI-first HRTech innovator engineering modern talent intelligence and automated applicant tracking systems for high-growth tech teams worldwide.',
+      'TechPulse Solutions is an HRTech innovator engineering modern talent intelligence and automated applicant tracking systems for high-growth tech teams worldwide.',
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     _id: 'job_fallback_2',
-    title: 'Frontend AI Interface Architect',
-    company: 'HyperScale AI',
+    title: 'Frontend Interface Architect',
+    company: 'HyperScale Systems',
     location: 'San Francisco, CA',
-    requiredSkills: ['React', 'TypeScript', 'TailwindCSS', 'Gemini AI', 'Next.js'],
+    requiredSkills: ['React', 'TypeScript', 'TailwindCSS', 'PostgreSQL', 'Next.js'],
     description:
-      'Lead our frontend engineering initiatives building generative AI copilots and real-time streaming interfaces. Strong mastery of React component trees, responsive CSS, and AI streaming APIs required.',
+      'Lead our frontend engineering initiatives building real-time data interfaces. Strong mastery of React component trees, responsive CSS, and high-performance streaming APIs required.',
     responsibilities: [
       'Build ultra-responsive web interfaces with React, TypeScript, and modern design systems.',
-      'Implement real-time token streaming and interactive AI chat copilots using Google Gemini SDK.',
+      'Implement real-time token streaming and interactive data dashboards.',
       'Optimize web vitals, bundle sizes, and clientside rendering performance.',
       'Collaborate with product designers to establish accessible, enterprise-grade design patterns.',
     ],
@@ -47,7 +47,7 @@ export const FALLBACK_JOBS = [
       'Experience consuming streaming REST and WebSocket APIs.',
     ],
     aboutCompany:
-      'HyperScale AI designs intuitive copilot interfaces and productivity tools that bridge complex foundation models with everyday knowledge workers.',
+      'HyperScale Systems designs intuitive interfaces and productivity tools for enterprise engineering teams.',
     createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {

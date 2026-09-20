@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { UploadCloud, FileText, Loader2, Sparkles, CheckCircle, AlertCircle } from 'lucide-react';
+import { UploadCloud, FileText, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 
 const ResumeDropzone = ({ onFileSelected, isParsing, parseProgressText, uploadedFileName, onUseDemoResume }) => {
   const onDrop = useCallback(
@@ -66,7 +66,7 @@ const ResumeDropzone = ({ onFileSelected, isParsing, parseProgressText, uploaded
               border: '1px solid rgba(15, 107, 92, 0.2)',
             }}
           >
-            <Sparkles size={16} color="var(--accent-teal)" />
+            <FileText size={16} color="var(--accent-teal)" />
           </div>
           <div>
             <h3
@@ -81,7 +81,7 @@ const ResumeDropzone = ({ onFileSelected, isParsing, parseProgressText, uploaded
               Automated Resume Parser
             </h3>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: 0 }}>
-              Upload your PDF resume to auto-fill your profile fields instantly using Gemini AI
+              Upload your PDF resume to auto-fill your profile fields instantly
             </p>
           </div>
         </div>
@@ -156,7 +156,7 @@ const ResumeDropzone = ({ onFileSelected, isParsing, parseProgressText, uploaded
                   marginTop: '0.25rem',
                 }}
               >
-                {parseProgressText || 'Extracting profile, experience, and competencies via Gemini AI...'}
+                {parseProgressText || 'Extracting profile, experience, and competencies...'}
               </div>
             </div>
           </div>
