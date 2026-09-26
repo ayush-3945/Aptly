@@ -28,7 +28,7 @@ async function testPreview() {
   }
   if (!Array.isArray(preview.matchedSkills) || preview.matchedSkills.length === 0) {
     throw new Error('matchedSkills must have items');
-  }
+  } 
   if (!preview.strengthSummary || !preview.gapSummary) {
     throw new Error('strengthSummary and gapSummary must be present');
   }
