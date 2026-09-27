@@ -14,6 +14,7 @@ import {
   Loader2,
   FileCheck,
   ArrowRight,
+  Activity,
   X,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
