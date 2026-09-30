@@ -53,52 +53,68 @@
 % 1. COVER PAGE
 % ==========================================
 \begin{titlepage}
+    % --- Official University Double Border Frame ---
+    \begin{tikzpicture}[remember picture, overlay]
+        \draw[primary, line width=2pt] 
+            ([xshift=13mm, yshift=-13mm]current page.north west) 
+            rectangle 
+            ([xshift=-13mm, yshift=13mm]current page.south east);
+        \draw[secondary!70, line width=0.8pt] 
+            ([xshift=14.5mm, yshift=-14.5mm]current page.north west) 
+            rectangle 
+            ([xshift=-14.5mm, yshift=14.5mm]current page.south east);
+    \end{tikzpicture}
+
     \centering
-    \vspace*{0.2cm}
+    \vspace*{0.3cm}
     
-    {\Huge \textbf{PROJECT SYNOPSIS}}\\[0.3cm]
-    {\large \textbf{B.Tech 3rd-Year Mini Project (Semester VI)}}\\[0.2cm]
-    {\normalsize Department of Computer Science \& Engineering}\\[0.9cm]
+    {\large \textbf{\color{primary} DEPARTMENT OF COMPUTER SCIENCE \& ENGINEERING}}\\[0.15cm]
+    {\Large \textbf{ABES ENGINEERING COLLEGE, GHAZIABAD}}\\[0.1cm]
+    {\footnotesize \textit{(Affiliated to Dr. A.P.J. Abdul Kalam Technical University, Lucknow)}}\\[0.5cm]
     
-    \begin{tcolorbox}[colback=lightgray, colframe=primary, arc=4mm, boxrule=1.2pt, width=0.96\textwidth]
-        \centering \vspace{0.25cm}
-        {\Large \textbf{\color{primary} AI-Based Resume Screening and Candidate Shortlisting System}}\\[0.25cm]
-        {\large \textbf{\color{secondary} Project Code: P\_204}}\\[0.2cm]
-        {\normalsize (Implementation: Aptly.AI -- Intelligent Semantic ATS \& Talent Pipeline)}\\[0.2cm]
-    \end{tcolorbox}
+    {\color{secondary}\rule{0.82\textwidth}{1.2pt}}\\[0.25cm]
+    {\LARGE \textbf{\color{primary} PROJECT SYNOPSIS REPORT}}\\[0.15cm]
+    {\normalsize \textbf{Bachelor of Technology in Computer Science \& Engineering}}\\[0.1cm]
+    {\small \textit{(Mini Project, Semester VI -- Academic Session 2026--2027)}}\\[0.25cm]
+    {\color{secondary}\rule{0.82\textwidth}{1.2pt}}\\[0.8cm]
+    
+    {\small \textbf{A SYNOPSIS ON}}\\[0.35cm]
+    
+    {\huge \bfseries \color{primary} AI-Based Resume Screening and}\\[0.25cm]
+    {\huge \bfseries \color{primary} Candidate Shortlisting System}\\[0.45cm]
+    
+    {\Large \textbf{\color{secondary} [ PROJECT CODE: P\_204 ]}}\\[0.3cm]
+    {\normalsize \textit{Implementation: \textbf{Aptly.AI} -- Semantic Multi-Vector ATS \& Talent Pipeline}}\\[1.2cm]
     
     \vfill
     
-    \begin{minipage}{0.92\textwidth}
-        \large
-        \textbf{Project Details:}\\[0.2cm]
-        \begin{tabular}{p{4.2cm} p{9.5cm}}
-            \textbf{Project Code:}   & \textbf{P\_204} \\
-            \textbf{Assigned Title:} & \textbf{AI-Based Resume Screening and Candidate Shortlisting System} \\
-            \textbf{Student Name:}   & Ayush Kumar Pandey \\
-            \textbf{Roll Number:}    & 2200320100052 \\
-            \textbf{Branch / Dept:}  & Computer Science \& Engineering (CSE) \\
-            \textbf{Academic Year:}  & 2026--2027 (3rd Year, 6th Semester) \\
-        \end{tabular}
-        
-        \vspace{0.9cm}
-        
-        \textbf{Under the Supervision of:}\\[0.2cm]
-        \begin{tabular}{p{4.2cm} p{9.5cm}}
-            \textbf{Project Guide:}  & Dr. / Prof. [Guide Name] \\
-            \textbf{Designation:}    & Assistant Professor, Dept. of CSE \\
-        \end{tabular}
-        
-        \vspace{0.9cm}
-        
-        \textbf{Institution:}\\[0.2cm]
-        \textbf{Department of Computer Science and Engineering}\\
-        \textbf{ABES Engineering College, Ghaziabad}\\
-        \textbf{Affiliated to:} Dr. A.P.J. Abdul Kalam Technical University (AKTU)
+    % --- Two-Column Parallel Layout: Student Details & Supervisor Details ---
+    \begin{minipage}[t]{0.48\textwidth}
+        \flushleft
+        {\large \textbf{\color{primary} SUBMITTED BY:}}\\[0.25cm]
+        \textbf{\large Ayush Kumar Pandey}\\[0.1cm]
+        \textbf{University Roll No.:} 2200320100052\\
+        \textbf{Branch:} Computer Science \& Engg.\\
+        \textbf{Year / Semester:} 3rd Year / 6th Semester
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \flushleft
+        {\large \textbf{\color{primary} UNDER THE GUIDANCE OF:}}\\[0.25cm]
+        \textbf{\large Dr. / Prof. [Guide Name]}\\[0.1cm]
+        Assistant Professor\\
+        Department of Computer Science \& Engg.\\
+        ABES Engineering College, Ghaziabad
     \end{minipage}
     
     \vfill
-    {\small \color{gray} Submission Date: October 2026}
+    \vspace{0.6cm}
+    
+    {\small \textbf{DEPARTMENT OF COMPUTER SCIENCE AND ENGINEERING}}\\[0.1cm]
+    {\large \textbf{\color{primary} ABES ENGINEERING COLLEGE, GHAZIABAD}}\\[0.1cm]
+    {\small NH-09, Lal Kuan, Ghaziabad, Uttar Pradesh -- 201009}\\[0.15cm]
+    {\footnotesize Submission Date: October 2026}
+    \vspace*{0.2cm}
 \end{titlepage}
 
 \newpage
