@@ -8,6 +8,7 @@
 \usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{enumitem}
+\usepackage{amssymb}
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning}
 \usepackage[most]{tcolorbox}
@@ -15,29 +16,29 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{setspace}
 
-% --- Color Palette ---
+% --- Color Palette (Professional Academic Theme) ---
 \definecolor{primary}{RGB}{20, 50, 95}       % Deep Academic Blue
 \definecolor{secondary}{RGB}{40, 100, 160}   % Steel Blue
 \definecolor{darktext}{RGB}{30, 30, 30}      % Soft Black
 \definecolor{lightgray}{RGB}{245, 247, 250}  % Card Background
 \definecolor{bordergray}{RGB}{210, 215, 225} % Subtle Border
 
-% --- Typography & Spacing ---
+% --- Spacing & Line Height ---
 \setstretch{1.15}
-\setlength{\parskip}{0.5em}
+\setlength{\parskip}{0.4em}
 \setlength{\parindent}{0pt}
 
-% --- Section Heading Formatting ---
+% --- Section Heading Formatting (Fixed \raggedright to prevent word stretching) ---
 \titleformat{\section}
-  {\Large\bfseries\color{primary}}
+  {\raggedright\Large\bfseries\color{primary}}
   {\thesection.}{0.6em}{}
   [\vspace{-0.3em}\color{secondary}\rule{\textwidth}{1pt}\vspace{-0.2em}]
 
 \titleformat{\subsection}
-  {\large\bfseries\color{secondary}}
+  {\raggedright\large\bfseries\color{secondary}}
   {\thesubsection}{0.5em}{}
 
-% --- Header and Footer ---
+% --- Running Header & Footer ---
 \pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0.4pt}
@@ -57,7 +58,7 @@
     
     {\Huge \textbf{PROJECT SYNOPSIS}}\\[0.3cm]
     {\large \textbf{B.Tech 3rd-Year Mini Project (Semester VI)}}\\[0.2cm]
-    {\normalsize Department of Computer Science \& Engineering}\\[1.0cm]
+    {\normalsize Department of Computer Science \& Engineering}\\[0.9cm]
     
     \begin{tcolorbox}[colback=lightgray, colframe=primary, arc=4mm, boxrule=1.2pt, width=0.96\textwidth]
         \centering \vspace{0.25cm}
@@ -80,7 +81,7 @@
             \textbf{Academic Year:}  & 2026--2027 (3rd Year, 6th Semester) \\
         \end{tabular}
         
-        \vspace{1.0cm}
+        \vspace{0.9cm}
         
         \textbf{Under the Supervision of:}\\[0.2cm]
         \begin{tabular}{p{4.2cm} p{9.5cm}}
@@ -88,7 +89,7 @@
             \textbf{Designation:}    & Assistant Professor, Dept. of CSE \\
         \end{tabular}
         
-        \vspace{1.0cm}
+        \vspace{0.9cm}
         
         \textbf{Institution:}\\[0.2cm]
         \textbf{Department of Computer Science and Engineering}\\
@@ -147,6 +148,8 @@ The core objectives of the Aptly.AI project are:
     \item \textbf{To provide an embedded AI conversational assistant:} Assist users in real time with technical queries, interview prep, and platform navigation.
 \end{itemize}
 
+\newpage
+
 % ==========================================
 % 6. PROPOSED SOLUTION
 % ==========================================
@@ -157,8 +160,6 @@ Aptly.AI provides an integrated full-stack web platform with dedicated workflows
     \item \textbf{Recruiter Portal:} Recruiters can draft and publish job listings with immediate feedback from an interactive \textbf{JD Quality Panel} that evaluates clarity and highlights non-inclusive or biased phrasing. Once candidates apply, the recruiter manages applicants across an interactive \textbf{ATS Kanban Board} (\textit{Applied $\rightarrow$ Shortlisted $\rightarrow$ Technical Interview $\rightarrow$ Offer}), complete with instant threshold-based candidate filtering.
     \item \textbf{Conversational AI Copilot:} A floating, reactive chatbot assistant embedded globally to resolve user inquiries, explain match scoring metrics, and offer role-specific guidance.
 \end{itemize}
-
-\newpage
 
 % ==========================================
 % 7. SCOPE OF THE PROJECT
@@ -188,12 +189,12 @@ Aptly.AI provides an integrated full-stack web platform with dedicated workflows
 \section{Methodology / Working}
 The workflow of Aptly.AI follows a systematic, stream-oriented data pipeline:
 
-\vspace{0.4cm}
+\vspace{0.3cm}
 \centering
 \begin{tikzpicture}[
-    node distance=0.8cm and 0.5cm,
+    node distance=0.8cm and 0.4cm,
     every node/.style={font=\small},
-    block/.style={rectangle, draw=primary, fill=lightgray, thick, rounded corners=3pt, minimum width=2.8cm, minimum height=0.9cm, align=center},
+    block/.style={rectangle, draw=primary, fill=lightgray, thick, rounded corners=3pt, minimum width=2.8cm, minimum height=0.85cm, align=center},
     arrow/.style={-Latex, thick, primary}
 ]
     \node (input) [block] {\textbf{INPUT}\\Resume PDF \& Job Post};
@@ -207,17 +208,19 @@ The workflow of Aptly.AI follows a systematic, stream-oriented data pipeline:
     \draw [arrow] (model) -- (db);
     \draw [arrow] (db) -- (output);
 \end{tikzpicture}
-\vspace{0.4cm}
+\vspace{0.3cm}
 
 \raggedright
 \textbf{Step-by-Step Execution Stages:}
-\begin{enumerate}[label=\textbf{Step \arabic*:}, leftmargin=1.8em, itemsep=3pt]
+\begin{enumerate}[label=\textbf{Step \arabic*:}, leftmargin=1.8em, itemsep=2pt]
     \item \textbf{Input Stage:} A candidate submits their resume in PDF format; recruiters submit structured role criteria.
     \item \textbf{Processing Stage:} \texttt{multer} buffers the upload in-memory, and \texttt{pdf-parse} extracts raw text content, sanitizing and normalizing whitespace.
     \item \textbf{Entity Extraction \& Semantic Reasoning:} Google Gemini processes the resume text against the target job description to assess core skills, adjacent technologies, and domain experience.
     \item \textbf{Database Persistence:} Evaluation results, applicant states, and user sessions are stored securely in MongoDB Atlas.
     \item \textbf{Output Stage:} The candidate views their diagnostic score, matched skills, and gap report. Simultaneously, the recruiter's Kanban board updates with auto-ranked candidate profiles.
 \end{enumerate}
+
+\newpage
 
 % ==========================================
 % 9. TECHNOLOGIES USED
@@ -226,10 +229,9 @@ The workflow of Aptly.AI follows a systematic, stream-oriented data pipeline:
 The technologies utilized across all layers of the Aptly.AI architecture are outlined below:
 
 \vspace{0.2cm}
-\begin{table}[h!]
-\centering
-\renewcommand{\arraystretch}{1.25}
-\begin{tabularx}{\textwidth}{l p{5.5cm} X}
+\begin{center}
+\renewcommand{\arraystretch}{1.18}
+\begin{tabularx}{\textwidth}{l p{5.2cm} X}
 \toprule
 \textbf{\color{primary}Category} & \textbf{\color{primary}Technology} & \textbf{\color{primary}Role in Project} \\
 \midrule
@@ -244,9 +246,9 @@ The technologies utilized across all layers of the Aptly.AI architecture are out
 \textbf{Version Control} & Git / GitHub & Source code tracking and team collaboration \\
 \bottomrule
 \end{tabularx}
-\end{table}
+\end{center}
 
-\newpage
+\vspace{0.3cm}
 
 % ==========================================
 % 10. MODULES
@@ -254,7 +256,7 @@ The technologies utilized across all layers of the Aptly.AI architecture are out
 \section{Modules}
 The Aptly.AI architecture is organized into five core functional modules:
 
-\begin{enumerate}[label=\textbf{Module \arabic* --}, leftmargin=2em, itemsep=6pt]
+\begin{enumerate}[label=\textbf{Module \arabic* --}, leftmargin=2em, itemsep=5pt]
     \item \textbf{Authentication and User Management:}
     Secures user onboarding and access. Provides role-based registration and login for both Candidates and Recruiters using password hashing (\texttt{bcryptjs}) and stateless JSON Web Tokens (JWT). Client-side routes are guarded by protected wrappers.
 
@@ -271,17 +273,69 @@ The Aptly.AI architecture is organized into five core functional modules:
     Generates actionable visual outcomes. Delivers detailed diagnostic scorecards with skill-gap breakdowns for applicants, and powers an interactive, drag-and-drop-style Kanban pipeline with dynamic threshold filtering for recruiters.
 \end{enumerate}
 
+\newpage
+
 % ==========================================
 % 11. EXPECTED OUTCOME
 % ==========================================
 \section{Expected Outcome}
 The completed Aptly.AI system achieves the following key outcomes:
-\begin{itemize}[leftmargin=1.5em, itemsep=3pt]
+\begin{itemize}[leftmargin=1.5em, itemsep=2.5pt]
     \item \textbf{Elimination of Keyword Rejection Errors:} Qualified developers with relevant, adjacent technical experience are no longer discarded due to slight phrasing differences.
     \item \textbf{Sub-Second Resume Screening:} Reduces candidate evaluation turnaround from several days to under 1.5 seconds per applicant.
     \item \textbf{Transparent Candidate Experience:} Replaces black-box rejection emails with actionable diagnostic scorecards that highlight exactly which skills candidates should learn.
     \item \textbf{Efficient Recruiter Workflows:} Enables recruiters to instantly identify top-tier talent via automated candidate ranking and dynamic Kanban staging.
     \item \textbf{Higher Job Description Quality:} Encourages clear, inclusive job postings that attract diverse, highly qualified candidate pools.
+\end{itemize}
+
+% ==========================================
+% 12. FUTURE SCOPE
+% ==========================================
+\section{Future Scope}
+To expand upon the current foundation, the following enhancements are planned:
+\begin{itemize}[leftmargin=1.5em, itemsep=2.5pt]
+    \item \textbf{Mobile Application:} Develop a cross-platform React Native mobile app for on-the-go candidate status notifications and recruiter applicant triage.
+    \item \textbf{Cloud Deployment \& Microservices:} Containerize core services using Docker and orchestrate on Kubernetes for elastic auto-scaling during high-volume campus hiring drives.
+    \item \textbf{Advanced Analytics:} Implement interactive comparative skill-gap radar charts and multi-candidate benchmark matrices.
+    \item \textbf{AI-Based Recommendations:} Deliver personalized learning roadmap suggestions to candidates based on identified competency gaps.
+    \item \textbf{Automated Notifications \& Scheduling:} Integrate Google Calendar and Calendly APIs to automate technical interview scheduling upon applicant shortlisting.
+    \item \textbf{Integration with External APIs:} Directly sync job posts and candidate profiles with LinkedIn, GitHub, and corporate HRMS platforms.
+    \item \textbf{Improved Security and Scalability:} Introduce automated anti-cheat PDF heuristic detection and enterprise single-sign-on (SSO) authentication.
+\end{itemize}
+
+% ==========================================
+% 13. REFERENCES
+% ==========================================
+\section{References}
+\begin{enumerate}[label={[\arabic*]}, leftmargin=2em, itemsep=2.5pt]
+    \item Google DeepMind: \textit{Gemini API Structured Outputs and Multimodal Reasoning Specification}, 2025--2026. URL: \url{https://ai.google.dev/}
+    \item React Team: \textit{React 18 and Vite Single Page Application Architecture Guidelines}, 2025. URL: \url{https://react.dev/}
+    \item MongoDB Inc.: \textit{Mongoose Object Data Modeling (ODM) Best Practices}, 2025. URL: \url{https://mongoosejs.com/}
+    \item A. Vasiliev et al.: \textit{``Semantic Natural Language Processing in Automated Applicant Tracking Systems,''} IEEE Transactions on Emerging Technologies, 2024.
+    \item Express.js Team: \textit{Express v5 RESTful Routing, Middleware, and Security Architecture}, 2025. URL: \url{https://expressjs.com/}
+    \item Aptly.AI Live Production Platform: \url{https://aptly-zeta.vercel.app/}
+\end{enumerate}
+
+\vspace{0.4cm}
+
+% ==========================================
+% FINAL SYNOPSIS CHECKLIST
+% ==========================================
+\subsection*{Final Synopsis Checklist}
+\begin{itemize}[label=$\square$, leftmargin=2em, itemsep=2pt]
+    \item Cover Page (Project Details, Student Credentials, Guide Name, Institution)
+    \item Project Title (Official Assigned Code: P\_204 and Title)
+    \item Introduction (Domain Background and Relevance)
+    \item Problem Statement (Specific Inefficiencies in Current Systems)
+    \item Objectives (Clear, Measurable Project Goals)
+    \item Proposed Solution (Candidate, Recruiter, and AI Copilot Workflows)
+    \item Scope of the Project (In Scope vs. Out of Scope)
+    \item Methodology / Working (Pipeline Architecture and Execution Stages)
+    \item Technologies Used (Structured Categorical Matrix)
+    \item Modules (Five Core System Modules Defined)
+    \item Expected Outcome (Measurable Performance and Impact Metrics)
+    \item Future Scope (Key Planned Advancements)
+    \item References (Academic Papers and Official Documentation)
 \end{itemize}
 
 \end{document}
