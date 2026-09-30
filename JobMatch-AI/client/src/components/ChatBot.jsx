@@ -132,16 +132,17 @@ export default function ChatBot() {
     }, 1200);
   };
 
-  // Direct Google Gemini API Caller in browser
+  // Direct Google Gemini API Caller in browser with multi-model fallback resilience
   const callGeminiDirect = async (query, history) => {
     if (!apiKey) return null;
 
     const systemInstruction = `You are Aptly AI, an ultra-smart, friendly, and versatile developer & career assistant.
+- You were developed and integrated into Aptly by Ayush Pandey.
 - Talk naturally, concisely, and conversationally like ChatGPT.
-- Support both English and Hinglish seamlessly. If user speaks Hinglish, reply in friendly Hinglish!
-- Answer ANY technical, coding, or career question with clear markdown, bullet points, and code snippets.
+- Support both English and Hinglish seamlessly. If user speaks in Hindi or Hinglish, reply naturally in friendly Hinglish!
+- Answer ANY technical, coding, system design, or career question with clear markdown, bullet points, and code snippets.
 - If asked about Aptly, explain that it's a semantic AI talent screening platform replacing blind ATS filters.
-- Keep answers direct and punchy without fluff.`;
+- Keep answers direct, punchy, and helpful.`;
 
     const contents = [];
     history.slice(-4).forEach((m) => {
@@ -155,47 +156,74 @@ export default function ChatBot() {
       parts: [{ text: query }],
     });
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    // Model list with graceful degradation
+    const modelsToTry = ['gemini-3.5-flash', 'gemini-3.7-flash', 'gemini-flash-latest'];
 
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemInstruction }] },
-        contents,
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 800,
-        },
-      }),
-    });
+    for (const model of modelsToTry) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-    if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      throw new Error(errData?.error?.message || `Gemini API returned status ${res.status}`);
-    }
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: systemInstruction }] },
+            contents,
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 800,
+            },
+          }),
+        });
 
-    const data = await res.json();
-    const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    return replyText || null;
-  };
-
-  // Natural Offline / Zero-Key Engine matching
-  const matchConversationalResponse = (query) => {
-    const q = query.toLowerCase().trim();
-
-    for (const item of CONVERSATIONAL_KNOWLEDGE) {
-      if (item.patterns.some((pat) => q.includes(pat))) {
-        return {
-          text: item.response,
-          suggestions: item.suggestions || [],
-        };
+        if (res.ok) {
+          const data = await res.json();
+          const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (replyText && replyText.trim()) {
+            return replyText.trim();
+          }
+        }
+      } catch (err) {
+        console.warn(`[ChatBot] Model ${model} failed, trying next:`, err?.message || err);
       }
     }
 
-    // Smart default response with helpful tips
+    return null;
+  };
+
+  // Natural Offline Engine matching with whole-word boundary regex
+  const matchConversationalResponse = (query) => {
+    const q = query.toLowerCase().trim();
+
+    // 1. Check multi-word phrase patterns first
+    for (const item of CONVERSATIONAL_KNOWLEDGE) {
+      for (const pat of item.patterns) {
+        if (pat.includes(' ') && q.includes(pat)) {
+          return {
+            text: item.response,
+            suggestions: item.suggestions || [],
+          };
+        }
+      }
+    }
+
+    // 2. Check single-word patterns with whole word boundary
+    for (const item of CONVERSATIONAL_KNOWLEDGE) {
+      for (const pat of item.patterns) {
+        const escaped = pat.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(^|\\W)${escaped}($|\\W)`, 'i');
+        if (regex.test(q)) {
+          return {
+            text: item.response,
+            suggestions: item.suggestions || [],
+          };
+        }
+      }
+    }
+
+    // Smart default response
     return {
-      text: `Aapne pucha: "${query}"\n\nMain is par help kar sakta hoon! Agar aap chahein toh direct **Google Gemini 2.5 Flash** se live answer lene ke liye upar ⚙️ icon par click karke apni free **Gemini API Key** connect kar sakte hain.\n\nYa fir aap niche diye gaye topics me se choose kar sakte hain:`,
+      text: `Aapne pucha: "${query}"\n\nMain is par help kar sakta hoon! Aap niche diye gaye topics me se choose kar sakte hain ya coding / tech interview ke baare me kuch bhi pooch sakte hain:`,
       suggestions: [
         'How does Aptly calculate match score?',
         'How does JD Quality & Bias check work?',
