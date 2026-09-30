@@ -1,9 +1,11 @@
 # PROJECT SYNOPSIS
 
 ## 1. Cover Page
-- **Project Title:** Aptly.AI – Intelligent Semantic ATS and Multi-Vector Talent Screening System
+- **Project Code / ID:** P_204
+- **Official Project Title:** AI-Based Resume Screening and Candidate Shortlisting System
+- **Implementation System:** Aptly.AI – Intelligent Semantic ATS and Multi-Vector Talent Screening System
 - **Student Name:** Ayush Kumar Pandey
-- **Roll Number:** 2200320100052 *(Update if different)*
+- **Roll Number:** 2200320100052
 - **Branch / Department:** Computer Science and Engineering (CSE)
 - **College Name:** ABES Engineering College, Ghaziabad
 - **Project Guide Name:** Dr. / Prof. [Guide Name]
@@ -12,7 +14,8 @@
 ---
 
 ## 2. Project Title
-**Aptly.AI: A Semantic Multi-Vector Applicant Tracking System (ATS) with Real-Time Job Quality Analysis and Automated Talent Pipeline**
+**Project Code: P_204**  
+**AI-Based Resume Screening and Candidate Shortlisting System (Aptly.AI)**
 
 ---
 
