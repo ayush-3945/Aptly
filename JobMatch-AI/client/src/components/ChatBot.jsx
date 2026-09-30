@@ -33,13 +33,19 @@ const INITIAL_MESSAGES = [
 
 const CLIENT_EMERGENCY_FALLBACKS = {
   score:
-    'Aptly evaluates candidates across **3 core vectors**:\n1. **Core Competency Overlap:** Skills extracted from your resume vs JD.\n2. **Adjacent Framework Equivalencies:** Understands related stacks (e.g. PostgreSQL ➔ SQL).\n3. **Experience & Project Depth:** Benchmarks production engineering tenure instead of keyword counts.',
+    'Aptly evaluates candidates across **3 core vectors**:\n1. **Core Competency Overlap:** Skills extracted from your resume vs JD.\n2. **Adjacent Framework Equivalencies:** Understands related stacks (e.g. PostgreSQL ➔ SQL, React ➔ Next.js).\n3. **Experience & Project Depth:** Benchmarks production engineering tenure instead of keyword counts.',
   jd:
-    'The **JD Quality Panel** checks your job post across 5 dimensions: Clarity, Specificity, Inclusivity, Competitiveness, and Structure. It flags restrictive words (e.g. "rockstar", "ninja") to ensure inclusive hiring.',
+    'The **JD Quality Panel** checks your job post across 5 dimensions: **Clarity**, **Specificity**, **Inclusivity**, **Market Competitiveness**, and **Structure**. It flags restrictive words (e.g. "rockstar", "ninja", "young energetic") and suggests inclusive alternatives to attract top talent.',
   pipeline:
-    'The recruiter pipeline uses an **interactive Kanban board** (Applied ➔ Shortlisted ➔ Technical Interview ➔ Offer). Candidates are pre-ranked by AI match percentage.',
+    'The recruiter pipeline uses an **interactive Kanban board** (Applied ➔ Shortlisted ➔ Technical Interview ➔ Offer). Candidates are pre-ranked by AI match percentage, and recruiters can filter with a score threshold slider.',
+  resume:
+    'Aptly\'s **Resume Parser** extracts technical skills, years of experience, projects, and domain expertise directly from PDF uploads. To maximize your score, highlight production projects, quantifiable metrics, and specific framework competencies.',
+  interview:
+    'To crack tech interviews:\n1. **Data Structures:** Master Arrays, HashMaps, Trees, and Two-pointer approaches.\n2. **System Design:** Understand API latency, caching (Redis), database indexing, and microservices.\n3. **Core Stack Depth:** Be ready to explain state management in React, Node event loop, and SQL vs NoSQL trade-offs.',
+  tech:
+    'Aptly is built on modern production architecture:\n- **Frontend:** React 18, Vite, Lucide SVG icons, Custom CSS Design Tokens.\n- **Backend:** Node.js, Express 5, MongoDB, Mongoose, JWT Auth.\n- **AI Engine:** Google Gemini 2.5 Flash (`@google/genai`), PDF parsing, Semantic Multi-Vector scoring.',
   default:
-    '**Aptly.AI** replaces blind ATS keyword filters with semantic evaluation, transparent candidate skill-gap scorecards, and a recruiter JD quality & ATS Kanban pipeline.',
+    '**Aptly.AI** is an AI-powered semantic ATS and talent intelligence platform. You can ask me about:\n- **Semantic Match Scoring:** How candidates are ranked\n- **Resume Optimization:** Tips to beat traditional keyword ATS filters\n- **JD Quality & Bias:** Writing inclusive job descriptions\n- **Technical Stacks & Coding:** React, Node.js, MongoDB, Express, System Design',
 };
 
 export default function ChatBot() {
@@ -81,15 +87,19 @@ export default function ChatBot() {
     setLoading(true);
 
     try {
-      const response = await api.post('/chat', {
-        message: query,
-        sessionId: `session-${user?._id || 'guest'}`,
-        userRole: user?.role || 'candidate',
-        history: messages.slice(-6).map((m) => ({
-          role: m.sender === 'user' ? 'user' : 'assistant',
-          content: m.text,
-        })),
-      });
+      const response = await api.post(
+        '/chat',
+        {
+          message: query,
+          sessionId: `session-${user?._id || 'guest'}`,
+          userRole: user?.role || 'candidate',
+          history: messages.slice(-6).map((m) => ({
+            role: m.sender === 'user' ? 'user' : 'assistant',
+            content: m.text,
+          })),
+        },
+        { timeout: 7000 }
+      );
 
       const data = response.data;
       const botReply = {
@@ -105,25 +115,31 @@ export default function ChatBot() {
       if (data.source?.includes('n8n')) {
         setActiveEngine('n8n RAG Agent');
       } else {
-        setActiveEngine('Local Domain Engine');
+        setActiveEngine('Aptly AI Engine');
       }
 
       setMessages((prev) => [...prev, botReply]);
     } catch (err) {
       console.warn('[ChatBot] API call failed, using client emergency engine:', err?.message || err);
 
-      // Local emergency heuristic fallback if backend or network is completely down
+      // Local emergency heuristic fallback if backend or network is offline
       const q = query.toLowerCase();
       let fallbackText = CLIENT_EMERGENCY_FALLBACKS.default;
-      if (q.includes('score') || q.includes('fit') || q.includes('match')) {
+      if (q.includes('score') || q.includes('fit') || q.includes('match') || q.includes('calculate')) {
         fallbackText = CLIENT_EMERGENCY_FALLBACKS.score;
-      } else if (q.includes('jd') || q.includes('post') || q.includes('bias')) {
+      } else if (q.includes('jd') || q.includes('post') || q.includes('bias') || q.includes('quality')) {
         fallbackText = CLIENT_EMERGENCY_FALLBACKS.jd;
-      } else if (q.includes('pipeline') || q.includes('recruiter') || q.includes('kanban')) {
+      } else if (q.includes('pipeline') || q.includes('recruiter') || q.includes('kanban') || q.includes('stage')) {
         fallbackText = CLIENT_EMERGENCY_FALLBACKS.pipeline;
+      } else if (q.includes('resume') || q.includes('cv') || q.includes('pdf') || q.includes('parser')) {
+        fallbackText = CLIENT_EMERGENCY_FALLBACKS.resume;
+      } else if (q.includes('interview') || q.includes('question') || q.includes('prep') || q.includes('cheat sheet')) {
+        fallbackText = CLIENT_EMERGENCY_FALLBACKS.interview;
+      } else if (q.includes('tech') || q.includes('stack') || q.includes('react') || q.includes('node') || q.includes('gemini')) {
+        fallbackText = CLIENT_EMERGENCY_FALLBACKS.tech;
       }
 
-      setActiveEngine('Local Knowledge Engine');
+      setActiveEngine('Aptly Local Engine');
       setMessages((prev) => [
         ...prev,
         {
@@ -136,6 +152,7 @@ export default function ChatBot() {
             'How is match score calculated?',
             'What is the recruiter pipeline?',
             'How does JD quality scoring work?',
+            'Technical interview prep tips',
           ],
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },

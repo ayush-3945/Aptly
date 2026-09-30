@@ -70,7 +70,7 @@ const queryRuleBasedKnowledge = (query) => {
 };
 
 /**
- * Local AI engine with Gemini fallback if available
+ * Local AI engine with Gemini generative reasoning for open-ended queries
  */
 const queryGeminiFallback = async (query, history = [], userRole = 'candidate') => {
   if (!isGeminiConfigured()) {
@@ -78,63 +78,79 @@ const queryGeminiFallback = async (query, history = [], userRole = 'candidate') 
   }
 
   try {
-    const client = getGeminiClient();
-    const systemInstruction = `You are Aptly's AI Support and Domain Intelligence Assistant.
-Aptly is a modern semantic ATS and talent screening SaaS that replaces rigid keyword filters with semantic evaluation, transparent candidate skill-gap scorecards, and a recruiter JD quality & ATS Kanban pipeline.
-User role: ${userRole}.
-Keep responses helpful, concise, well-formatted with markdown bullet points, and encouraging. Never invent non-existent features.`;
+    const aiClient = getGeminiClient();
+    if (!aiClient) return null;
 
-    const chatSession = client.chats.create({
+    const systemInstruction = `You are Aptly AI, an intelligent, versatile developer and talent AI assistant.
+You can answer ANY question the user asks:
+- Technical & coding questions (JavaScript, React, Node.js, Python, Java, SQL, System Design, algorithms, etc.)
+- Aptly platform questions (Semantic ATS matching, JD quality, bias detection, Kanban pipeline)
+- Career advice, Resume optimization, and Interview preparation
+- General queries, conceptual explanations, and troubleshooting
+
+Format your answers clearly with markdown: use bold text for emphasis, bullet points for lists, and code blocks with syntax highlighting where relevant.
+Be direct, helpful, and concise.`;
+
+    const conversationContext = history && history.length > 0
+      ? history.slice(-4).map((h) => `${h.role === 'user' ? 'User' : 'Assistant'}: ${h.content}`).join('\n') + '\n'
+      : '';
+
+    const prompt = `${conversationContext}User: ${query}\nAssistant:`;
+
+    const response = await aiClient.models.generateContent({
       model: DEFAULT_MODEL,
+      contents: prompt,
       config: {
         systemInstruction,
-        temperature: 0.3,
+        temperature: 0.7,
       },
     });
 
-    const prompt = `User question: "${query}"`;
-    const result = await chatSession.sendMessage({ message: prompt });
-    const reply = result?.text?.() || result?.text || '';
+    const reply = response?.text || '';
 
     if (reply && reply.trim()) {
       return {
         reply: reply.trim(),
-        source: 'local-gemini-engine',
-        suggestions: ['Explore open roles', 'View sample match report', 'How does Aptly score JDs?'],
+        source: 'gemini-generative-ai',
+        suggestions: ['Ask a coding question', 'How to optimize my resume?', 'How does Aptly score JDs?'],
       };
     }
   } catch (err) {
-    console.warn('[LocalKnowledgeEngine] Gemini fallback error:', err?.message || err);
+    console.warn('[LocalKnowledgeEngine] Gemini generation error:', err?.message || err);
   }
 
   return null;
 };
 
 /**
- * Main Answer Query dispatcher for the Local Engine
+ * Main Answer Query dispatcher
+ * If Gemini AI is configured, it answers ANYTHING with generative intelligence.
+ * If offline or key not provided, it falls back to curated deterministic knowledge rules.
  */
 const answerQuery = async (query, history = [], userRole = 'candidate') => {
-  // 1. Check deterministic curated knowledge base
+  // 1. If Gemini AI is active, answer ANY open-ended question with Generative AI
+  if (isGeminiConfigured()) {
+    const geminiResult = await queryGeminiFallback(query, history, userRole);
+    if (geminiResult) {
+      return geminiResult;
+    }
+  }
+
+  // 2. Check deterministic curated knowledge base
   const ruleResult = queryRuleBasedKnowledge(query);
   if (ruleResult) {
     return ruleResult;
   }
 
-  // 2. If no rule matched, invoke local Gemini engine if available
-  const geminiResult = await queryGeminiFallback(query, history, userRole);
-  if (geminiResult) {
-    return geminiResult;
-  }
-
-  // 3. Ultimate deterministic fallback response
+  // 3. Fallback response with helpful suggestions
   return {
     reply:
-      "I am **Aptly's AI Assistant**. I can assist you with understanding your candidate match score, identifying skill gaps, creating inclusive JDs with our JD Quality Panel, or navigating our ATS Kanban pipeline.\n\nCould you please rephrase or ask about one of the topics below?",
+      "I am **Aptly AI**. To enable open-ended answering for ANY topic (coding, career, tech, anything), configure your **GEMINI_API_KEY** in the backend `.env` file.\n\nCurrently operating on **Local Knowledge Engine mode**. You can ask me about:\n- **Match Scoring:** How Aptly calculates candidate fit\n- **JD Quality:** How bias and clarity scoring works\n- **Recruiter Pipeline:** How the ATS Kanban board operates\n- **Resume Parsing:** How technical competencies are extracted",
     source: 'local-domain-engine',
     suggestions: [
       'What is Aptly?',
-      'How does the match score work?',
-      'How to post a job without bias?',
+      'How does match score work?',
+      'How does JD quality scoring work?',
       'Tell me about the recruiter pipeline',
     ],
   };
