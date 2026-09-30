@@ -18,61 +18,61 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-// Built-in intelligent conversational responses for zero-setup instant chat
+// Built-in intelligent conversational responses for zero-setup instant chat (in English)
 const CONVERSATIONAL_KNOWLEDGE = [
   {
-    patterns: ['hi', 'hello', 'hey', 'namaste', 'yo', 'sup', 'hola', 'hlo'],
+    patterns: ['hi', 'hello', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening', 'yo', 'sup'],
     response:
-      'Hey there! 👋 Main badhiya hoon. Aptly AI me aapka swagat hai!\n\nAaj kis cheez me help chahiye — coding doubts, resume review, tech interview prep, ya Aptly ke features?',
+      "Hello! 👋 Welcome to **Aptly AI**.\n\nHow can I help you today — technical interview prep, coding concepts (React, Node.js, databases), resume feedback, or exploring Aptly's ATS features?",
     suggestions: ['Tell me about Aptly', 'React vs Next.js', 'How to improve ATS score?', 'How to prepare for tech interviews?'],
   },
   {
-    patterns: ['kaise ho', 'kya haal', 'how are you', 'how r u', 'sab badhiya'],
+    patterns: ['how are you', 'how r u', 'how are you doing', 'how is it going'],
     response:
-      'Main ekdum first-class hoon! 🚀 System running smooth hai. Aap batao, aaj kya build kar rahe ho ya interview prep chal rahi hai?',
-    suggestions: ['Help me with React hooks', 'What is Aptly.AI?', 'Top JavaScript interview questions'],
+      "I'm operating at peak performance and ready to assist! 🚀 What are you working on or preparing for today?",
+    suggestions: ['Explain React hooks', 'What is Aptly.AI?', 'Top JavaScript interview questions'],
   },
   {
-    patterns: ['who made you', 'who created you', 'kisne banaya', 'creator', 'founder', 'author'],
+    patterns: ['who made you', 'who created you', 'creator', 'founder', 'author', 'who developed you'],
     response:
-      'Mujhe **Ayush Pandey** ne develop kiya hai as part of **Aptly.AI** — ek next-generation semantic ATS and AI job-matching ecosystem.',
+      "I was developed by **Ayush Pandey** as part of **Aptly.AI** — an intelligent, semantic talent screening and AI job-matching ecosystem.",
     suggestions: ['What is Aptly.AI?', 'How does Aptly calculate match score?'],
   },
   {
-    patterns: ['kya kar sakte ho', 'what can you do', 'features', 'help me', 'madad'],
+    patterns: ['what can you do', 'features', 'help me', 'capabilities'],
     response:
-      "Main aapka personal AI Developer & Career Copilot hoon! Main ye sab kar sakta hoon:\n\n1. **Coding Doubts Solve:** React, Node.js, JavaScript, Python, MongoDB, SQL samjhana.\n2. **Aptly Platform Guide:** Semantic Match Score, Resume Parser, aur Recruiter ATS Pipeline explain karna.\n3. **Interview Preparation:** Technical questions aur system design concepts clear karna.\n4. **Resume Advice:** Traditional ATS keyword traps se bachne ke tips dena.",
+      "I am your personal AI Developer & Career Copilot! Here is what I can do for you:\n\n1. **Resolve Technical & Coding Doubts:** Deep dive into React, Node.js, JavaScript, Python, MongoDB, SQL, and system architecture.\n2. **Aptly Platform Guide:** Explain Semantic Match Scoring, Resume Parsing, and the Recruiter ATS Kanban Pipeline.\n3. **Interview Preparation:** Generate tailored technical interview questions and architecture best practices.\n4. **Resume Optimization:** Provide concrete advice to bypass rigid keyword-based ATS filters.",
     suggestions: ['How does match score work?', 'Explain React hooks', 'JavaScript Event Loop', 'ATS Resume Tips'],
   },
   {
     patterns: ['score', 'match score', 'calculate', 'percentage', 'fit score', 'ranking'],
     response:
-      'Aptly candidate match score **3 Multi-Vectors** par calculate karta hai:\n\n1. **Core Competency Overlap:** Resume ke exact skills vs Job description.\n2. **Adjacent Frameworks:** Transferable knowledge ko credit deta hai (e.g. knowing PostgreSQL translates to SQL depth; React translates to Next.js).\n3. **Production Depth & Tenure:** Superficial keyword count ke badle actual engineering experience aur project complexity score karta hai.',
+      "Aptly evaluates candidates across **3 Multi-Vectors**:\n\n1. **Core Competency Overlap:** Compares resume technical skills against job requirements.\n2. **Adjacent Framework Equivalencies:** Recognizes transferable skills (e.g. knowing PostgreSQL translates to strong relational SQL depth; React proficiency bridges smoothly to Next.js or Vue).\n3. **Production Depth & Tenure:** Assesses real-world project impact and architectural complexity rather than superficial keyword density.",
     suggestions: ['How does the resume parser work?', 'What is the recruiter pipeline?'],
   },
   {
     patterns: ['jd quality', 'bias', 'jd panel', 'post job', 'job description'],
     response:
-      'Aptly ka **JD Quality & Bias Analyzer** (`JDQualityPanel`) job post karne se pehle 5 criteria check karta hai:\n- **Clarity & Specificity**\n- **Inclusivity & Tone** (Flags biased words like "ninja", "rockstar", "young energetic")\n- **Market Competitiveness**\n- **Structure & Formatting**\n\nIsse job post zyada inclusive aur top-tier engineers ke liye attractive banti hai.',
+      "Aptly's **JD Quality & Bias Analyzer** (`JDQualityPanel`) evaluates job postings across 5 essential dimensions before publishing:\n\n- **Clarity & Overview**\n- **Specificity & Qualifications**\n- **Inclusivity & Tone** (Flags restrictive terms like 'ninja', 'rockstar', 'young energetic' and suggests professional alternatives)\n- **Market Competitiveness**\n- **Structure & Formatting**\n\nThis ensures job descriptions attract diverse, high-caliber engineering talent.",
     suggestions: ['What words are considered biased?', 'How to post a job on Aptly?'],
   },
   {
     patterns: ['pipeline', 'ats pipeline', 'kanban', 'stages', 'recruiter'],
     response:
-      'Recruiter ke liye Aptly ek **Automated ATS Kanban Pipeline** provide karta hai:\n\n- **Applied ➔ Shortlisted ➔ Technical Interview ➔ Offer / Hired**\n- Candidates unke AI fit score ke hisaab se **automatically pre-ranked** hote hain, aur recruiter single score-threshold slider se top talent filter kar sakta hai.',
+      "For recruiters, Aptly provides an **Automated ATS Kanban Pipeline** with stages:\n\n- **Applied ➔ Shortlisted ➔ Technical Interview ➔ Offer / Hired**\n- Applicants are **automatically pre-ranked** by AI match percentage, allowing recruiters to filter talent dynamically with a score threshold slider.",
     suggestions: ['How does interview scheduling work?', 'How to benchmark a candidate?'],
   },
   {
     patterns: ['react', 'hooks', 'usestate', 'useeffect', 'usememo'],
     response:
-      '**React Hooks Quick Reference:**\n- `useState`: Component local state maintain karne ke liye.\n- `useEffect`: Side-effects (API calls, event listeners, timers) handle karne ke liye.\n- `useMemo`: Expensive calculations ko memoize (cache) karne ke liye.\n- `useCallback`: Function references ko re-renders ke beech memoize karne ke liye taaki unnecessary child renders na hon.',
-    suggestions: ['What is virtual DOM?', 'React vs Next.js', 'Explain useEffect cleanup'],
+      "**React Hooks Quick Reference:**\n- `useState`: Manages local component state.\n- `useEffect`: Handles side effects (data fetching, subscriptions, DOM manipulation, cleanup).\n- `useMemo`: Memoizes expensive computational calculations.\n- `useCallback`: Memoizes function instances across re-renders to prevent unnecessary child component re-evaluations.",
+    suggestions: ['What is the Virtual DOM?', 'React vs Next.js', 'Explain useEffect cleanup'],
   },
   {
     patterns: ['event loop', 'node', 'asynchronous', 'promises', 'async await'],
     response:
-      '**Node.js / JS Event Loop in 30 Seconds:**\nJavaScript single-threaded hai. Asynchronous operations (like `fetch`, timers, DB queries) ko **libuv** handle karta hai.\n\n1. **Call Stack:** Synchronous code run hota hai.\n2. **Web APIs / Worker Pool:** Background I/O execute hoti hai.\n3. **Microtask Queue:** Promises (`.then`, `async/await`) pehle execute hote hain.\n4. **Macrotask Queue:** `setTimeout`, `setInterval` baad me run hote hain.',
-    suggestions: ['Difference between SQL and NoSQL', 'How does indexing work in MongoDB?'],
+      "**Node.js / JavaScript Event Loop Overview:**\nJavaScript is single-threaded. Asynchronous operations (network I/O, timers, database calls) are managed by the underlying **libuv** thread pool.\n\n1. **Call Stack:** Executes synchronous JavaScript code.\n2. **Web APIs / Worker Threads:** Handles background I/O operations.\n3. **Microtask Queue:** Processes Promises (`.then`, `async/await`) with high priority.\n4. **Macrotask Queue:** Executes timers (`setTimeout`, `setInterval`) and I/O callbacks.",
+    suggestions: ['SQL vs NoSQL differences', 'How database indexing works in MongoDB'],
   },
 ];
 
@@ -93,7 +93,7 @@ export default function ChatBot() {
     {
       id: 'welcome',
       sender: 'bot',
-      text: "Hey! 👋 Main **Aptly AI** hoon. Main aapke coding questions, interview prep, resume optimization, aur platform queries sab me help kar sakta hoon.\n\nKuch bhi pucho!",
+      text: "Hello! 👋 I'm **Aptly AI**, your career and talent engineering assistant.\n\nI can help with coding questions, interview prep, resume optimization, and Aptly platform features.\n\nFeel free to ask me anything!",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       suggestions: [
         'How does Aptly calculate match score?',
@@ -223,7 +223,7 @@ export default function ChatBot() {
 
     // Smart default response
     return {
-      text: `Aapne pucha: "${query}"\n\nMain is par help kar sakta hoon! Aap niche diye gaye topics me se choose kar sakte hain ya coding / tech interview ke baare me kuch bhi pooch sakte hain:`,
+      text: `You asked: "${query}"\n\nI can help you explore this topic! You can select one of the suggested prompts below, or ask any technical / career question:`,
       suggestions: [
         'How does Aptly calculate match score?',
         'How does JD Quality & Bias check work?',
@@ -519,7 +519,7 @@ export default function ChatBot() {
                     {
                       id: 'welcome',
                       sender: 'bot',
-                      text: "Chat cleared! Main aapki kya help kar sakta hoon?",
+                      text: "Chat cleared! How can I assist you today?",
                       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                       suggestions: ['Tell me about Aptly', 'React interview questions'],
                     },
@@ -595,12 +595,12 @@ export default function ChatBot() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Key size={18} color="var(--accent-teal)" />
                 <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                  Connect Gemini 2.5 Flash AI
+                  Connect Google Gemini AI
                 </h4>
               </div>
 
               <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
-                Apni free **Google Gemini API Key** daalein taaki chatbot ChatGPT jaisa live reasoning se kisi bhi sawaal ka instant jawab de sake!
+                Enter your free **Google Gemini API Key** to enable live, open-ended reasoning for any coding, system design, or career question!
               </p>
 
               <form onSubmit={handleSaveKey} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -924,7 +924,7 @@ export default function ChatBot() {
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Pucho kuch bhi — coding, job prep, Aptly..."
+                    placeholder="Ask anything — coding, job prep, Aptly..."
                     disabled={loading}
                     style={{
                       flex: 1,
