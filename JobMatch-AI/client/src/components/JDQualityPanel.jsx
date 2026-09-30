@@ -10,7 +10,6 @@ import {
   ChevronUp,
   FileText,
   Loader2,
-  HelpCircle,
   ShieldAlert,
   ArrowRight,
 } from 'lucide-react';
