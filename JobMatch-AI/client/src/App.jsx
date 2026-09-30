@@ -16,6 +16,7 @@ import Signup from './pages/Signup';
 import CandidateProfile from './pages/CandidateProfile';
 import Onboarding from './pages/Onboarding';
 import ErrorBoundary from './components/ErrorBoundary';
+import ChatBot from './components/ChatBot';
 
 function App() {
   return (
@@ -72,6 +73,7 @@ function App() {
             </ErrorBoundary>
           </main>
             <Footer />
+            <ChatBot />
           </div>
         </ToastProvider>
       </AuthProvider>
