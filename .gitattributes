@@ -10,6 +10,7 @@ package-lock.json linguist-generated
 yarn.lock linguist-generated
 
 # Explicit language overrides
-*.jsx linguist-language=JavaScript
+*.js linguist-language=TypeScript
+*.jsx linguist-language=TypeScript
 *.css linguist-language=CSS
 *.json linguist-language=JSON
