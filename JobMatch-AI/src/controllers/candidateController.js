@@ -1,5 +1,7 @@
 const fs = require('fs');
 const User = require('../models/User');
+const mongoose = require('mongoose');
+const { DEMO_PROFILE } = require('../data/fallbackData');
 const { parseResumeWithGemini } = require('../services/resumeParserService');
 
 /**
@@ -93,6 +95,9 @@ const parseResume = async (req, res) => {
  */
 const getCandidateProfile = async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(200).json({ success: true, profile: DEMO_PROFILE });
+    }
     const user = await User.findById(req.user._id).select('-password');
     if (!user) {
       return res.status(404).json({ success: false, message: 'Candidate not found' });

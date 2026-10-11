@@ -1,4 +1,6 @@
 const Job = require('../models/Job');
+const mongoose = require('mongoose');
+const { FALLBACK_JOBS } = require('../data/fallbackData');
 
 // Create a new job
 const createJob = async (req, res) => {
@@ -23,6 +25,9 @@ const createJob = async (req, res) => {
 // Get all jobs with optional keyword, location, and skill filtering
 const getJobs = async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(200).json(FALLBACK_JOBS);
+    }
     const { keyword, location, skill } = req.query;
     const query = {};
 
@@ -59,6 +64,10 @@ const getJobs = async (req, res) => {
 // Get a single job by ID
 const getJobById = async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      const fb = FALLBACK_JOBS.find((j) => j._id === req.params.id) || FALLBACK_JOBS[0];
+      return res.status(200).json(fb);
+    }
     const job = await Job.findById(req.params.id).populate('postedBy', 'name email');
 
     if (job) {

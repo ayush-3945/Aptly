@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const Application = require('../models/Application');
+const { SAMPLE_APPLICATIONS } = require('../data/fallbackData');
 const Job = require('../models/Job');
 const User = require('../models/User');
 const { extractTextFromPDF } = require('../services/resumeParserService');
@@ -208,6 +209,9 @@ Bachelor of Technology in Computer Science & Engineering | 2016 - 2020`;
 // GET /api/applications/my - Candidate views their applications with status and job details
 const getMyApplications = async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(200).json(SAMPLE_APPLICATIONS);
+    }
     const applications = await Application.find({ candidate: req.user._id })
       .populate('job', 'title company location requiredSkills')
       .select('job status resumeUrl aiMatchScore matchedSkills missingSkills fitSummary experienceFit recommendation appliedAt updatedAt')
