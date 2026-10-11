@@ -31,6 +31,8 @@ import { useToast } from '../context/ToastContext';
 import ScheduleInterviewModal from '../components/ScheduleInterviewModal';
 import KanbanBoard from '../components/KanbanBoard';
 import InterviewKitModal from '../components/InterviewKitModal';
+import CandidateCompareModal from '../components/CandidateCompareModal';
+import { Scale } from 'lucide-react';
 
 const PIPELINE_COLUMNS = [
   {

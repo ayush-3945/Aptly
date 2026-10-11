@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import VoiceInterviewModal from './VoiceInterviewModal';
 import {
+  Mic,
   X,
   Copy,
   Check,
@@ -39,6 +41,7 @@ const InterviewKitModal = ({ application, job, onClose }) => {
   const [error, setError] = useState(null);
   const [questions, setQuestions] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
 
   // Section collapse states (all open by default)
   const [expandedSections, setExpandedSections] = useState({
@@ -291,6 +294,26 @@ const InterviewKitModal = ({ application, job, onClose }) => {
 
           {/* Actions & Close */}
           <div className="no-print" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button
+              type="button"
+              onClick={() => setIsVoiceModalOpen(true)}
+              style={{
+                padding: '0.4rem 0.85rem',
+                borderRadius: '4px',
+                border: 'none',
+                background: 'var(--accent-teal)',
+                color: '#fff',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+              }}
+            >
+              <Mic size={14} />
+              Start Voice Mock
+            </button>
             <button
               type="button"
               onClick={handleCopyAll}
@@ -763,6 +786,22 @@ const InterviewKitModal = ({ application, job, onClose }) => {
             </div>
           </div>
         )}
+              <VoiceInterviewModal
+          isOpen={isVoiceModalOpen}
+          onClose={() => setIsVoiceModalOpen(false)}
+          jobTitle={jobTitle}
+          candidateName={candidateName}
+          initialQuestions={
+            questions
+              ? [
+                  ...(questions.warmup || []).map(q => ({ category: 'Warmup', question: q.question })),
+                  ...(questions.technical || []).map(q => ({ category: 'Technical', question: q.question })),
+                  ...(questions.gapProbe || []).map(q => ({ category: 'Skill Gap Probe', question: q.question })),
+                  ...(questions.behavioral || []).map(q => ({ category: 'Behavioral', question: q.question })),
+                ]
+              : []
+          }
+        />
       </div>
     </div>
   );
