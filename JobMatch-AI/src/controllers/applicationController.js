@@ -143,6 +143,9 @@ Bachelor of Technology in Computer Science & Engineering | 2016 - 2020`;
       existingApplication.fitSummary = evaluation.fitSummary;
       existingApplication.experienceFit = evaluation.experienceFit;
       existingApplication.recommendation = evaluation.recommendation;
+      existingApplication.scoreBreakdown = evaluation.scoreBreakdown || { skillsScore: 0, experienceScore: 0, relevanceScore: 0 };
+      existingApplication.skillGapRoadmap = evaluation.skillGapRoadmap || [];
+      existingApplication.resumeImprovements = evaluation.resumeImprovements || [];
       await existingApplication.save();
       application = existingApplication;
     } else {
@@ -156,6 +159,9 @@ Bachelor of Technology in Computer Science & Engineering | 2016 - 2020`;
         fitSummary: evaluation.fitSummary,
         experienceFit: evaluation.experienceFit,
         recommendation: evaluation.recommendation,
+        scoreBreakdown: evaluation.scoreBreakdown || { skillsScore: 0, experienceScore: 0, relevanceScore: 0 },
+        skillGapRoadmap: evaluation.skillGapRoadmap || [],
+        resumeImprovements: evaluation.resumeImprovements || [],
       });
     }
 

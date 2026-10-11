@@ -1,4 +1,42 @@
 const { getGeminiClient, isGeminiConfigured, DEFAULT_MODEL } = require('../config/aiConfig');
+/**
+ * Generates an actionable skill gap roadmap for missing technologies
+ * @param {Array<string>} missingSkills 
+ * @returns {Array<Object>} Roadmap steps
+ */
+const generateRoadmapFromMissingSkills = (missingSkills = []) => {
+  if (!Array.isArray(missingSkills) || missingSkills.length === 0) {
+    return [
+      {
+        skill: 'Production Polish',
+        priority: 'Low',
+        impact: '+5% Polish',
+        timeToBridge: '1-2 Days',
+        actionPlan: 'Core technical requirements already met. Add comprehensive unit tests, API docs, and Dockerfile.',
+        resource: 'Clean Architecture best practices & Jest documentation',
+      },
+    ];
+  }
+
+  return missingSkills.slice(0, 5).map((skill, index) => {
+    const isHigh = index < 2;
+    return {
+      skill,
+      priority: isHigh ? 'High' : 'Medium',
+      impact: isHigh ? '+15% Match Score' : '+8% Match Score',
+      timeToBridge: isHigh ? '2-3 Days' : '4-5 Days',
+      actionPlan: 'Build a hands-on mini-module utilizing ' + skill + ' and showcase it in your portfolio or GitHub.',
+      resource: 'Official ' + skill + ' documentation and community crash courses.',
+    };
+  });
+};
+
+const getDefaultResumeImprovements = () => [
+  'Quantify project outcomes: Replace generic phrases with measurable metrics (e.g. "Reduced API response latency by 35%").',
+  'Lead bullet points with strong action verbs: "Architected", "Deployed", "Engineered" rather than "Helped" or "Worked on".',
+  'Ensure every technical skill listed in your stack is referenced with real-world application in your projects section.',
+];
+
 
 /**
  * Fallback heuristic matching engine when Gemini AI is not configured or unavailable
@@ -50,13 +88,20 @@ const generateFallbackEvaluation = (job, resumeText, reason = 'Gemini API not co
     recommendation = 'Low Match';
   }
 
+  const skillsScore = matchScore;
+  const experienceScore = Math.min(95, Math.max(50, Math.round(matchScore * 0.9 + 10)));
+  const relevanceScore = Math.round((skillsScore + experienceScore) / 2);
+
   return {
     matchScore,
+    scoreBreakdown: { skillsScore, experienceScore, relevanceScore },
     matchedSkills,
     missingSkills,
     experienceFit: `Heuristic evaluation: ${matchedSkills.length} of ${requiredSkills.length || 0} core skills matched against candidate resume.`,
     fitSummary: `Candidate matches ${matchedSkills.length}/${requiredSkills.length || 0} specified skills. [Notice: ${reason}]`,
     recommendation,
+    skillGapRoadmap: generateRoadmapFromMissingSkills(missingSkills),
+    resumeImprovements: getDefaultResumeImprovements(),
   };
 };
 
@@ -76,6 +121,9 @@ const evaluateMatch = async (job, resumeText) => {
       experienceFit: 'Resume text is empty, scanned, or could not be extracted.',
       fitSummary: 'Text could not be extracted from the resume PDF. Flagged for manual recruiter review.',
       recommendation: 'Pending Evaluation',
+      scoreBreakdown: { skillsScore: 0, experienceScore: 0, relevanceScore: 0 },
+      skillGapRoadmap: generateRoadmapFromMissingSkills(Array.isArray(job?.requiredSkills) ? job.requiredSkills : []),
+      resumeImprovements: ['Upload a machine-readable text PDF rather than a scanned image.'],
     };
   }
 
@@ -188,13 +236,24 @@ Analyze the match and provide the evaluation in the requested JSON structure.`;
       ? parsed.recommendation
       : (matchScore >= 75 ? 'Strong Match' : matchScore >= 40 ? 'Moderate Match' : 'Low Match');
 
+    const missingSkills = Array.isArray(parsed.missingSkills) ? parsed.missingSkills : [];
+    const scoreBreakdown = parsed.scoreBreakdown || {
+      skillsScore: matchScore,
+      experienceScore: Math.min(95, Math.max(50, Math.round(matchScore * 0.9 + 10))),
+      relevanceScore: matchScore,
+    };
+    const skillGapRoadmap = Array.isArray(parsed.skillGapRoadmap) && parsed.skillGapRoadmap.length > 0 ? parsed.skillGapRoadmap : generateRoadmapFromMissingSkills(missingSkills);
+    const resumeImprovements = Array.isArray(parsed.resumeImprovements) && parsed.resumeImprovements.length > 0 ? parsed.resumeImprovements : getDefaultResumeImprovements();
     return {
       matchScore,
+      scoreBreakdown,
       matchedSkills: Array.isArray(parsed.matchedSkills) ? parsed.matchedSkills : [],
-      missingSkills: Array.isArray(parsed.missingSkills) ? parsed.missingSkills : [],
+      missingSkills,
       experienceFit: parsed.experienceFit || 'Experience profile assessed.',
       fitSummary: parsed.fitSummary || 'Fit assessment completed.',
       recommendation,
+      skillGapRoadmap,
+      resumeImprovements,
     };
   } catch (error) {
     console.warn('Gemini AI generation failed, falling back to heuristic matcher:', error.message);
@@ -245,13 +304,20 @@ const generateFallbackPreview = (job, candidateProfile) => {
     ? `Identified technical gaps in ${missingSkills.slice(0, 3).join(', ')} relative to this role.`
     : 'No critical competency gaps identified against the posted job criteria.';
 
+  const skillsScore = matchScore;
+  const experienceScore = Math.min(95, Math.max(50, Math.round(matchScore * 0.9 + 10)));
+  const relevanceScore = Math.round((skillsScore + experienceScore) / 2);
+
   return {
     matchScore,
     matchTier,
+    scoreBreakdown: { skillsScore, experienceScore, relevanceScore },
     matchedSkills,
     missingSkills,
     strengthSummary,
     gapSummary,
+    skillGapRoadmap: generateRoadmapFromMissingSkills(missingSkills),
+    resumeImprovements: getDefaultResumeImprovements(),
   };
 };
 
@@ -325,13 +391,24 @@ Candidate Profile: ${candidateDetails}`;
       ? parsed.matchTier
       : (matchScore >= 75 ? 'Strong Match' : matchScore >= 50 ? 'Moderate Match' : 'Low Match');
 
+    const missingSkills = Array.isArray(parsed.missingSkills) ? parsed.missingSkills : [];
+    const scoreBreakdown = parsed.scoreBreakdown || {
+      skillsScore: matchScore,
+      experienceScore: Math.min(95, Math.max(50, Math.round(matchScore * 0.9 + 10))),
+      relevanceScore: matchScore,
+    };
+    const skillGapRoadmap = Array.isArray(parsed.skillGapRoadmap) && parsed.skillGapRoadmap.length > 0 ? parsed.skillGapRoadmap : generateRoadmapFromMissingSkills(missingSkills);
+    const resumeImprovements = Array.isArray(parsed.resumeImprovements) && parsed.resumeImprovements.length > 0 ? parsed.resumeImprovements : getDefaultResumeImprovements();
     return {
       matchScore,
       matchTier,
+      scoreBreakdown,
       matchedSkills: Array.isArray(parsed.matchedSkills) ? parsed.matchedSkills : [],
-      missingSkills: Array.isArray(parsed.missingSkills) ? parsed.missingSkills : [],
+      missingSkills,
       strengthSummary: String(parsed.strengthSummary || 'Candidate demonstrates relevant competencies.').trim(),
       gapSummary: String(parsed.gapSummary || 'No major gaps observed.').trim(),
+      skillGapRoadmap,
+      resumeImprovements,
     };
   } catch (error) {
     console.warn('[PreviewMatch] Gemini generation failed, using heuristic preview:', error.message);
