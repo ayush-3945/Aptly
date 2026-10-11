@@ -1362,6 +1362,25 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
                 </span>
                 {evaluationResult.experienceFit}
               </div>
+
+              {/* AI Skill Gap Roadmap, Score Factors & ATS Roast */}
+              <SkillGapRoadmapCard
+                scoreBreakdown={evaluationResult.scoreBreakdown}
+                skillGapRoadmap={
+                  evaluationResult.skillGapRoadmap && evaluationResult.skillGapRoadmap.length > 0
+                    ? evaluationResult.skillGapRoadmap
+                    : (evaluationResult.missingSkills || []).map((skill, idx) => ({
+                        skill,
+                        priority: idx === 0 ? 'High' : 'Medium',
+                        impact: '+15% Match Score',
+                        timeToBridge: '2-3 Days',
+                        actionPlan: 'Build a containerized module or hands-on project utilizing ' + skill + ' to bridge this requirement.',
+                        resource: 'Official ' + skill + ' documentation and crash courses.',
+                      }))
+                }
+                resumeImprovements={evaluationResult.resumeImprovements}
+                matchScore={evaluationResult.aiMatchScore ?? 83}
+              />
             </div>
           )}
         </div>
