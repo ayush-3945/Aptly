@@ -26,6 +26,7 @@ import { FALLBACK_JOBS } from '../data/fallbackJobs';
 import ApplyModal from '../components/ApplyModal';
 import CandidateProfile from './CandidateProfile';
 import UpcomingInterviews from '../components/UpcomingInterviews';
+import SkillGapRoadmapCard from '../components/SkillGapRoadmapCard';
 
 // Curated sample applications so candidate dashboard demonstrates rich state even prior to first application
 const SAMPLE_APPLICATIONS = [
@@ -753,6 +754,25 @@ const CandidateDashboard = () => {
                             </div>
                           </div>
                         </div>
+
+                        {/* Interactive Skill Gap Roadmap, Score Factors & ATS Roast */}
+                        <SkillGapRoadmapCard
+                          scoreBreakdown={app.scoreBreakdown}
+                          skillGapRoadmap={
+                            app.skillGapRoadmap && app.skillGapRoadmap.length > 0
+                              ? app.skillGapRoadmap
+                              : (app.missingSkills || []).map((skill, idx) => ({
+                                  skill,
+                                  priority: idx === 0 ? 'High' : 'Medium',
+                                  impact: '+15% Match Score',
+                                  timeToBridge: '2-3 Days',
+                                  actionPlan: 'Build a containerized module or hands-on project utilizing ' + skill + ' to bridge this requirement.',
+                                  resource: 'Official ' + skill + ' documentation and crash courses.',
+                                }))
+                          }
+                          resumeImprovements={app.resumeImprovements}
+                          matchScore={app.aiMatchScore ?? 88}
+                        />
                       </div>
                     )}
                   </div>
