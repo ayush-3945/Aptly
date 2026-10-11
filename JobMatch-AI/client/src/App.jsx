@@ -4,7 +4,6 @@ import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
 import Home from './pages/Home';
 import JobsList from './pages/JobsList';
 import JobDetail from './pages/JobDetail';
@@ -72,7 +71,6 @@ function App() {
               </Routes>
             </ErrorBoundary>
           </main>
-            <Footer />
             <ChatBot />
           </div>
         </ToastProvider>
