@@ -2,7 +2,7 @@ export const FALLBACK_JOBS = [
   {
     _id: 'job_fallback_1',
     title: 'Senior Full-Stack MERN Systems Engineer',
-    company: 'Razorpay',
+    company: 'Acme Payments',
     location: 'Bengaluru, India (Remote)',
     requiredSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'Docker'],
     description:
@@ -23,13 +23,13 @@ export const FALLBACK_JOBS = [
       'Hands-on experience with LLM APIs and prompt engineering is a major plus.',
     ],
     aboutCompany:
-      'Razorpay is India’s leading full-stack financial services and payment gateway platform powering millions of businesses worldwide.',
+      'Acme Payments is a full-stack financial services and payment gateway platform powering innovative global transactions.',
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     _id: 'job_fallback_2',
     title: 'Frontend Interface Architect',
-    company: 'Zepto Tech',
+    company: 'Nova Logistics',
     location: 'Mumbai, India (Hybrid)',
     requiredSkills: ['React', 'TypeScript', 'TailwindCSS', 'PostgreSQL', 'Next.js'],
     description:
@@ -47,13 +47,13 @@ export const FALLBACK_JOBS = [
       'Experience consuming streaming REST and WebSocket APIs.',
     ],
     aboutCompany:
-      'Zepto Tech is India’s fastest-growing quick-commerce network engineering low-latency delivery infrastructure and consumer experiences.',
+      'Nova Logistics is a quick-commerce delivery network engineering low-latency fulfillment and consumer experiences.',
     createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     _id: 'job_fallback_3',
     title: 'Backend Systems & API Engineer',
-    company: 'Slice',
+    company: 'Helix Core',
     location: 'Bengaluru, India (Remote)',
     requiredSkills: ['Node.js', 'Express', 'MongoDB', 'Docker', 'Redis', 'Microservices'],
     description:
@@ -70,13 +70,13 @@ export const FALLBACK_JOBS = [
       'Experience deploying services inside Docker containers and running automated CI checks.',
     ],
     aboutCompany:
-      'Slice is a consumer payments and fintech company redesigning modern financial products for the next generation.',
+      'Helix Core is a financial technology infrastructure company engineering modern transaction routing and ledger systems.',
     createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     _id: 'job_fallback_4',
     title: 'Full-Stack Software Engineer',
-    company: 'Groww Engineering',
+    company: 'Apex Analytics',
     location: 'Bengaluru, India',
     requiredSkills: ['React', 'Node.js', 'MongoDB', 'Python', 'REST API'],
     description:
@@ -92,13 +92,13 @@ export const FALLBACK_JOBS = [
       'Comfortable writing clean MongoDB queries and managing state across SPAs.',
     ],
     aboutCompany:
-      'Groww Engineering builds transparent, high-speed investing and wealth management platforms for tens of millions of active users.',
+      'Apex Analytics builds high-speed data analytics and portfolio management platforms for enterprise organizations.',
     createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     _id: 'job_fallback_5',
     title: 'Cloud Infrastructure & DevOps Engineer',
-    company: 'BrowserStack',
+    company: 'CloudScale Systems',
     location: 'Mumbai, India (Remote)',
     requiredSkills: ['Docker', 'AWS', 'Kubernetes', 'CI/CD', 'Node.js'],
     description:
@@ -114,13 +114,13 @@ export const FALLBACK_JOBS = [
       'Firm grasp of security standards, network topologies, and secrets management.',
     ],
     aboutCompany:
-      'BrowserStack is the global leader in software testing infrastructure, enabling millions of developers to test web and mobile apps at scale.',
+      'CloudScale Systems provides cloud testing infrastructure enabling engineering teams to test web and mobile apps at scale.',
     createdAt: new Date(Date.now() - 11 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     _id: 'job_fallback_6',
     title: 'Junior Full-Stack Web Developer',
-    company: 'Swiggy',
+    company: 'QuickServe Technologies',
     location: 'Bengaluru, India (Hybrid)',
     requiredSkills: ['React', 'JavaScript', 'Express', 'MongoDB', 'Git'],
     description:
@@ -136,7 +136,7 @@ export const FALLBACK_JOBS = [
       'Eager curiosity to learn modern API integrations and production DevOps tools.',
     ],
     aboutCompany:
-      'Swiggy is India’s pioneering on-demand convenience platform connecting consumers with millions of restaurants and partner stores.',
+      'QuickServe Technologies is an on-demand convenience platform connecting consumers with local partner stores.',
     createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
   },
 ];

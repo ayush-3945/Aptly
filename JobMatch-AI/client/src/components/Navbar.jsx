@@ -9,6 +9,7 @@ import {
   PlusCircle,
   Menu,
   X,
+  GitBranch,
 } from 'lucide-react';
 import Logo from './Logo';
 import { useAuth } from '../context/AuthContext';
@@ -94,7 +95,7 @@ const Navbar = () => {
             }}
           >
             <LayoutDashboard size={15} />
-            <span>ATS Pipeline</span>
+            <span>{user?.role === 'candidate' ? 'My Applications' : 'ATS Pipeline'}</span>
           </Link>
 
           {user?.role === 'recruiter' && (
@@ -218,6 +219,29 @@ const Navbar = () => {
               </Link>
             </div>
           )}
+
+          {/* GitHub Icon Link */}
+          <a
+            href="https://github.com/ayush-3945/Aptly"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '34px',
+              height: '34px',
+              borderRadius: '4px',
+              border: '1px solid var(--border-default)',
+              backgroundColor: 'var(--bg-secondary)',
+              color: 'var(--text-secondary)',
+              transition: 'var(--transition)',
+            }}
+            title="GitHub Repository"
+            aria-label="GitHub Repository"
+          >
+            <GitBranch size={16} />
+          </a>
         </div>
 
         {/* Mobile Hamburger Toggle Button */}
@@ -355,7 +379,7 @@ const Navbar = () => {
                 }}
               >
                 <LayoutDashboard size={16} />
-                <span>ATS Pipeline</span>
+                <span>{user?.role === 'candidate' ? 'My Applications' : 'ATS Pipeline'}</span>
               </Link>
 
               {user?.role === 'recruiter' && (
@@ -454,6 +478,31 @@ const Navbar = () => {
                   </Link>
                 </div>
               )}
+
+              {/* GitHub Link for Mobile */}
+              <a
+                href="https://github.com/ayush-3945/Aptly"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  padding: '0.6rem',
+                  marginTop: '0.45rem',
+                  borderRadius: '6px',
+                  border: '1px solid var(--border-default)',
+                  backgroundColor: 'var(--bg-secondary)',
+                  color: 'var(--text-secondary)',
+                  fontSize: '0.86rem',
+                  fontWeight: 500,
+                  textDecoration: 'none',
+                }}
+              >
+                <GitBranch size={15} />
+                <span>GitHub Repository</span>
+              </a>
             </div>
           </div>
         </div>

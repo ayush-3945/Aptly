@@ -11,7 +11,7 @@ const { isGeminiConfigured } = require('../src/config/aiConfig');
 // 1. Target Job Definition
 const targetJob = {
   title: 'Full-Stack MERN & AI Engineer',
-  company: 'Razorpay',
+  company: 'Acme Payments',
   location: 'Remote',
   requiredSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'Docker'],
   description: `We are looking for a Senior Full-Stack MERN & AI Engineer.

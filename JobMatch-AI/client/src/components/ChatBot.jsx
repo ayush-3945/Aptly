@@ -351,8 +351,8 @@ export default function ChatBot() {
     <div
       style={{
         position: 'fixed',
-        bottom: '24px',
-        right: '24px',
+        bottom: 'clamp(14px, 2.5vw, 24px)',
+        right: 'clamp(14px, 2.5vw, 24px)',
         zIndex: 9999,
         fontFamily: 'var(--font-main)',
       }}

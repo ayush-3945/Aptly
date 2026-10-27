@@ -9,10 +9,10 @@ import {
   Terminal,
   ExternalLink,
   FileCheck,
-  GitBranch,
   UserCheck,
   Briefcase,
   Sparkles,
+  Loader2,
 } from 'lucide-react';
 import ApplyModal from './ApplyModal';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
@@ -23,7 +23,7 @@ const SAMPLE_EVALUATION = {
   aiMatchScore: 88,
   recommendation: 'Strong Match',
   fitSummary:
-    'Subject candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and REST services. The candidate exhibits strong alignment with Razorpay requirements.',
+    'Subject candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and REST services. The candidate exhibits strong alignment with target role requirements.',
   matchedSkills: ['React.js', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'REST APIs', 'Git'],
   missingSkills: ['Docker Containerization', 'Kubernetes Orchestration'],
   experienceFit:
@@ -33,9 +33,11 @@ const SAMPLE_EVALUATION = {
 const Hero = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalEvaluation, setModalEvaluation] = useState(null);
-  const [demoLoading, setDemoLoading] = useState(false);
+  const [demoRoleLoading, setDemoRoleLoading] = useState(null); // 'recruiter' | 'candidate' | null
+  const [wakeUpNotice, setWakeUpNotice] = useState(false);
+
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { user, isAuthenticated, login } = useAuth();
   const { showToast } = useToast();
 
   const openSampleReport = () => {
@@ -49,18 +51,37 @@ const Hero = () => {
   };
 
   const handle1ClickDemo = async (role) => {
-    setDemoLoading(true);
+    setDemoRoleLoading(role);
+    setWakeUpNotice(false);
+
+    // After 2.5s of waiting, show friendly server wake-up notice
+    const noticeTimer = setTimeout(() => {
+      setWakeUpNotice(true);
+    }, 2500);
+
+    // 60-second timeout guard
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('TIMEOUT')), 60000)
+    );
+
     try {
       const email = role === 'recruiter' ? 'recruiter@aptly.ai' : 'candidate@aptly.ai';
-      const res = await login(email, 'password123');
+      const loginPromise = login(email, 'password123');
+      const res = await Promise.race([loginPromise, timeoutPromise]);
+      clearTimeout(noticeTimer);
       showToast(`Signed in as demo ${role} (${res.name})!`, 'success');
-      navigate(role === 'recruiter' ? '/dashboard' : '/jobs');
+      navigate(role === 'recruiter' ? '/dashboard' : '/dashboard');
     } catch (err) {
+      clearTimeout(noticeTimer);
       console.error('Demo login error:', err);
-      showToast('Redirecting to login...', 'info');
-      navigate('/login');
+      if (err.message === 'TIMEOUT') {
+        showToast('Server is taking longer than expected to wake up. Please retry in a few seconds.', 'warning');
+      } else {
+        showToast('Server is waking up or temporarily busy. Please retry in a moment, or visit /login.', 'error');
+      }
     } finally {
-      setDemoLoading(false);
+      setDemoRoleLoading(null);
+      setWakeUpNotice(false);
     }
   };
 
@@ -120,137 +141,109 @@ const Hero = () => {
             <span style={{ color: 'var(--accent-teal)', fontWeight: 600 }}>Google Gemini</span>
           </div>
 
-          {/* Primary Action Buttons & Links */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
-            <Link
-              to="/jobs"
-              className="btn btn-primary"
-              style={{
-                padding: '0.75rem 1.5rem',
-                fontSize: '0.92rem',
-                borderRadius: '4px',
-                fontWeight: 600,
-              }}
-            >
-              <span>Explore Open Roles</span>
-              <ArrowRight size={16} />
-            </Link>
-            <button
-              type="button"
-              onClick={openSampleReport}
-              className="btn btn-secondary"
-              style={{
-                padding: '0.75rem 1.4rem',
-                fontSize: '0.92rem',
-                borderRadius: '4px',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              <FileCheck size={16} color="var(--accent-teal)" />
-              <span>Sample Match Report</span>
-            </button>
-            <a
-              href="https://github.com/ayush-3945/Aptly"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-secondary"
-              style={{
-                padding: '0.75rem 1.25rem',
-                fontSize: '0.92rem',
-                borderRadius: '4px',
-                fontWeight: 600,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-              }}
-            >
-              <GitBranch size={16} />
-              <span>GitHub</span>
-            </a>
-            <a
-              href="https://aptly-zeta.vercel.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-secondary"
-              style={{
-                padding: '0.75rem 1.25rem',
-                fontSize: '0.92rem',
-                borderRadius: '4px',
-                fontWeight: 600,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-              }}
-            >
-              <ExternalLink size={16} color="var(--accent-teal)" />
-              <span>Live Demo</span>
-            </a>
+          {/* Hero Action Buttons: Only 2 Buttons (or 1 "Go to Dashboard" if logged in) */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.85rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            {isAuthenticated && user ? (
+              <Link
+                to="/dashboard"
+                className="btn btn-primary"
+                style={{
+                  padding: '0.8rem 1.85rem',
+                  fontSize: '0.98rem',
+                  borderRadius: '4px',
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
+                <span>Go to Dashboard</span>
+                <ArrowRight size={16} />
+              </Link>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  disabled={Boolean(demoRoleLoading)}
+                  onClick={() => handle1ClickDemo('recruiter')}
+                  className="btn btn-primary"
+                  style={{
+                    padding: '0.8rem 1.65rem',
+                    fontSize: '0.95rem',
+                    borderRadius: '4px',
+                    fontWeight: 600,
+                    cursor: demoRoleLoading ? 'not-allowed' : 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
+                  {demoRoleLoading === 'recruiter' ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Connecting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Briefcase size={16} />
+                      <span>Try Demo as Recruiter</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  disabled={Boolean(demoRoleLoading)}
+                  onClick={() => handle1ClickDemo('candidate')}
+                  className="btn btn-secondary"
+                  style={{
+                    padding: '0.8rem 1.65rem',
+                    fontSize: '0.95rem',
+                    borderRadius: '4px',
+                    fontWeight: 600,
+                    cursor: demoRoleLoading ? 'not-allowed' : 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
+                  {demoRoleLoading === 'candidate' ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Connecting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <UserCheck size={16} color="var(--accent-teal)" />
+                      <span>Try Demo as Candidate</span>
+                    </>
+                  )}
+                </button>
+              </>
+            )}
           </div>
 
-          {/* 1-Click Fast Demo Login for Reviewers & Interviewers */}
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.65rem',
-              padding: '0.45rem 0.95rem',
-              background: 'rgba(15, 107, 92, 0.06)',
-              border: '1px dashed var(--accent-teal)',
-              borderRadius: '6px',
-              fontSize: '0.82rem',
-              color: 'var(--text-secondary)',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-            }}
-          >
-            <span style={{ fontWeight: 600, color: 'var(--accent-teal)' }}>⚡ 1-Click Test Accounts:</span>
-            <button
-              type="button"
-              disabled={demoLoading}
-              onClick={() => handle1ClickDemo('recruiter')}
+          {/* Cold-start friendly notice while server wakes up */}
+          {demoRoleLoading && wakeUpNotice && (
+            <div
               style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-default)',
-                borderRadius: '4px',
-                padding: '0.25rem 0.65rem',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                color: 'var(--text-primary)',
-                cursor: 'pointer',
-                display: 'inline-flex',
+                marginTop: '1rem',
+                fontSize: '0.84rem',
+                color: 'var(--accent-teal)',
+                display: 'flex',
                 alignItems: 'center',
-                gap: '0.35rem',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                fontWeight: 500,
               }}
             >
-              <Briefcase size={13} color="var(--accent-teal)" />
-              <span>Try Demo as Recruiter</span>
-            </button>
-            <button
-              type="button"
-              disabled={demoLoading}
-              onClick={() => handle1ClickDemo('candidate')}
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-default)',
-                borderRadius: '4px',
-                padding: '0.25rem 0.65rem',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                color: 'var(--text-primary)',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-              }}
-            >
-              <UserCheck size={13} color="var(--semantic-green)" />
-              <span>Try Demo as Candidate</span>
-            </button>
-          </div>
+              <Loader2 size={15} className="animate-spin" />
+              <span>Waking up server... this can take up to a minute</span>
+            </div>
+          )}
         </div>
 
-        {/* Interactive Live ATS Evaluation Card Preview */}
+        {/* Interactive Sample ATS Evaluation Card Preview */}
         <div id="preview" style={{ maxWidth: '940px', margin: '0 auto' }}>
           <div
             className="paper-card"
@@ -295,9 +288,25 @@ const Hero = () => {
                   <Terminal size={18} color="var(--accent-teal)" />
                 </div>
                 <div>
-                  <h4 style={{ fontSize: '1.1rem', marginBottom: '0.2rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                    Full-Stack MERN Systems Engineer
-                  </h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                    <h4 style={{ fontSize: '1.1rem', margin: 0, fontWeight: 700, color: 'var(--text-primary)' }}>
+                      Full-Stack MERN Systems Engineer
+                    </h4>
+                    <span
+                      style={{
+                        fontSize: '0.68rem',
+                        padding: '0.12rem 0.5rem',
+                        background: 'rgba(15, 107, 92, 0.08)',
+                        color: 'var(--accent-teal)',
+                        borderRadius: '3px',
+                        fontWeight: 700,
+                        letterSpacing: '0.03em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Sample evaluation
+                    </span>
+                  </div>
                   <div
                     style={{
                       fontSize: '0.78rem',
@@ -305,7 +314,7 @@ const Hero = () => {
                       letterSpacing: '0.01em',
                     }}
                   >
-                    Evaluation: Ayush Kumar Pandey • Razorpay •{' '}
+                    Sample candidate • Sample company •{' '}
                     <span style={{ color: 'var(--accent-teal)', fontWeight: 600 }}>Click to inspect</span>
                   </div>
                 </div>
@@ -345,6 +354,95 @@ const Hero = () => {
                   }}
                 >
                   88% Fit
+                </div>
+              </div>
+            </div>
+
+            {/* Sub-Score Breakdown: Real 40/30/20/10 Formula Math */}
+            <div
+              style={{
+                marginBottom: '1.35rem',
+                padding: '0.95rem 1.15rem',
+                background: 'var(--bg-primary)',
+                borderRadius: '4px',
+                border: '1px solid var(--border-default)',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '0.75rem',
+                  flexWrap: 'wrap',
+                  gap: '0.4rem',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: '0.74rem',
+                    fontWeight: 700,
+                    color: 'var(--text-muted)',
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  How the score is built
+                </span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--accent-teal)', fontWeight: 600 }}>
+                  90×0.4 + 85×0.3 + 90×0.2 + 80×0.1 = 88%
+                </span>
+              </div>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: '0.85rem',
+                }}
+              >
+                {/* Skills 40% */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.25rem' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Skills (40%)</span>
+                    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>90%</span>
+                  </div>
+                  <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ width: '90%', height: '100%', background: 'var(--accent-teal)', borderRadius: '2px' }} />
+                  </div>
+                </div>
+
+                {/* Experience 30% */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.25rem' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Experience (30%)</span>
+                    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>85%</span>
+                  </div>
+                  <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ width: '85%', height: '100%', background: 'var(--accent-teal)', borderRadius: '2px' }} />
+                  </div>
+                </div>
+
+                {/* Domain 20% */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.25rem' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Domain (20%)</span>
+                    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>90%</span>
+                  </div>
+                  <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ width: '90%', height: '100%', background: 'var(--accent-teal)', borderRadius: '2px' }} />
+                  </div>
+                </div>
+
+                {/* Education 10% */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.25rem' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Education (10%)</span>
+                    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>80%</span>
+                  </div>
+                  <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ width: '80%', height: '100%', background: 'var(--accent-teal)', borderRadius: '2px' }} />
+                  </div>
                 </div>
               </div>
             </div>
@@ -447,7 +545,7 @@ const Hero = () => {
               >
                 Evaluation synthesis:
               </span>
-              Candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and REST services. The candidate exhibits strong alignment with Razorpay requirements.
+              Subject candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and REST services. The candidate exhibits strong alignment with target role requirements.
             </div>
 
             {/* Interactive Card Action Bar */}
@@ -473,7 +571,7 @@ const Hero = () => {
                 }}
               >
                 <ShieldCheck size={15} color="var(--accent-teal)" />
-                <span>Verified ATS Evaluation Engine • Graceful fallback when AI is unavailable</span>
+                <span>AI Evaluation Engine • Graceful fallback when AI is unavailable</span>
               </div>
 
               <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -499,157 +597,6 @@ const Hero = () => {
                   <ArrowRight size={14} />
                   <span>Benchmark Your CV</span>
                 </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Proof Metrics Strip with Illustrative Demo Values Label */}
-        <div
-          style={{
-            marginTop: '3.5rem',
-            padding: '1.5rem 1.75rem',
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-default)',
-            borderRadius: '6px',
-            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.03)',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              borderBottom: '1px solid var(--border-default)',
-              paddingBottom: '0.75rem',
-              marginBottom: '1.25rem',
-              flexWrap: 'wrap',
-              gap: '0.5rem',
-            }}
-          >
-            <span
-              style={{
-                fontSize: '0.78rem',
-                fontWeight: 700,
-                color: 'var(--text-primary)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.04em',
-              }}
-            >
-              ATS Pipeline Architecture & Verification
-            </span>
-            <span
-              style={{
-                fontSize: '0.7rem',
-                padding: '0.2rem 0.6rem',
-                background: 'var(--accent-teal-light)',
-                color: 'var(--accent-teal)',
-                borderRadius: '12px',
-                fontWeight: 600,
-                letterSpacing: '0.02em',
-              }}
-            >
-              Illustrative Demo Values
-            </span>
-          </div>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
-              gap: '1.5rem',
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  fontSize: '1.85rem',
-                  fontWeight: 800,
-                  color: 'var(--accent-teal)',
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1.1,
-                }}
-              >
-                4 Dimensions
-              </div>
-              <div
-                style={{
-                  fontSize: '0.78rem',
-                  color: 'var(--text-muted)',
-                  fontWeight: 600,
-                  marginTop: '0.25rem',
-                }}
-              >
-                Skills (40%), Experience (30%), Domain (20%), Education (10%)
-              </div>
-            </div>
-            <div>
-              <div
-                style={{
-                  fontSize: '1.85rem',
-                  fontWeight: 800,
-                  color: 'var(--text-primary)',
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1.1,
-                }}
-              >
-                Gemini 2.5
-              </div>
-              <div
-                style={{
-                  fontSize: '0.78rem',
-                  color: 'var(--text-muted)',
-                  fontWeight: 600,
-                  marginTop: '0.25rem',
-                }}
-              >
-                JSON Schema Enforced Extraction
-              </div>
-            </div>
-            <div>
-              <div
-                style={{
-                  fontSize: '1.85rem',
-                  fontWeight: 800,
-                  color: 'var(--accent-teal)',
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1.1,
-                }}
-              >
-                Graceful
-              </div>
-              <div
-                style={{
-                  fontSize: '0.78rem',
-                  color: 'var(--text-muted)',
-                  fontWeight: 600,
-                  marginTop: '0.25rem',
-                }}
-              >
-                Fallback When AI Is Unavailable
-              </div>
-            </div>
-            <div>
-              <div
-                style={{
-                  fontSize: '1.85rem',
-                  fontWeight: 800,
-                  color: 'var(--semantic-green)',
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1.1,
-                }}
-              >
-                100% Pass
-              </div>
-              <div
-                style={{
-                  fontSize: '0.78rem',
-                  color: 'var(--text-muted)',
-                  fontWeight: 600,
-                  marginTop: '0.25rem',
-                }}
-              >
-                Automated Verification Suite
               </div>
             </div>
           </div>

@@ -943,7 +943,7 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
                       <Zap size={16} color="var(--accent-teal)" />
                       <div>
                         <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                          Or use 1-Click Verified Demo CV
+                          Or use 1-Click Sample Demo CV
                         </div>
                         <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
                           Pre-loaded Senior MERN engineer profile for instant testing
@@ -1166,7 +1166,7 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
                     Gaps Identified
                   </div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    <strong style={{ color: 'var(--accent-teal)' }}>ATS</strong> Verified
+                    <strong style={{ color: 'var(--accent-teal)' }}>ATS</strong> Evaluated
                   </div>
                 </div>
               </div>

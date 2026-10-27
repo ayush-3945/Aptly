@@ -135,7 +135,7 @@ const JobApplicants = () => {
           FALLBACK_JOBS.find((j) => j._id === jobId) || {
             _id: jobId,
             title: 'Senior Full-Stack MERN Systems Engineer',
-            company: 'Razorpay',
+            company: 'Acme Payments',
             location: 'Bengaluru, India (Remote)',
             requiredSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL'],
           };
@@ -1343,7 +1343,7 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInte
         {/* Matched Skills */}
         <div style={{ marginBottom: '1.5rem' }}>
           <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.6rem', color: 'var(--semantic-green)' }}>
-            Verified Matched Skills ({candidateApp.matchedSkills?.length || 0})
+            Matched Skills ({candidateApp.matchedSkills?.length || 0})
           </h4>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
             {candidateApp.matchedSkills && candidateApp.matchedSkills.length > 0 ? (

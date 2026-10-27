@@ -67,7 +67,7 @@ const JobsList = () => {
           setJobs(FALLBACK_JOBS);
         }
       } catch (err) {
-        console.warn('Jobs API unreachable, using verified fallback list:', err.message);
+        console.warn('Jobs API unreachable, using fallback list:', err.message);
         setJobs(FALLBACK_JOBS);
       } finally {
         setLoading(false);
@@ -270,7 +270,7 @@ const JobsList = () => {
                   lineHeight: 1.55,
                 }}
               >
-                Browse verified positions and compare your competencies against role requirements with transparent match evaluations.
+                Browse open positions and compare your competencies against role requirements with transparent match evaluations.
               </p>
             </div>
           </div>

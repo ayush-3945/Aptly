@@ -206,7 +206,7 @@ const JobDetail = () => {
                 }}
               >
                 <ShieldCheck size={13} />
-                <span>Verified ATS Opening</span>
+                <span>Active ATS Opening</span>
               </span>
             </div>
           </div>

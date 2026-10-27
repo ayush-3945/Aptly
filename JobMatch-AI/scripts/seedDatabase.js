@@ -52,7 +52,7 @@ async function seedDatabase() {
         email: 'recruiter@jobmatch.ai',
         password: hashedPassword,
         role: 'recruiter',
-        bio: 'Head of Technical Talent & Engineering Recruitment at Razorpay.',
+        bio: 'Head of Technical Talent & Engineering Recruitment at Acme Payments.',
         location: 'Bengaluru, India',
       },
       {
@@ -178,11 +178,11 @@ async function seedDatabase() {
     const jobDefinitions = [
       {
         title: 'Full-Stack MERN Systems Engineer',
-        company: 'Razorpay',
+        company: 'Acme Payments',
         location: 'Bengaluru, India (Remote)',
         requiredSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'Docker'],
         description: `About the Role:
-Razorpay is engineering next-generation payment and fintech platforms. We are seeking a Senior Full-Stack MERN Systems Engineer to lead the architecture and implementation of our developer dashboards and automated candidate matching services.
+Acme Payments is engineering next-generation payment and fintech platforms. We are seeking a Senior Full-Stack MERN Systems Engineer to lead the architecture and implementation of our developer dashboards and automated candidate matching services.
 
 Key Responsibilities:
 • Design and build scalable Node.js microservices and RESTful APIs connecting to MongoDB clusters.
@@ -200,7 +200,7 @@ Requirements:
       },
       {
         title: 'Senior Backend Architect - Node.js & Microservices',
-        company: 'Slice',
+        company: 'Helix Core',
         location: 'Bengaluru, India (Hybrid)',
         requiredSkills: ['Node.js', 'Express', 'MongoDB', 'Redis', 'Docker', 'Microservices', 'Kubernetes'],
         description: `Lead our backend infrastructure initiatives designing resilient, high-throughput microservices handling millions of daily payment transactions. You will optimize database throughput, implement distributed Redis caching, and maintain robust API gateways.`,
@@ -208,15 +208,15 @@ Requirements:
       },
       {
         title: 'Frontend React 19 Engineer',
-        company: 'Groww Engineering',
+        company: 'Apex Analytics',
         location: 'Bengaluru, India',
         requiredSkills: ['React', 'TypeScript', 'TailwindCSS', 'Next.js', 'CSS Modules', 'Web Vitals'],
-        description: `Join Groww Engineering to craft high-fidelity, component-driven user interfaces. You will build responsive investment applications with React 19, accessible design systems, and optimized Core Web Vitals.`,
+        description: `Join Apex Analytics to craft high-fidelity, component-driven user interfaces. You will build responsive investment applications with React 19, accessible design systems, and optimized Core Web Vitals.`,
         postedBy: recruiterUser._id,
       },
       {
         title: 'Cloud Infrastructure & DevOps Lead',
-        company: 'BrowserStack',
+        company: 'CloudScale Systems',
         location: 'Mumbai, India (Remote)',
         requiredSkills: ['Docker', 'Kubernetes', 'AWS', 'Terraform', 'CI/CD', 'GitHub Actions', 'Linux'],
         description: `Architect automated CI/CD pipelines, containerize backend microservices with Docker/Kubernetes, and manage multi-region AWS cloud infrastructure with Terraform.`,
@@ -224,7 +224,7 @@ Requirements:
       },
       {
         title: 'Platform API & Developer Tools Engineer',
-        company: 'Postman',
+        company: 'DevFlow Systems',
         location: 'Bengaluru, India (Remote)',
         requiredSkills: ['Node.js', 'Express', 'REST API', 'GraphQL', 'Docker', 'PostgreSQL'],
         description: `Build high-throughput developer tooling, API governance systems, and developer workspace features used by millions of engineers globally.`,
@@ -232,7 +232,7 @@ Requirements:
       },
       {
         title: 'Junior Full-Stack Developer',
-        company: 'Zepto Tech',
+        company: 'Nova Logistics',
         location: 'Mumbai, India (Remote)',
         requiredSkills: ['JavaScript', 'HTML5', 'CSS3', 'React', 'Git', 'REST API'],
         description: `Entry-level engineering position for ambitious web developers. Build reusable UI components, write unit tests, and collaborate with senior mentors on modern full-stack logistics products.`,

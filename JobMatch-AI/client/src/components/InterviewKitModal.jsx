@@ -409,7 +409,7 @@ const InterviewKitModal = ({ application, job, onClose }) => {
                 Preparing personalized questions...
               </p>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Analyzing {candidateName}'s verified skills, gaps, and {jobTitle} criteria
+                Analyzing {candidateName}'s matched skills, gaps, and {jobTitle} criteria
               </span>
             </div>
           </div>

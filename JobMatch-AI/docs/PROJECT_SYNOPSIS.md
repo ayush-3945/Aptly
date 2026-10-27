@@ -150,7 +150,7 @@ The implementation of Aptly.AI delivers the following tangible benefits:
 - **Enhanced Shortlisting Velocity:** Enables recruiters to immediately isolate top-percentile candidates via auto-ranking without manual sorting.
 - **Constructive Candidate Experience:** Replaces silent rejections with transparent scorecards outlining exact skills to acquire for future growth.
 - **Inclusive Job Descriptions:** Proactively flags biased language, resulting in more welcoming and diverse applicant pools.
-- **Privacy & Transparency:** Candidly communicates that resume text is evaluated via Google Gemini and labels simulated telemetry as illustrative demo values.
+- **Privacy & Transparency:** Candidly communicates that resume text is evaluated via Google Gemini.
 
 ---
 

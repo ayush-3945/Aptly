@@ -23,10 +23,10 @@ const SAMPLE_INTERVIEWS = [
   {
     _id: 'demo_int_1',
     candidateId: { name: 'Elena Rostova', email: 'elena.rostova@gmail.com' },
-    recruiterId: { name: 'Dr. Sarah Lin', email: 'sarah@razorpay.com' },
+    recruiterId: { name: 'Dr. Sarah Lin', email: 'sarah@acmepayments.com' },
     jobId: {
       title: 'Senior Full-Stack MERN Systems Engineer',
-      company: 'Razorpay',
+      company: 'Acme Payments',
       location: 'Bengaluru, India (Remote)',
     },
     scheduledAt: new Date(Date.now() + 26 * 60 * 60 * 1000).toISOString(),
@@ -39,10 +39,10 @@ const SAMPLE_INTERVIEWS = [
   {
     _id: 'demo_int_2',
     candidateId: { name: 'Marcus Chen', email: 'marcus.chen@outlook.com' },
-    recruiterId: { name: 'Dr. Sarah Lin', email: 'sarah@razorpay.com' },
+    recruiterId: { name: 'Dr. Sarah Lin', email: 'sarah@acmepayments.com' },
     jobId: {
       title: 'Frontend Interface Architect',
-      company: 'Zepto Tech',
+      company: 'Nova Logistics',
       location: 'Mumbai, India (Hybrid)',
     },
     scheduledAt: new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),

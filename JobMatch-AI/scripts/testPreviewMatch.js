@@ -1,3 +1,7 @@
+require('dotenv').config();
+if (!process.env.JWT_SECRET) {
+  process.env.JWT_SECRET = 'test_jwt_secret_for_unit_tests';
+}
 const { previewProfileMatch, generateFallbackPreview } = require('../src/services/aiMatcherService');
 
 async function testPreview() {

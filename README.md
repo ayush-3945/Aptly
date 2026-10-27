@@ -32,10 +32,10 @@ The live production deployment is hosted at **[aptly-zeta.vercel.app](https://ap
 
 | Persona | Demo Email | Demo Password | Capabilities & Test Views |
 | :--- | :--- | :--- | :--- |
-| **🏢 Recruiter** | `recruiter@jobmatch.ai` | `password123` | **Post a Job** with live 60/40 AI Quality Scorer & bias alerts, **ATS Pipeline Kanban** with 6-stage drag-and-drop, **AI Interview Question Generator**, **Talent Pipeline Intelligence Analytics v2** |
-| **🎯 Candidate** | `candidate@jobmatch.ai` | `password123` | Explore open roles, **AI Resume Parser** (PDF extraction), **Pre-apply live compatibility match score**, skill gap breakdown, application timeline |
+| **🏢 Recruiter** | `recruiter@aptly.ai` | `password123` | **Post a Job** with live 60/40 AI Quality Scorer & bias alerts, **ATS Pipeline Kanban** with 6-stage drag-and-drop, **AI Interview Question Generator**, **Talent Pipeline Intelligence Analytics v2** |
+| **🎯 Candidate** | `candidate@aptly.ai` | `password123` | Explore open roles, **AI Resume Parser** (PDF extraction), **Pre-apply live compatibility match score**, skill gap breakdown, application timeline |
 
-*Tip: You can also register a fresh account or click the "Quick Demo Fill" buttons directly on the Login page.*
+*Tip: You can also register a fresh account or click the "1-Click Test Accounts" buttons directly on the Homepage or Login page. Legacy `@jobmatch.ai` aliases are also supported.*
 
 ---
 

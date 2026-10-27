@@ -43,7 +43,7 @@ const SAMPLE_APPLICATIONS = [
     job: {
       _id: 'job_fallback_1',
       title: 'Senior Full-Stack MERN Engineer',
-      company: 'Razorpay',
+      company: 'Acme Payments',
       location: 'Bengaluru, India (Remote)',
     },
   },
@@ -277,7 +277,7 @@ const CandidateDashboard = () => {
               My Applications & Match Tracker
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginTop: '0.25rem' }}>
-              Real-time telemetry on your submitted applications, ATS status changes, and semantic match breakdowns.
+              Track your applications and see how well you match each role.
             </p>
           </div>
 
@@ -690,7 +690,7 @@ const CandidateDashboard = () => {
                             {app.recommendation || (matchScore >= 75 ? 'Strong Match' : 'Moderate Match')}
                           </span>
                           <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                            {app.experienceFit || 'Candidate experience verified against job requirements.'}
+                            {app.experienceFit || 'Candidate experience evaluated against job requirements.'}
                           </span>
                         </div>
 
