@@ -52,7 +52,7 @@ graph TD
   - **Specificity & Qualifications:** Distinguishes mandatory hard requirements from nice-to-haves.
   - **Inclusivity & Tone:** Scans for gender-biased or exclusionary language (e.g., replacing *"rockstar/ninja"* with collaborative terminology).
   - **Market Competitiveness:** Salary range transparency, tech stack modernness, and benefits clarity.
-- **Sub-Second SVG Circular Gauge:** High-performance dynamic SVG stroke-dashoffset rendering with zero canvas overhead.
+- **Lightweight SVG Circular Gauge:** High-performance dynamic SVG stroke-dashoffset rendering with zero canvas overhead.
 
 ---
 

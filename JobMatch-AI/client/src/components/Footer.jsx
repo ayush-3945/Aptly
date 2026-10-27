@@ -8,7 +8,7 @@ const Footer = () => {
       style={{
         borderTop: '1px solid var(--border-default)',
         backgroundColor: 'var(--bg-secondary)',
-        padding: '2.5rem 0 2rem',
+        padding: '2.5rem 0 4.5rem',
         marginTop: 'auto',
       }}
     >
@@ -59,6 +59,7 @@ const Footer = () => {
           style={{
             borderTop: '1px solid var(--border-default)',
             paddingTop: '1.25rem',
+            paddingRight: 'clamp(0px, 8vw, 120px)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -69,7 +70,7 @@ const Footer = () => {
           }}
         >
           <div>
-            © {new Date().getFullYear()} Aptly AI. Engineered by <strong style={{ color: 'var(--text-primary)' }}>Ayush Kumar Pandey</strong>.
+            © {new Date().getFullYear()} Aptly.AI. Engineered by <strong style={{ color: 'var(--text-primary)' }}>Ayush Kumar Pandey</strong>.
           </div>
           <div style={{ display: 'flex', gap: '0.85rem', color: 'var(--text-muted)', fontSize: '0.78rem' }}>
             <span>React 19</span>

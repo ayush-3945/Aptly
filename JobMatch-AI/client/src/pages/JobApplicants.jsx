@@ -161,8 +161,11 @@ const JobApplicants = () => {
     fetchData();
   }, [jobId]);
 
-  // 1-Click Status Transition Handler
+  // 1-Click Status Transition Handler with optimistic update and rollback
   const handleTransition = async (applicationId, newStatus, candidateName) => {
+    const targetApp = applicants.find((app) => app._id === applicationId);
+    const previousStatus = targetApp?.status || 'applied';
+
     setApplicants((prev) =>
       prev.map((app) => (app._id === applicationId ? { ...app, status: newStatus } : app))
     );
@@ -171,6 +174,7 @@ const JobApplicants = () => {
       applied: 'Applied',
       shortlisted: 'Shortlisted',
       interview: 'Interview Scheduled',
+      offer: 'Offer Extended',
       hired: 'Hired',
       rejected: 'Archived / Rejected',
     };
@@ -182,7 +186,12 @@ const JobApplicants = () => {
         await api.patch(`/applications/${applicationId}/status`, { status: newStatus });
       }
     } catch (err) {
-      console.warn('Status update API call error (fallback active):', err.message);
+      console.warn('Status update API call error, rolling back optimistic state:', err.message);
+      // Revert optimistic update on failure
+      setApplicants((prev) =>
+        prev.map((app) => (app._id === applicationId ? { ...app, status: previousStatus } : app))
+      );
+      showToast('Failed to update status. Reverted.', 'error');
     }
   };
 

@@ -1,19 +1,20 @@
 {
-  "name": "jobmatch-ai",
+  "name": "aptly-ai",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Aptly.AI - Intelligent Semantic ATS & Talent Screening Platform",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
     "build": "npm --prefix client run build",
     "client": "npm --prefix client run dev",
     "seed": "node scripts/seedDatabase.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run test:security && npm run test:health",
     "test:ai": "node scripts/verifyAIPipeline.js",
     "test:preview": "node scripts/testPreviewMatch.js",
     "test:emails": "node scripts/testEmailNotifications.js",
-    "test:health": "node scripts/testHealth.js"
+    "test:health": "node scripts/testHealth.js",
+    "test:security": "node scripts/testSecurityPathTraversal.js"
   },
   "keywords": [],
   "author": "",

@@ -402,7 +402,7 @@ export default function ChatBot() {
           >
             <Sparkles size={14} color="#FFFFFF" />
           </div>
-          <span>Aptly AI</span>
+          <span>Aptly.AI</span>
           <span
             style={{
               width: '8px',

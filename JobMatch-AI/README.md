@@ -32,10 +32,10 @@ The live production deployment is hosted at **[aptly-zeta.vercel.app](https://ap
 
 | Persona | Demo Email | Demo Password | Capabilities & Test Views |
 | :--- | :--- | :--- | :--- |
-| **🏢 Recruiter** | `recruiter@jobmatch.ai` | `password123` | **Post a Job** with live 60/40 AI Quality Scorer & bias alerts, **ATS Pipeline Kanban** with 6-stage drag-and-drop, **AI Interview Question Generator**, **Talent Pipeline Intelligence Analytics v2** |
-| **🎯 Candidate** | `candidate@jobmatch.ai` | `password123` | Explore open roles, **AI Resume Parser** (PDF extraction), **Pre-apply live compatibility match score**, skill gap breakdown, application timeline |
+| **🏢 Recruiter** | `recruiter@aptly.ai` | `password123` | **Post a Job** with live 60/40 AI Quality Scorer & bias alerts, **ATS Pipeline Kanban** with 6-stage drag-and-drop, **AI Interview Question Generator**, **Talent Pipeline Intelligence Analytics v2** |
+| **🎯 Candidate** | `candidate@aptly.ai` | `password123` | Explore open roles, **AI Resume Parser** (PDF extraction), **Pre-apply live compatibility match score**, skill gap breakdown, application timeline |
 
-*Tip: You can also register a fresh account or click the "Quick Demo Fill" buttons directly on the Login page.*
+*Tip: You can also register a fresh account or click the "1-Click Test Accounts" buttons directly on the Homepage or Login page. Legacy `@jobmatch.ai` aliases are also supported.*
 
 ---
 
@@ -329,26 +329,66 @@ Open your browser at **`http://localhost:5173`** and sign in using the Quick Dem
 
 ## 🛡️ Resilience & Circuit Breakers
 
-Aptly is engineered for bulletproof production reliability:
-1. **Deterministic Heuristic Fallbacks**: Every AI integration (`matchScoreService`, `jdScorerService`, `interviewQuestionService`, and `analyticsService`) includes a local heuristic fallback engine. If the Gemini API experiences network timeouts, quota exhaustion, or temporary outages, the system seamlessly fulfills the request without user-facing crashes.
+Aptly is engineered for dependable, transparent production behavior:
+1. **Graceful Fallback When AI Is Unavailable**: Every AI integration (`aiMatcherService`, `jdScorerService`, `interviewQuestionService`, and `analyticsService`) includes a local heuristic engine. If Google Gemini experiences network timeouts, quota limits, or temporary outages, the system seamlessly fulfills the evaluation request using deterministic skill matching without crashing.
 2. **Strict JSON Schema Enforcement**: LLM queries leverage `responseMimeType: 'application/json'` and programmatic JSON sanitizers to eliminate markdown fences (` ```json `), preventing JSON parse syntax errors.
-3. **Graceful Database Offline Handling**: If MongoDB is slow to respond or offline, the client seamlessly renders pre-calculated demo applications, ensuring offline demos, campus presentations, and recruitment showcases remain fully functional.
+3. **Graceful Database Offline Handling**: If MongoDB is slow to respond or offline, the client gracefully renders pre-calculated demo applications, ensuring offline demos, campus presentations, and recruitment showcases remain fully functional.
+
+---
+
+## 🧪 Automated Verification & Test Suite
+
+The codebase includes automated regression and benchmark test suites runnable via npm:
+
+```bash
+# 1. Security Regression: Path traversal prevention, MIME validation, and RBAC guards
+npm run test:security
+
+# 2. ATS Pipeline Benchmark: 4 candidate archetypes (Strong, Partial, Mismatch, Scanned PDF)
+npm run test:ai
+
+# 3. System Telemetry Probe: Ephemeral server verifying /api/health and database readiness
+npm run test:health
+
+# 4. Email Transport Test: Verification of transactional interview email templates
+npm run test:emails
+
+# 5. Pre-Apply Scoring Benchmark: Live job match preview test
+npm run test:preview
+```
+
+---
+
+## 🔒 Limitations & Privacy Notice
+
+* **Privacy Notice (LLM Data Transmission)**: During resume evaluation and job scoring, candidate resume text and job descriptions are transmitted via HTTPS to the **Google Gemini API** (`@google/genai` SDK) for structured semantic analysis. In enterprise environments with strict data sovereignty requirements, this module can be swapped with self-hosted models (e.g., Llama 3 on vLLM) or configured under an enterprise zero-data-retention agreement.
+* **Scanned / Image-Only PDFs**: Resumes that are scanned images without an underlying machine-readable text layer cannot be parsed by `pdf-parse`. The system flags these candidates with a status of *"Pending Evaluation"* and alerts recruiters for manual review.
+* **In-Memory Rate Limiting**: The current rate limiter operates in-process via `express-rate-limit`. Distributed multi-instance deployments should attach a Redis store.
+
+---
+
+## 🔮 Future Work & Scaling Roadmap
+
+1. **Asynchronous Background Processing with BullMQ**: Offload heavy PDF parsing and batch resume evaluations to asynchronous background worker queues powered by **BullMQ** and Redis, isolating long-running LLM calls from HTTP request lifecycles.
+2. **Automated PII Scrubbing**: Strip candidate names, phone numbers, home addresses, and gender pronouns prior to LLM evaluation to eliminate unconscious demographic bias from ATS scoring.
+3. **Hybrid Dense Vector Retrieval**: Augment Gemini structured evaluations with vector embeddings (using MongoDB Vector Search or pgvector) to enable sub-50ms candidate similarity search across millions of profiles.
+4. **HttpOnly Refresh Cookie Rotation**: Migrate from client-side Bearer token storage to HttpOnly, SameSite strict refresh cookie pairs for enhanced XSS defense.
 
 ---
 
 ## 🧠 Architectural Q&A — Technical Defense Guide
 
 #### Q1: Why did you choose Google Gemini 2.5 Flash over OpenAI GPT-4o?
-> **Answer**: Gemini 2.5 Flash offers the ideal balance of sub-second inference latency, high token throughput, and native JSON mode enforcement (`responseMimeType: 'application/json'`). For real-time applications like our **1.5s debounced JD Scorer** and rapid PDF resume evaluation, Gemini Flash provides near-instant response times at significantly lower compute costs while maintaining deep semantic comprehension of technical developer stacks.
+> **Answer**: Gemini 2.5 Flash offers low inference latency, high token throughput, and native JSON mode enforcement (`responseMimeType: 'application/json'`). For real-time applications like our **1.5s debounced JD Scorer** and rapid PDF resume evaluation, Gemini Flash provides near-instant response times at significantly lower compute costs while maintaining deep semantic comprehension of technical developer stacks.
 
 #### Q2: How does Aptly prevent AI hallucinations in ATS scoring?
 > **Answer**: We employ three layers of defense:
-> 1. **Structured Rubric Prompting**: The LLM is constrained to evaluate solely against explicit skills extracted from the candidate's actual text and the job requisition.
-> 2. **Boundary Normalization**: All scores are clamped between 0 and 100, and recommendations are constrained to a fixed enum (`Strong Match`, `Moderate Match`, `Low Match`).
-> 3. **Validation & Fallback**: If the returned payload lacks required keys, a deterministic heuristic analyzer recalculates the score using exact and synonym token matching.
+> 1. **Structured Rubric Prompting**: The LLM is constrained to evaluate 4 explicit dimensions (skills, experience, domain, education) extracted from candidate text.
+> 2. **Boundary Normalization & Code-Side Weighting**: Sub-scores are validated in code and combined deterministically (`skills * 0.4 + experience * 0.3 + domain * 0.2 + education * 0.1`). Recommendation tiers (`Strong Match`, `Moderate Match`, `Low Match`) are calculated in code from score brackets.
+> 3. **Graceful Heuristic Fallback**: If the API call times out or returns unexpected keys, a deterministic heuristic analyzer recalculates the score using token and adjacent-technology overlap.
 
-#### Q3: How do optimistic updates work in the Kanban Board?
-> **Answer**: When a recruiter drags a card from `Applied` to `Shortlisted`, `@dnd-kit` immediately updates the client-side state. Simultaneously, an asynchronous `PATCH /api/applications/:id/status` request is dispatched to MongoDB. If the network request fails, the card automatically rolls back to its original column and triggers a red toast alert, ensuring data integrity without UI lag.
+#### Q3: How do optimistic updates work in the Kanban Board and List views?
+> **Answer**: When a recruiter changes a candidate stage (via drag-and-drop or select dropdown), the client immediately transitions the UI state. Simultaneously, an asynchronous `PATCH /api/applications/:id/status` request is dispatched. If the network request fails, the state automatically rolls back to its previous status and triggers an error toast alert, preventing visual desynchronization without blocking user interactions.
 
 ---
 

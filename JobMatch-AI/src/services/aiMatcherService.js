@@ -45,7 +45,7 @@ const getDefaultResumeImprovements = () => [
  * @param {string} reason - Cause of fallback invocation
  * @returns {Object} Structured match evaluation
  */
-const generateFallbackEvaluation = (job, resumeText, reason = 'Gemini API not configured or unavailable') => {
+const generateFallbackEvaluation = (job, resumeText, reason = 'Graceful fallback when AI is unavailable') => {
   const resumeLower = (resumeText || '').toLowerCase();
 
   let requiredSkills = [];
@@ -89,15 +89,17 @@ const generateFallbackEvaluation = (job, resumeText, reason = 'Gemini API not co
   }
 
   const skillsScore = matchScore;
-  const experienceScore = Math.min(95, Math.max(50, Math.round(matchScore * 0.9 + 10)));
+  const experienceScore = Math.min(95, Math.max(30, Math.round(matchScore * 0.9 + 10)));
+  const domainScore = matchScore >= 75 ? 85 : matchScore >= 40 ? 55 : 20;
+  const educationScore = 75;
   const relevanceScore = Math.round((skillsScore + experienceScore) / 2);
 
   return {
     matchScore,
-    scoreBreakdown: { skillsScore, experienceScore, relevanceScore },
+    scoreBreakdown: { skillsScore, experienceScore, domainScore, educationScore, relevanceScore },
     matchedSkills,
     missingSkills,
-    experienceFit: `Heuristic evaluation: ${matchedSkills.length} of ${requiredSkills.length || 0} core skills matched against candidate resume.`,
+    experienceFit: `Rule-based evaluation: ${matchedSkills.length} of ${requiredSkills.length || 0} core skills matched against candidate resume.`,
     fitSummary: `Candidate matches ${matchedSkills.length}/${requiredSkills.length || 0} specified skills. [Notice: ${reason}]`,
     recommendation,
     skillGapRoadmap: generateRoadmapFromMissingSkills(missingSkills),
@@ -149,10 +151,16 @@ ${job.description || 'N/A'}`;
 
   const systemInstruction = `You are an expert ATS (Applicant Tracking System) Technical Recruiter and Talent Acquisition Specialist.
 Your task is to objectively evaluate a candidate's resume against a target job description.
-Evaluate semantic alignment across:
-1. Technical and domain skills (exact and adjacent technologies)
+Evaluate semantic alignment across 4 dimensions:
+1. Technical skills (exact and adjacent technologies)
 2. Years of experience and seniority level
-3. Core responsibilities and project impact
+3. Domain relevance (industry, architectural patterns)
+4. Education & credentials
+
+Recommendation tiers:
+- 'Strong Match' (75-100)
+- 'Moderate Match' (40-74)
+- 'Low Match' (0-39)
 
 Be objective, thorough, and realistic in your scoring.
 Return a valid JSON object matching the required schema.`;
@@ -181,6 +189,22 @@ Analyze the match and provide the evaluation in the requested JSON structure.`;
             matchScore: {
               type: 'integer',
               description: 'Overall match score from 0 to 100',
+            },
+            skillsScore: {
+              type: 'integer',
+              description: 'Technical skills match score from 0 to 100',
+            },
+            experienceScore: {
+              type: 'integer',
+              description: 'Years of experience and seniority match score from 0 to 100',
+            },
+            domainScore: {
+              type: 'integer',
+              description: 'Industry domain alignment match score from 0 to 100',
+            },
+            educationScore: {
+              type: 'integer',
+              description: 'Education and certifications match score from 0 to 100',
             },
             matchedSkills: {
               type: 'array',
@@ -229,17 +253,28 @@ Analyze the match and provide the evaluation in the requested JSON structure.`;
 
     const parsed = JSON.parse(rawText);
 
-    // Enforce and sanitize output boundaries
-    const matchScore = Math.max(0, Math.min(100, Number(parsed.matchScore) || 0));
-    const validRecommendations = ['Strong Match', 'Moderate Match', 'Low Match'];
-    const recommendation = validRecommendations.includes(parsed.recommendation)
-      ? parsed.recommendation
-      : (matchScore >= 75 ? 'Strong Match' : matchScore >= 40 ? 'Moderate Match' : 'Low Match');
+    // Compute verified matchScore: weighted across evaluated dimensions in code if available
+    const rawSkills = Number(parsed.skillsScore);
+    const rawExp = Number(parsed.experienceScore);
+    const rawDomain = Number(parsed.domainScore);
+    const rawEdu = Number(parsed.educationScore);
+
+    let matchScore;
+    if (!isNaN(rawSkills) && !isNaN(rawExp) && !isNaN(rawDomain) && !isNaN(rawEdu)) {
+      matchScore = Math.max(0, Math.min(100, Math.round(rawSkills * 0.4 + rawExp * 0.3 + rawDomain * 0.2 + rawEdu * 0.1)));
+    } else {
+      matchScore = Math.max(0, Math.min(100, Number(parsed.matchScore) || 0));
+    }
+
+    // Derive recommendation tier deterministically from matchScore
+    const recommendation = matchScore >= 75 ? 'Strong Match' : matchScore >= 40 ? 'Moderate Match' : 'Low Match';
 
     const missingSkills = Array.isArray(parsed.missingSkills) ? parsed.missingSkills : [];
-    const scoreBreakdown = parsed.scoreBreakdown || {
-      skillsScore: matchScore,
-      experienceScore: Math.min(95, Math.max(50, Math.round(matchScore * 0.9 + 10))),
+    const scoreBreakdown = {
+      skillsScore: !isNaN(rawSkills) ? rawSkills : matchScore,
+      experienceScore: !isNaN(rawExp) ? rawExp : Math.min(95, Math.max(50, Math.round(matchScore * 0.9 + 10))),
+      domainScore: !isNaN(rawDomain) ? rawDomain : (matchScore >= 75 ? 85 : 55),
+      educationScore: !isNaN(rawEdu) ? rawEdu : 75,
       relevanceScore: matchScore,
     };
     const skillGapRoadmap = Array.isArray(parsed.skillGapRoadmap) && parsed.skillGapRoadmap.length > 0 ? parsed.skillGapRoadmap : generateRoadmapFromMissingSkills(missingSkills);
@@ -257,7 +292,7 @@ Analyze the match and provide the evaluation in the requested JSON structure.`;
     };
   } catch (error) {
     console.warn('Gemini AI generation failed, falling back to heuristic matcher:', error.message);
-    return generateFallbackEvaluation(job, resumeText, `AI service error: ${error.message}`);
+    return generateFallbackEvaluation(job, resumeText, `AI service unavailable: ${error.message}`);
   }
 };
 

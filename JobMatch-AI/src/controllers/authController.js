@@ -3,26 +3,41 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 
-// Supported Demo Credentials
+// Supported Demo Credentials (Seeded, safe mock profiles for interviewers & reviewers)
 const DEMO_USERS = {
+  'candidate@aptly.ai': {
+    _id: '64f8a1b2c3d4e5f6a7b8c9d0',
+    name: 'Alex Morgan',
+    email: 'candidate@aptly.ai',
+    role: 'candidate',
+  },
+  'recruiter@aptly.ai': {
+    _id: '64f8a1b2c3d4e5f6a7b8c9d1',
+    name: 'Sarah Jenkins',
+    email: 'recruiter@aptly.ai',
+    role: 'recruiter',
+  },
   'candidate@jobmatch.ai': {
     _id: '64f8a1b2c3d4e5f6a7b8c9d0',
     name: 'Alex Morgan',
-    email: 'candidate@jobmatch.ai',
+    email: 'candidate@aptly.ai',
     role: 'candidate',
   },
   'recruiter@jobmatch.ai': {
     _id: '64f8a1b2c3d4e5f6a7b8c9d1',
     name: 'Sarah Jenkins',
-    email: 'recruiter@jobmatch.ai',
+    email: 'recruiter@aptly.ai',
     role: 'recruiter',
   },
 };
 
-// Generate JWT
+// Generate JWT (7-day validity: balances blast-radius mitigation against user session retention)
 const generateToken = (id, role = 'candidate', email = '') => {
-  return jwt.sign({ id, role, email }, process.env.JWT_SECRET || 'fallback_secret', {
-    expiresIn: '30d',
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET environment variable is missing.');
+  }
+  return jwt.sign({ id, role, email }, process.env.JWT_SECRET, {
+    expiresIn: '7d',
   });
 };
 
@@ -33,7 +48,7 @@ const signup = async (req, res) => {
     if (!name || !email || !password || !role) {
       return res.status(400).json({ message: 'Please provide all required fields: name, email, password, and role' });
     }
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: 'Please provide a valid email address' });
@@ -96,7 +111,7 @@ const login = async (req, res) => {
       }
     }
 
-    // 2. High-Availability Fallback for 1-Click Demo Credentials
+    // 2. Graceful fallback for 1-Click Demo Credentials
     if (DEMO_USERS[email]) {
       const demo = DEMO_USERS[email];
       if (password === 'password123' || !isDbConnected) {

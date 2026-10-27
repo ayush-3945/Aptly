@@ -28,7 +28,10 @@ const protect = async (req, res, next) => {
   ) {
     try {
       token = req.headers.authorization.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
+      if (!process.env.JWT_SECRET) {
+        return res.status(500).json({ message: 'Server misconfiguration: JWT_SECRET missing.' });
+      }
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       if (mongoose.connection.readyState === 1) {
         try {
@@ -70,7 +73,8 @@ const optionalProtect = async (req, res, next) => {
   ) {
     try {
       const token = req.headers.authorization.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
+      if (!process.env.JWT_SECRET) return next();
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
       if (mongoose.connection.readyState === 1) {
         try {
           req.user = await User.findById(decoded.id).select('-password');

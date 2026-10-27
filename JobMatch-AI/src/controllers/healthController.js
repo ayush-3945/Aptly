@@ -11,7 +11,7 @@ const getHealth = (req, res) => {
 
   res.status(200).json({
     status: 'healthy',
-    service: 'JobMatch AI (Aptly) Backend',
+    service: 'Aptly.AI Backend',
     uptime: Math.floor(process.uptime()),
     database: {
       status: isDbConnected ? 'connected' : 'disconnected',

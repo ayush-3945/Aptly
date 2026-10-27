@@ -12,11 +12,40 @@ const app = express();
 // Trust reverse proxy for accurate client IP resolution behind Vercel/Render/Nginx
 app.set('trust proxy', 1);
 
+// Validate critical security environment variables on startup
+if (!process.env.JWT_SECRET && process.env.NODE_ENV !== 'test') {
+  console.error('FATAL ERROR: JWT_SECRET environment variable is missing.');
+  console.error('Please configure JWT_SECRET in your .env file before starting Aptly.AI.');
+  process.exit(1);
+}
+
 // Security Headers
 app.use(helmetMiddleware);
 
-// Middleware
-app.use(cors());
+// Restrict CORS to explicitly configured client allowlist
+const defaultAllowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000',
+];
+const envOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',').map((url) => url.trim().replace(/\/$/, '')).filter(Boolean)
+  : [];
+const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envOrigins])];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile clients, curl, server-to-server) or in whitelist
+      if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ''))) {
+        return callback(null, true);
+      }
+      return callback(new Error(`CORS blocked: Origin ${origin} not permitted by Aptly.AI policy.`));
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Public Health Check Route (uncapped for monitoring probes)

@@ -33,12 +33,12 @@ const Login = () => {
   const fillDemoCredentials = (role) => {
     if (role === 'candidate') {
       setFormData({
-        email: 'candidate@jobmatch.ai',
+        email: 'candidate@aptly.ai',
         password: 'password123',
       });
     } else {
       setFormData({
-        email: 'recruiter@jobmatch.ai',
+        email: 'recruiter@aptly.ai',
         password: 'password123',
       });
     }

@@ -40,7 +40,7 @@ Traditional hiring pipelines and legacy ATS platforms exhibit three critical str
 3. **Provide Transparent Candidate Scorecards:** Deliver deterministic 0–100% match scores, explicit matched skills, identified skill gaps, and custom AI-generated interview preparation questions.
 4. **Enforce Job Description Quality & Inclusivity:** Create a real-time reactive analyzer that evaluates clarity, specificity, and flags exclusionary/biased language before a job is published.
 5. **Streamline Recruiter Hiring Velocity:** Develop an interactive ATS Kanban board with dynamic score-threshold filtering to sort, stage, and advance applicants in real time.
-6. **Deploy an Embedded Conversational Copilot:** Provide an AI assistant capable of answering open-ended candidate and recruiter queries with sub-second latency.
+6. **Deploy an Embedded Conversational Copilot:** Provide an AI assistant capable of answering open-ended candidate and recruiter queries with graceful fallback when AI is unavailable.
 
 ---
 
@@ -145,17 +145,18 @@ A globally accessible floating chat assistant equipped with dual-engine fallback
 
 ## 11. Expected Outcome
 The implementation of Aptly.AI delivers the following tangible benefits:
-- **Zero Keyword-Drop Rate:** Eliminates erroneous candidate rejections caused by slight terminology variations, achieving a 99.2% semantic matching accuracy.
-- **Sub-Second Screening Latency:** Reduces resume review turnaround from days to under 1.5 seconds per applicant.
-- **4.2x Shortlisting Velocity:** Enables recruiters to immediately isolate top-percentile candidates via auto-ranking without manual sorting.
+- **Eliminates Keyword Rigidity:** Evaluates semantic alignment across technical skills, seniority, domain, and credentials rather than naive string counts.
+- **Graceful Fallback When AI Is Unavailable:** Resilient dual-tier architecture ensures uninterrupted operation via local heuristic evaluation if LLM quotas or timeouts occur.
+- **Enhanced Shortlisting Velocity:** Enables recruiters to immediately isolate top-percentile candidates via auto-ranking without manual sorting.
 - **Constructive Candidate Experience:** Replaces silent rejections with transparent scorecards outlining exact skills to acquire for future growth.
 - **Inclusive Job Descriptions:** Proactively flags biased language, resulting in more welcoming and diverse applicant pools.
+- **Privacy & Transparency:** Candidly communicates that resume text is evaluated via Google Gemini and labels simulated telemetry as illustrative demo values.
 
 ---
 
 ## 12. Future Scope
-1. **Automated Technical Video / Voice Screening:** Integrate async voice agents to conduct preliminary 2-minute technical Q&A rounds and evaluate communication clarity.
-2. **GitHub & LinkedIn Profile Deep Scraping:** Automatically fetch public repositories, commit frequency, and open-source contributions to validate resume claims.
+1. **Asynchronous Background Processing with BullMQ:** Offload heavy PDF parsing and batch resume evaluation to dedicated background workers using BullMQ and Redis.
+2. **Automated PII Scrubbing:** Strip personal demographic identifiers (names, emails, phone numbers, addresses) prior to LLM evaluation to eliminate unconscious demographic bias.
 3. **Multi-Resume Comparative Matrix & Radar Charts:** Allow recruiters to upload batches of 50+ resumes and visualize comparative skill matrices on radar graphs.
 4. **Automated Interview Calendar Scheduling:** Integrate Google Calendar / Calendly APIs to trigger automated interview scheduling links upon shortlisting.
 5. **Native Cross-Platform Mobile Application:** Build React Native mobile apps for iOS and Android with push notifications for status updates.

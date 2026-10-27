@@ -52,7 +52,7 @@ async function testHealthEndpoint() {
     const errors = [];
     if (status !== 200) errors.push(`Expected HTTP 200, got ${status}`);
     if (body.status !== 'healthy') errors.push(`Expected status 'healthy', got '${body.status}'`);
-    if (body.service !== 'JobMatch AI (Aptly) Backend') errors.push(`Unexpected service name: '${body.service}'`);
+    if (body.service !== 'Aptly.AI Backend') errors.push(`Unexpected service name: '${body.service}'`);
     if (typeof body.uptime !== 'number') errors.push(`Uptime should be a number, got ${typeof body.uptime}`);
     if (!body.database || typeof body.database.readyState !== 'number') errors.push('Missing database.readyState');
     if (!['connected', 'disconnected'].includes(body.database?.status)) {

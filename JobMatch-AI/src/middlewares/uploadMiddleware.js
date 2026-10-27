@@ -17,12 +17,15 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter: accept only PDF files
+// Strict file filter: validate both MIME type and file extension
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype === 'application/pdf') {
+  const isPdfMime = file.mimetype === 'application/pdf';
+  const isPdfExt = path.extname(file.originalname || '').toLowerCase() === '.pdf';
+
+  if (isPdfMime && isPdfExt) {
     cb(null, true);
   } else {
-    cb(new Error('Only PDF files are allowed'), false);
+    cb(new Error('Invalid file format. Only machine-readable PDF documents (.pdf) up to 5MB are permitted.'), false);
   }
 };
 
