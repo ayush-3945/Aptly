@@ -1,110 +1,21 @@
 const { getGeminiClient, isGeminiConfigured, DEFAULT_MODEL } = require('../config/aiConfig');
-/**
- * Generates an actionable skill gap roadmap for missing technologies
- * @param {Array<string>} missingSkills 
- * @returns {Array<Object>} Roadmap steps
- */
-const generateRoadmapFromMissingSkills = (missingSkills = []) => {
-  if (!Array.isArray(missingSkills) || missingSkills.length === 0) {
-    return [
-      {
-        skill: 'Production Polish',
-        priority: 'Low',
-        impact: '+5% Polish',
-        timeToBridge: '1-2 Days',
-        actionPlan: 'Core technical requirements already met. Add comprehensive unit tests, API docs, and Dockerfile.',
-        resource: 'Clean Architecture best practices & Jest documentation',
-      },
-    ];
-  }
-
-  return missingSkills.slice(0, 5).map((skill, index) => {
-    const isHigh = index < 2;
-    return {
-      skill,
-      priority: isHigh ? 'High' : 'Medium',
-      impact: isHigh ? '+15% Match Score' : '+8% Match Score',
-      timeToBridge: isHigh ? '2-3 Days' : '4-5 Days',
-      actionPlan: 'Build a hands-on mini-module utilizing ' + skill + ' and showcase it in your portfolio or GitHub.',
-      resource: 'Official ' + skill + ' documentation and community crash courses.',
-    };
-  });
-};
-
-const getDefaultResumeImprovements = () => [
-  'Quantify project outcomes: Replace generic phrases with measurable metrics (e.g. "Reduced API response latency by 35%").',
-  'Lead bullet points with strong action verbs: "Architected", "Deployed", "Engineered" rather than "Helped" or "Worked on".',
-  'Ensure every technical skill listed in your stack is referenced with real-world application in your projects section.',
-];
-
+const {
+  evaluateRuleBasedMatch,
+  generateRoadmapFromMissingSkills,
+  getDefaultResumeImprovements,
+} = require('./ruleBasedMatcher');
 
 /**
  * Fallback heuristic matching engine when Gemini AI is not configured or unavailable
+ * Delegates to the unified ruleBasedMatcher engine to eliminate duplication.
+ *
  * @param {Object|string} job - Job document or requirements string
  * @param {string} resumeText - Extracted text from candidate's resume
  * @param {string} reason - Cause of fallback invocation
- * @returns {Object} Structured match evaluation
+ * @returns {Object} Structured match evaluation with evaluationSource: 'fallback'
  */
 const generateFallbackEvaluation = (job, resumeText, reason = 'Graceful fallback when AI is unavailable') => {
-  const resumeLower = (resumeText || '').toLowerCase();
-
-  let requiredSkills = [];
-  if (job && Array.isArray(job.requiredSkills)) {
-    requiredSkills = job.requiredSkills;
-  } else if (job && typeof job.requiredSkills === 'string') {
-    requiredSkills = job.requiredSkills.split(',').map((s) => s.trim()).filter(Boolean);
-  } else if (typeof job === 'string') {
-    const commonTech = [
-      'javascript', 'typescript', 'react', 'node.js', 'nodejs', 'express',
-      'mongodb', 'python', 'java', 'sql', 'docker', 'aws', 'git', 'rest api',
-    ];
-    requiredSkills = commonTech.filter((tech) => job.toLowerCase().includes(tech));
-  }
-
-  const matchedSkills = [];
-  const missingSkills = [];
-
-  requiredSkills.forEach((skill) => {
-    const escaped = skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(?:\\b|\\W)${escaped}(?:\\b|\\W)`, 'i');
-    if (regex.test(resumeLower) || resumeLower.includes(skill.toLowerCase())) {
-      matchedSkills.push(skill);
-    } else {
-      missingSkills.push(skill);
-    }
-  });
-
-  let matchScore = 50;
-  if (requiredSkills.length > 0) {
-    matchScore = Math.round((matchedSkills.length / requiredSkills.length) * 100);
-  } else if (resumeLower.length > 300) {
-    matchScore = 65;
-  }
-
-  let recommendation = 'Moderate Match';
-  if (matchScore >= 75) {
-    recommendation = 'Strong Match';
-  } else if (matchScore < 40) {
-    recommendation = 'Low Match';
-  }
-
-  const skillsScore = matchScore;
-  const experienceScore = Math.min(95, Math.max(30, Math.round(matchScore * 0.9 + 10)));
-  const domainScore = matchScore >= 75 ? 85 : matchScore >= 40 ? 55 : 20;
-  const educationScore = 75;
-  const relevanceScore = Math.round((skillsScore + experienceScore) / 2);
-
-  return {
-    matchScore,
-    scoreBreakdown: { skillsScore, experienceScore, domainScore, educationScore, relevanceScore },
-    matchedSkills,
-    missingSkills,
-    experienceFit: `Rule-based evaluation: ${matchedSkills.length} of ${requiredSkills.length || 0} core skills matched against candidate resume.`,
-    fitSummary: `Candidate matches ${matchedSkills.length}/${requiredSkills.length || 0} specified skills. [Notice: ${reason}]`,
-    recommendation,
-    skillGapRoadmap: generateRoadmapFromMissingSkills(missingSkills),
-    resumeImprovements: getDefaultResumeImprovements(),
-  };
+  return evaluateRuleBasedMatch({ job, resumeText, reason });
 };
 
 /**
@@ -281,6 +192,7 @@ Analyze the match and provide the evaluation in the requested JSON structure.`;
     const resumeImprovements = Array.isArray(parsed.resumeImprovements) && parsed.resumeImprovements.length > 0 ? parsed.resumeImprovements : getDefaultResumeImprovements();
     return {
       matchScore,
+      evaluationSource: 'ai',
       scoreBreakdown,
       matchedSkills: Array.isArray(parsed.matchedSkills) ? parsed.matchedSkills : [],
       missingSkills,

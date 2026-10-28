@@ -45,9 +45,16 @@ const applicationSchema = new mongoose.Schema({
     enum: ['Strong Match', 'Moderate Match', 'Low Match', 'Pending Evaluation'],
     default: 'Pending Evaluation',
   },
+  evaluationSource: {
+    type: String,
+    enum: ['ai', 'fallback'],
+    default: 'fallback',
+  },
   scoreBreakdown: {
     skillsScore: { type: Number, default: 0 },
-    experienceScore: { type: Number, default: 0 },
+    experienceScore: { type: Number, default: null },
+    domainScore: { type: Number, default: null },
+    educationScore: { type: Number, default: null },
     relevanceScore: { type: Number, default: 0 },
   },
   skillGapRoadmap: [{

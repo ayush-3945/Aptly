@@ -330,8 +330,8 @@ Open your browser at **`http://localhost:5173`** and sign in using the Quick Dem
 ## 🛡️ Resilience & Circuit Breakers
 
 Aptly is engineered for dependable, transparent production behavior:
-1. **Graceful Fallback When AI Is Unavailable**: Every AI integration (`aiMatcherService`, `jdScorerService`, `interviewQuestionService`, and `analyticsService`) includes a local heuristic engine. If Google Gemini experiences network timeouts, quota limits, or temporary outages, the system seamlessly fulfills the evaluation request using deterministic skill matching without crashing.
-2. **Strict JSON Schema Enforcement**: LLM queries leverage `responseMimeType: 'application/json'` and programmatic JSON sanitizers to eliminate markdown fences (` ```json `), preventing JSON parse syntax errors.
+1. **Graceful Fallback When AI Is Unavailable (With Strict Honesty)**: Every AI integration includes a local heuristic engine. When Google Gemini experiences network timeouts, quota limits, or temporary outages, the system seamlessly fulfills evaluations using our shared deterministic rule-based matcher (`ruleBasedMatcher.js`). Evaluated records are tagged with `evaluationSource: 'fallback'`. Rather than fabricating arbitrary experience or education numbers, the fallback score is driven purely by verified skill matches (`matchScore = skillsScore`), and the UI marks the result with *"Keyword-based result (AI was unavailable)"* while hiding the non-derived sub-score bars.
+2. **Strict JSON Schema Enforcement & Code-Side Weighting**: LLM queries leverage `responseMimeType: 'application/json'` and explicit schemas. For AI evaluations (`evaluationSource: 'ai'`), Gemini provides 4 sub-scores (skills, experience, domain, education), and the final match score is calculated deterministically in Node.js (`skills * 0.4 + experience * 0.3 + domain * 0.2 + education * 0.1`).
 3. **Graceful Database Offline Handling**: If MongoDB is slow to respond or offline, the client gracefully renders pre-calculated demo applications, ensuring offline demos, campus presentations, and recruitment showcases remain fully functional.
 
 ---
@@ -385,7 +385,7 @@ npm run test:preview
 > **Answer**: We employ three layers of defense:
 > 1. **Structured Rubric Prompting**: The LLM is constrained to evaluate 4 explicit dimensions (skills, experience, domain, education) extracted from candidate text.
 > 2. **Boundary Normalization & Code-Side Weighting**: Sub-scores are validated in code and combined deterministically (`skills * 0.4 + experience * 0.3 + domain * 0.2 + education * 0.1`). Recommendation tiers (`Strong Match`, `Moderate Match`, `Low Match`) are calculated in code from score brackets.
-> 3. **Graceful Heuristic Fallback**: If the API call times out or returns unexpected keys, a deterministic heuristic analyzer recalculates the score using token and adjacent-technology overlap.
+> 3. **Graceful Heuristic Fallback with Scoring Transparency**: If the API call times out or returns unexpected keys, our shared rule-based matcher (`ruleBasedMatcher.js`) calculates the score purely from verified skills (`matchScore = skillsScore`). The evaluation is tagged `evaluationSource: 'fallback'`, non-derived sub-scores are set to null, and the UI marks the result as keyword-based, guaranteeing complete transparency without fabricated metrics.
 
 #### Q3: How do optimistic updates work in the Kanban Board and List views?
 > **Answer**: When a recruiter changes a candidate stage (via drag-and-drop or select dropdown), the client immediately transitions the UI state. Simultaneously, an asynchronous `PATCH /api/applications/:id/status` request is dispatched. If the network request fails, the state automatically rolls back to its previous status and triggers an error toast alert, preventing visual desynchronization without blocking user interactions.

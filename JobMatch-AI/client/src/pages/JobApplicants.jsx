@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   Briefcase,
@@ -14,7 +14,6 @@ import {
   ArrowUpDown,
   ChevronDown,
   ChevronUp,
-  Loader2,
   X,
   RotateCcw,
   Search,
@@ -32,6 +31,7 @@ import ScheduleInterviewModal from '../components/ScheduleInterviewModal';
 import KanbanBoard from '../components/KanbanBoard';
 import InterviewKitModal from '../components/InterviewKitModal';
 import CandidateCompareModal from '../components/CandidateCompareModal';
+import ApplicantSideDrawer from '../components/ApplicantSideDrawer';
 import { Scale } from 'lucide-react';
 
 const PIPELINE_COLUMNS = [
@@ -84,13 +84,16 @@ const PIPELINE_COLUMNS = [
 
 const JobApplicants = () => {
   const { jobId } = useParams();
+  const navigate = useNavigate();
 
   const [job, setJob] = useState(null);
+  const [allJobs, setAllJobs] = useState([]);
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Filter & Sort State
   const [scoreFilter, setScoreFilter] = useState('all'); // 'all', '75', '50'
+  const [selectedSkillFilter, setSelectedSkillFilter] = useState(null);
   const [sortBy, setSortBy] = useState('score'); // 'score', 'date'
   const [searchQuery, setSearchQuery] = useState('');
   const [showRejectedTray, setShowRejectedTray] = useState(false);
@@ -113,6 +116,23 @@ const JobApplicants = () => {
 
   // Global Toast
   const { showToast } = useToast();
+
+  // Load all jobs for switcher
+  useEffect(() => {
+    const fetchAllJobs = async () => {
+      try {
+        const res = await api.get('/jobs');
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setAllJobs(res.data);
+        } else {
+          setAllJobs(FALLBACK_JOBS);
+        }
+      } catch {
+        setAllJobs(FALLBACK_JOBS);
+      }
+    };
+    fetchAllJobs();
+  }, []);
 
   // Load Job details and Applicants
   useEffect(() => {
@@ -161,6 +181,18 @@ const JobApplicants = () => {
     fetchData();
   }, [jobId]);
 
+  // Derive unique skills from job and applicants for filter chips
+  const availableSkills = useMemo(() => {
+    const skillSet = new Set();
+    if (job?.requiredSkills && Array.isArray(job.requiredSkills)) {
+      job.requiredSkills.forEach((s) => skillSet.add(s));
+    }
+    applicants.forEach((app) => {
+      (app.matchedSkills || []).forEach((s) => skillSet.add(s));
+    });
+    return Array.from(skillSet).slice(0, 10);
+  }, [job, applicants]);
+
   // 1-Click Status Transition Handler with optimistic update and rollback
   const handleTransition = async (applicationId, newStatus, candidateName) => {
     const targetApp = applicants.find((app) => app._id === applicationId);
@@ -205,13 +237,23 @@ const JobApplicants = () => {
       list = list.filter((a) => (a.aiMatchScore || 0) >= 50);
     }
 
+    if (selectedSkillFilter) {
+      list = list.filter((a) =>
+        (a.matchedSkills || []).some(
+          (s) => s.toLowerCase() === selectedSkillFilter.toLowerCase()
+        )
+      );
+    }
+
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
         (a) =>
           a.candidate?.name?.toLowerCase().includes(q) ||
+          a.candidateName?.toLowerCase().includes(q) ||
           a.candidate?.email?.toLowerCase().includes(q) ||
-          (a.matchedSkills && a.matchedSkills.some((s) => s.toLowerCase().includes(q)))
+          (a.matchedSkills && a.matchedSkills.some((s) => s.toLowerCase().includes(q))) ||
+          (a.missingSkills && a.missingSkills.some((s) => s.toLowerCase().includes(q)))
       );
     }
 
@@ -222,7 +264,7 @@ const JobApplicants = () => {
     }
 
     return list;
-  }, [applicants, scoreFilter, searchQuery, sortBy]);
+  }, [applicants, scoreFilter, selectedSkillFilter, searchQuery, sortBy]);
 
   // Group by Column Stage
   const columnApplicants = useMemo(() => {
@@ -417,7 +459,7 @@ const JobApplicants = () => {
         </div>
       </div>
 
-      {/* AI Controls & Filter Bar */}
+      {/* Filter and Control Bar */}
       <div
         className="paper-card"
         style={{
@@ -425,172 +467,448 @@ const JobApplicants = () => {
           borderRadius: '8px',
           marginBottom: '2rem',
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '1.25rem',
+          flexDirection: 'column',
+          gap: '1rem',
           background: 'var(--bg-card)',
           border: '1px solid var(--border-default)',
         }}
       >
-        {/* Left: AI Score Filtering Pills */}
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.65rem' }}>
-          <span
-            style={{
-              fontSize: '0.82rem',
-              color: 'var(--text-muted)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-              marginRight: '0.25rem',
-            }}
-          >
-            <Filter size={14} />
-            AI Filter:
-          </span>
+        {/* Top Controls Row: Job Switcher, Search Input, Sort & View Mode */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1rem',
+          }}
+        >
+          {/* Left: Job Switcher */}
+          {allJobs.length > 1 ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: '220px' }}>
+              <Briefcase size={15} color="var(--accent-teal)" />
+              <label htmlFor="job-selector" style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                Job:
+              </label>
+              <select
+                id="job-selector"
+                value={jobId}
+                onChange={(e) => navigate(`/applicants/${e.target.value}`)}
+                className="form-input"
+                style={{
+                  padding: '0.4rem 0.75rem',
+                  fontSize: '0.84rem',
+                  fontWeight: 600,
+                  maxWidth: '280px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-default)',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                {allJobs.map((j) => (
+                  <option key={j._id} value={j._id}>
+                    {j.title} ({j.company || 'Company'})
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+              <Briefcase size={15} color="var(--accent-teal)" />
+              <span>{job?.title || 'Open Position'}</span>
+            </div>
+          )}
 
-          <button
-            onClick={() => setScoreFilter('all')}
-            className={scoreFilter === 'all' ? 'btn btn-primary' : 'btn btn-secondary'}
-            style={{ fontSize: '0.78rem', padding: '0.35rem 0.85rem' }}
-          >
-            All ({applicants.length})
-          </button>
+          {/* Right: Search + Sort + View */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap', flex: 1, justifyContent: 'flex-end' }}>
+            <div style={{ position: 'relative', minWidth: '240px', flex: 1, maxWidth: '360px' }}>
+              <Search
+                size={15}
+                style={{
+                  position: 'absolute',
+                  left: '0.85rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--text-muted)',
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Search candidate name, email, or skill..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="form-input"
+                style={{
+                  width: '100%',
+                  paddingLeft: '2.4rem',
+                  paddingRight: searchQuery ? '2rem' : '0.85rem',
+                  paddingTop: '0.45rem',
+                  paddingBottom: '0.45rem',
+                  fontSize: '0.82rem',
+                }}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  style={{
+                    position: 'absolute',
+                    right: '0.6rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    padding: 0,
+                    display: 'flex',
+                  }}
+                  title="Clear search"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
 
-          <button
-            onClick={() => setScoreFilter('75')}
-            className={scoreFilter === '75' ? 'btn btn-primary' : 'btn btn-secondary'}
-            style={{ fontSize: '0.78rem', padding: '0.35rem 0.85rem' }}
-          >
-            Strong Match ≥ 75% ({applicants.filter((a) => (a.aiMatchScore || 0) >= 75).length})
-          </button>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                background: 'var(--bg-secondary)',
+                borderRadius: '6px',
+                padding: '0.2rem',
+                border: '1px solid var(--border-default)',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setSortBy('score')}
+                style={{
+                  padding: '0.35rem 0.75rem',
+                  borderRadius: '4px',
+                  border: 'none',
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  background: sortBy === 'score' ? 'var(--accent-teal)' : 'transparent',
+                  color: sortBy === 'score' ? '#FFFFFF' : 'var(--text-muted)',
+                }}
+              >
+                Match Score
+              </button>
+              <button
+                type="button"
+                onClick={() => setSortBy('date')}
+                style={{
+                  padding: '0.35rem 0.75rem',
+                  borderRadius: '4px',
+                  border: 'none',
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  background: sortBy === 'date' ? 'var(--accent-teal)' : 'transparent',
+                  color: sortBy === 'date' ? '#FFFFFF' : 'var(--text-muted)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                }}
+              >
+                <ArrowUpDown size={13} />
+                Date
+              </button>
+            </div>
 
-          <button
-            onClick={() => setScoreFilter('50')}
-            className={scoreFilter === '50' ? 'btn btn-primary' : 'btn btn-secondary'}
-            style={{ fontSize: '0.78rem', padding: '0.35rem 0.85rem' }}
-          >
-            Moderate ≥ 50% ({applicants.filter((a) => (a.aiMatchScore || 0) >= 50).length})
-          </button>
+            {/* View Mode Toggle */}
+            <div className="view-toggle-pill">
+              <button
+                type="button"
+                onClick={() => setViewMode('kanban')}
+                className={`view-toggle-btn ${viewMode === 'kanban' ? 'active' : ''}`}
+              >
+                <Columns3 size={13} />
+                Kanban
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+              >
+                <LayoutList size={13} />
+                List
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Right: Search Input & Sort Selector */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative', minWidth: '220px' }}>
-            <Search
-              size={15}
+        {/* Filter Chips Row: Score Chips & Skill Chips */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '0.75rem',
+            paddingTop: '0.75rem',
+            borderTop: '1px solid var(--border-default)',
+          }}
+        >
+          {/* Min Score & Skill Filter Chips */}
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <span
               style={{
-                position: 'absolute',
-                left: '0.85rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
+                fontSize: '0.78rem',
+                fontWeight: 600,
                 color: 'var(--text-muted)',
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Filter by candidate or skill..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="form-input"
-              style={{
-                paddingLeft: '2.4rem',
-                paddingTop: '0.45rem',
-                paddingBottom: '0.45rem',
-                fontSize: '0.82rem',
-              }}
-            />
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              background: 'var(--bg-secondary)',
-              borderRadius: '6px',
-              padding: '0.2rem',
-              border: '1px solid var(--border-default)',
-            }}
-          >
-            <button
-              onClick={() => setSortBy('score')}
-              style={{
-                padding: '0.35rem 0.75rem',
-                borderRadius: '4px',
-                border: 'none',
-                fontSize: '0.78rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                background: sortBy === 'score' ? 'var(--accent-teal)' : 'transparent',
-                color: sortBy === 'score' ? '#FFFFFF' : 'var(--text-muted)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.3rem',
+                marginRight: '0.2rem',
               }}
             >
-              Match Score
-            </button>
+              <Filter size={13} />
+              Filter:
+            </span>
+
+            {/* Score chips */}
             <button
-              onClick={() => setSortBy('date')}
+              type="button"
+              onClick={() => setScoreFilter('all')}
               style={{
-                padding: '0.35rem 0.75rem',
+                padding: '0.28rem 0.65rem',
                 borderRadius: '4px',
-                border: 'none',
-                fontSize: '0.78rem',
+                fontSize: '0.74rem',
                 fontWeight: 600,
                 cursor: 'pointer',
-                background: sortBy === 'date' ? 'var(--accent-teal)' : 'transparent',
-                color: sortBy === 'date' ? '#FFFFFF' : 'var(--text-muted)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.3rem',
+                border: scoreFilter === 'all' ? '1px solid var(--accent-teal)' : '1px solid var(--border-default)',
+                background: scoreFilter === 'all' ? 'var(--accent-teal)' : 'var(--bg-secondary)',
+                color: scoreFilter === 'all' ? '#FFFFFF' : 'var(--text-secondary)',
+                transition: 'all 0.15s ease',
               }}
             >
-              <ArrowUpDown size={13} />
-              Date
+              All ({applicants.length})
             </button>
+            <button
+              type="button"
+              onClick={() => setScoreFilter('75')}
+              style={{
+                padding: '0.28rem 0.65rem',
+                borderRadius: '4px',
+                fontSize: '0.74rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                border: scoreFilter === '75' ? '1px solid var(--accent-teal)' : '1px solid var(--border-default)',
+                background: scoreFilter === '75' ? 'var(--accent-teal)' : 'var(--bg-secondary)',
+                color: scoreFilter === '75' ? '#FFFFFF' : 'var(--text-secondary)',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              Strong Fit ≥ 75% ({applicants.filter((a) => (a.aiMatchScore || 0) >= 75).length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setScoreFilter('50')}
+              style={{
+                padding: '0.28rem 0.65rem',
+                borderRadius: '4px',
+                fontSize: '0.74rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                border: scoreFilter === '50' ? '1px solid var(--accent-teal)' : '1px solid var(--border-default)',
+                background: scoreFilter === '50' ? 'var(--accent-teal)' : 'var(--bg-secondary)',
+                color: scoreFilter === '50' ? '#FFFFFF' : 'var(--text-secondary)',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              Moderate ≥ 50% ({applicants.filter((a) => (a.aiMatchScore || 0) >= 50).length})
+            </button>
+
+            {/* Divider */}
+            {availableSkills.length > 0 && (
+              <span style={{ color: 'var(--border-default)', margin: '0 0.2rem' }}>|</span>
+            )}
+
+            {/* Skill Chips */}
+            {availableSkills.map((skill) => {
+              const isSelected = selectedSkillFilter?.toLowerCase() === skill.toLowerCase();
+              return (
+                <button
+                  key={skill}
+                  type="button"
+                  onClick={() => setSelectedSkillFilter(isSelected ? null : skill)}
+                  style={{
+                    padding: '0.28rem 0.65rem',
+                    borderRadius: '12px',
+                    fontSize: '0.74rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    border: isSelected ? '1px solid var(--accent-teal)' : '1px solid var(--border-default)',
+                    background: isSelected ? 'var(--accent-teal-light)' : 'var(--bg-primary)',
+                    color: isSelected ? 'var(--accent-teal)' : 'var(--text-secondary)',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {skill}
+                </button>
+              );
+            })}
           </div>
 
-          {/* View Mode Toggle */}
-          <div className="view-toggle-pill">
+          {/* Reset Filters CTA if active */}
+          {(scoreFilter !== 'all' || selectedSkillFilter || searchQuery.trim()) && (
             <button
-              onClick={() => setViewMode('kanban')}
-              className={`view-toggle-btn ${viewMode === 'kanban' ? 'active' : ''}`}
+              type="button"
+              onClick={() => {
+                setScoreFilter('all');
+                setSelectedSkillFilter(null);
+                setSearchQuery('');
+              }}
+              style={{
+                fontSize: '0.76rem',
+                color: 'var(--accent-teal)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: 600,
+                textDecoration: 'underline',
+              }}
             >
-              <Columns3 size={13} />
-              Kanban
+              Reset filters
             </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
-            >
-              <LayoutList size={13} />
-              List
-            </button>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Loading State */}
+      {/* Loading Skeleton State */}
       {loading ? (
+        <div
+          style={{
+            display: 'flex',
+            gap: '1rem',
+            overflowX: 'auto',
+            paddingBottom: '1rem',
+            marginBottom: '2.5rem',
+          }}
+        >
+          {PIPELINE_COLUMNS.map((col) => (
+            <div
+              key={col.id}
+              style={{
+                borderRadius: '8px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-default)',
+                borderTop: `4px solid ${col.borderTop}`,
+                flex: 1,
+                minWidth: '180px',
+                maxWidth: '220px',
+                padding: '0.75rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.75rem',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="skeleton-shimmer" style={{ width: '80px', height: '16px', borderRadius: '4px' }} />
+                <div className="skeleton-shimmer" style={{ width: '24px', height: '16px', borderRadius: '4px' }} />
+              </div>
+              {[1, 2, 3].map((cardIdx) => (
+                <div
+                  key={cardIdx}
+                  style={{
+                    padding: '0.85rem',
+                    borderRadius: '6px',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-default)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.5rem',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div className="skeleton-shimmer" style={{ width: '85px', height: '14px', borderRadius: '3px' }} />
+                    <div className="skeleton-shimmer" style={{ width: '32px', height: '16px', borderRadius: '4px' }} />
+                  </div>
+                  <div className="skeleton-shimmer" style={{ width: '120px', height: '11px', borderRadius: '3px' }} />
+                  <div className="skeleton-shimmer" style={{ width: '100%', height: '8px', borderRadius: '3px', marginTop: '0.2rem' }} />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : processedApplicants.length === 0 ? (
+        /* Friendly Empty State with Icon and Clear Action */
         <div
           className="paper-card"
           style={{
-            padding: '4rem 2rem',
+            padding: '3.5rem 2rem',
             textAlign: 'center',
             borderRadius: '8px',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-default)',
+            maxWidth: '520px',
+            margin: '2rem auto 4rem',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             gap: '1rem',
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-default)',
           }}
         >
-          <Loader2 className="spin" size={36} color="var(--accent-teal)" />
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-            Assembling ATS Kanban Board & Scoring Pipelines...
+          <div
+            style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              background: 'var(--accent-teal-light)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--accent-teal)',
+            }}
+          >
+            <Search size={26} />
+          </div>
+          <h3
+            style={{
+              fontFamily: "'Newsreader', Georgia, serif",
+              fontSize: '1.4rem',
+              fontWeight: 700,
+              margin: 0,
+              color: 'var(--text-primary)',
+            }}
+          >
+            {applicants.length === 0 ? 'No applicants yet for this role' : 'No candidates match your filters'}
+          </h3>
+          <p
+            style={{
+              fontSize: '0.88rem',
+              color: 'var(--text-secondary)',
+              margin: 0,
+              maxWidth: '380px',
+              lineHeight: 1.5,
+            }}
+          >
+            {applicants.length === 0
+              ? 'New applications will appear here automatically with match scores and skill breakdowns.'
+              : 'Try adjusting your search query, lowering the match score filter, or clearing selected skill chips.'}
           </p>
+          {applicants.length === 0 ? (
+            <Link to="/dashboard" className="btn btn-primary" style={{ padding: '0.6rem 1.25rem', marginTop: '0.5rem' }}>
+              Back to My Postings
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setScoreFilter('all');
+                setSelectedSkillFilter(null);
+                setSearchQuery('');
+              }}
+              className="btn btn-secondary"
+              style={{ padding: '0.6rem 1.25rem', marginTop: '0.5rem' }}
+            >
+              Clear all filters
+            </button>
+          )}
         </div>
       ) : (
         <>
@@ -819,14 +1137,19 @@ const JobApplicants = () => {
         </>
       )}
 
-      {/* Candidate Scorecard Modal */}
+      {/* Candidate Scorecard Side Drawer */}
       {selectedCandidate && (
-        <ResumeDetailModal
-          candidateApp={selectedCandidate}
+        <ApplicantSideDrawer
+          application={selectedCandidate}
+          applicants={processedApplicants}
           onClose={() => setSelectedCandidate(null)}
-          onTransition={handleTransition}
-          onScheduleInterview={(appToSchedule) => setSchedulingApplicant(appToSchedule)}
-          onGenerateKit={(appToKit) => setSelectedKitCandidate(appToKit)}
+          onSelectCandidate={(cand) => setSelectedCandidate(cand)}
+          onTransition={(appId, newStatus, candidateName) => {
+            handleTransition(appId, newStatus, candidateName);
+            setSelectedCandidate((prev) => (prev ? { ...prev, status: newStatus } : null));
+          }}
+          onScheduleInterview={(cand) => setSchedulingApplicant(cand)}
+          onGenerateKit={(cand) => setSelectedKitCandidate(cand)}
         />
       )}
 
@@ -1205,358 +1528,6 @@ const CandidateCard = ({
               Restore
             </button>
           )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInterview, onGenerateKit }) => {
-  const candidate = candidateApp.candidate || {};
-  const score = candidateApp.aiMatchScore || 0;
-
-  const scoreColor =
-    score >= 75
-      ? 'var(--semantic-green)'
-      : score >= 45
-      ? 'var(--semantic-amber)'
-      : 'var(--semantic-red)';
-
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div
-        className="paper-card"
-        style={{
-          width: '100%',
-          maxWidth: '680px',
-          maxHeight: '90vh',
-          overflowY: 'auto',
-          padding: '2.5rem',
-          borderRadius: '8px',
-          border: '1px solid var(--border-default)',
-          backgroundColor: 'var(--bg-card)',
-          boxShadow: '0 16px 48px rgba(0, 0, 0, 0.12)',
-          animation: 'fadeIn 0.25s ease-out',
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            marginBottom: '1.5rem',
-            paddingBottom: '1.25rem',
-            borderBottom: '1px solid var(--border-default)',
-          }}
-        >
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
-                {candidate.name || 'Candidate Profile'}
-              </h2>
-              <span
-                style={{
-                  padding: '0.2rem 0.6rem',
-                  borderRadius: '4px',
-                  background: 'var(--accent-teal-light)',
-                  color: 'var(--accent-teal)',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.01em',
-                  textTransform: 'capitalize',
-                }}
-              >
-                {candidateApp.status}
-              </span>
-            </div>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', margin: 0 }}>
-              {candidate.email} {candidate.profile?.location ? `• ${candidate.profile.location}` : ''}
-            </p>
-          </div>
-
-          <button
-            onClick={onClose}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              borderRadius: '4px',
-              color: 'var(--text-muted)',
-              cursor: 'pointer',
-              padding: '0.4rem',
-              display: 'flex',
-            }}
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        {/* AI Match Overview Box */}
-        <div
-          style={{
-            padding: '1.5rem',
-            borderRadius: '6px',
-            background: 'var(--bg-primary)',
-            border: '1px solid var(--border-default)',
-            marginBottom: '1.75rem',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '1rem',
-          }}
-        >
-          <div>
-            <div style={{ marginBottom: '0.3rem' }}>
-              <span style={{ fontSize: '0.82rem', fontWeight: 700, letterSpacing: '0.01em', color: 'var(--accent-teal)' }}>
-                Candidate Evaluation
-              </span>
-            </div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-              {score}% Match Score
-            </div>
-            <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-              Recommendation Tier: <strong style={{ color: scoreColor }}>{candidateApp.recommendation || 'Strong Match'}</strong>
-            </span>
-          </div>
-
-          <div
-            style={{
-              width: '70px',
-              height: '70px',
-              borderRadius: '50%',
-              border: `4px solid ${scoreColor}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 800,
-              fontSize: '1.25rem',
-              color: scoreColor,
-              background: 'var(--bg-card)',
-            }}
-          >
-            {score}%
-          </div>
-        </div>
-
-        {/* Matched Skills */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.6rem', color: 'var(--semantic-green)' }}>
-            Matched Skills ({candidateApp.matchedSkills?.length || 0})
-          </h4>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
-            {candidateApp.matchedSkills && candidateApp.matchedSkills.length > 0 ? (
-              candidateApp.matchedSkills.map((s, idx) => (
-                <span
-                  key={idx}
-                  style={{
-                    padding: '0.3rem 0.75rem',
-                    borderRadius: '4px',
-                    background: 'var(--accent-teal-light)',
-                    border: '1px solid rgba(15, 107, 92, 0.25)',
-                    color: 'var(--accent-teal)',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                  }}
-                >
-                  {s}
-                </span>
-              ))
-            ) : (
-              <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>None identified</span>
-            )}
-          </div>
-        </div>
-
-        {/* Missing / Gap Skills */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.6rem', color: 'var(--semantic-red)' }}>
-            Missing Skills ({candidateApp.missingSkills?.length || 0})
-          </h4>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
-            {candidateApp.missingSkills && candidateApp.missingSkills.length > 0 ? (
-              candidateApp.missingSkills.map((s, idx) => (
-                <span
-                  key={idx}
-                  style={{
-                    padding: '0.3rem 0.75rem',
-                    borderRadius: '4px',
-                    background: 'rgba(185, 28, 28, 0.08)',
-                    border: '1px solid rgba(185, 28, 28, 0.22)',
-                    color: 'var(--semantic-red)',
-                    fontSize: '0.8rem',
-                  }}
-                >
-                  {s}
-                </span>
-              ))
-            ) : (
-              <span style={{ fontSize: '0.82rem', color: 'var(--semantic-green)' }}>
-                Zero skill gaps detected! Complete technical coverage.
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Experience Fit Evaluation */}
-        {candidateApp.experienceFit && (
-          <div style={{ marginBottom: '1.5rem' }}>
-            <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.45rem', color: 'var(--accent-teal)' }}>
-              Seniority & Experience Alignment
-            </h4>
-            <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', lineHeight: 1.55, margin: 0 }}>
-              {candidateApp.experienceFit}
-            </p>
-          </div>
-        )}
-
-        {/* Recruiter Fit Summary */}
-        {candidateApp.fitSummary && (
-          <div style={{ marginBottom: '2rem' }}>
-            <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.45rem', color: 'var(--accent-teal)' }}>
-              ATS Recruiter Executive Synthesis
-            </h4>
-            <div
-              style={{
-                padding: '1rem 1.25rem',
-                borderRadius: '6px',
-                background: 'var(--bg-primary)',
-                border: '1px solid var(--border-default)',
-                borderLeft: '3px solid var(--accent-teal)',
-                fontSize: '0.88rem',
-                color: 'var(--text-primary)',
-                lineHeight: 1.6,
-              }}
-            >
-              {candidateApp.fitSummary}
-            </div>
-          </div>
-        )}
-
-        {/* Modal Actions */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '1rem',
-            paddingTop: '1.25rem',
-            borderTop: '1px solid var(--border-default)',
-          }}
-        >
-          {candidateApp.resumeUrl ? (
-            <a
-              href={candidateApp.resumeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-secondary"
-              style={{
-                padding: '0.65rem 1.2rem',
-                fontSize: '0.85rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-              }}
-            >
-              <ExternalLink size={15} />
-              Open Original PDF Resume
-            </a>
-          ) : (
-            <div />
-          )}
-
-          <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
-            <button
-              type="button"
-              onClick={() => {
-                if (onGenerateKit) onGenerateKit(candidateApp);
-              }}
-              className="btn btn-secondary"
-              style={{
-                padding: '0.65rem 1.15rem',
-                fontSize: '0.85rem',
-                borderColor: 'var(--accent-teal)',
-                color: 'var(--accent-teal)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                fontWeight: 600,
-              }}
-              title="Generate personalized interview kit based on skills & gaps"
-            >
-              <FileText size={14} />
-              Generate Interview Kit
-            </button>
-
-            <button
-              onClick={() => {
-                onTransition(candidateApp._id, 'shortlisted', candidate.name);
-                onClose();
-              }}
-              className="btn btn-secondary"
-              style={{
-                padding: '0.65rem 1.15rem',
-                fontSize: '0.85rem',
-                borderColor: 'rgba(15, 107, 92, 0.3)',
-                color: 'var(--accent-teal)',
-              }}
-            >
-              Shortlist
-            </button>
-
-            {candidateApp.status === 'shortlisted' ? (
-              <button
-                onClick={() => {
-                  onClose();
-                  if (onScheduleInterview) onScheduleInterview(candidateApp);
-                }}
-                className="btn btn-primary"
-                style={{
-                  padding: '0.65rem 1.25rem',
-                  fontSize: '0.85rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  background: 'var(--accent-teal)',
-                }}
-              >
-                <Calendar size={15} />
-                Schedule Interview
-              </button>
-            ) : (
-              <button
-                onClick={() => {
-                  onClose();
-                  if (onScheduleInterview) {
-                    onScheduleInterview(candidateApp);
-                  } else {
-                    onTransition(candidateApp._id, 'interview', candidate.name);
-                  }
-                }}
-                className="btn btn-secondary"
-                style={{
-                  padding: '0.65rem 1.15rem',
-                  fontSize: '0.85rem',
-                  borderColor: 'rgba(180, 83, 9, 0.3)',
-                  color: 'var(--semantic-amber)',
-                }}
-              >
-                Schedule Interview
-              </button>
-            )}
-            <button
-              onClick={() => {
-                onTransition(candidateApp._id, 'hired', candidate.name);
-                onClose();
-              }}
-              className="btn btn-primary"
-              style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}
-            >
-              Hire Candidate
-            </button>
-          </div>
         </div>
       </div>
     </div>

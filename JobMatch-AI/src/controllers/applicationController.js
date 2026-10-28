@@ -144,7 +144,8 @@ Bachelor of Technology in Computer Science & Engineering | 2016 - 2020`;
       existingApplication.fitSummary = evaluation.fitSummary;
       existingApplication.experienceFit = evaluation.experienceFit;
       existingApplication.recommendation = evaluation.recommendation;
-      existingApplication.scoreBreakdown = evaluation.scoreBreakdown || { skillsScore: 0, experienceScore: 0, relevanceScore: 0 };
+      existingApplication.evaluationSource = evaluation.evaluationSource || 'fallback';
+      existingApplication.scoreBreakdown = evaluation.scoreBreakdown || { skillsScore: evaluation.matchScore };
       existingApplication.skillGapRoadmap = evaluation.skillGapRoadmap || [];
       existingApplication.resumeImprovements = evaluation.resumeImprovements || [];
       await existingApplication.save();
@@ -154,13 +155,14 @@ Bachelor of Technology in Computer Science & Engineering | 2016 - 2020`;
         job: jobId,
         candidate: req.user._id,
         resumeUrl,
+        evaluationSource: evaluation.evaluationSource || 'fallback',
         aiMatchScore: evaluation.matchScore,
         matchedSkills: evaluation.matchedSkills,
         missingSkills: evaluation.missingSkills,
         fitSummary: evaluation.fitSummary,
         experienceFit: evaluation.experienceFit,
         recommendation: evaluation.recommendation,
-        scoreBreakdown: evaluation.scoreBreakdown || { skillsScore: 0, experienceScore: 0, relevanceScore: 0 },
+        scoreBreakdown: evaluation.scoreBreakdown || { skillsScore: evaluation.matchScore },
         skillGapRoadmap: evaluation.skillGapRoadmap || [],
         resumeImprovements: evaluation.resumeImprovements || [],
       });

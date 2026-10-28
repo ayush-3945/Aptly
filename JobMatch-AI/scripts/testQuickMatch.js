@@ -76,19 +76,16 @@ async function runQuickMatchTests() {
 
     if (res3.status === 200 && res3.body.matchScore !== undefined) {
       const b = res3.body;
-      const expectedWeighted = Math.round(
-        b.scoreBreakdown.skills * 0.4 +
-        b.scoreBreakdown.experience * 0.3 +
-        b.scoreBreakdown.domain * 0.2 +
-        b.scoreBreakdown.education * 0.1
-      );
-      if (b.matchScore !== expectedWeighted) {
-        throw new Error(`Formula mismatch: expected ${expectedWeighted}, got ${b.matchScore}`);
+      if (b.evaluationSource !== 'fallback') {
+        throw new Error(`Expected evaluationSource: fallback, got ${b.evaluationSource}`);
+      }
+      if (b.matchScore !== b.scoreBreakdown.skillsScore) {
+        throw new Error(`Skills score mismatch: expected matchScore === skillsScore, got ${b.matchScore} vs ${b.scoreBreakdown.skillsScore}`);
       }
       if (!b.matchedSkills.includes('React') || !b.missingSkills.includes('Docker')) {
         throw new Error('Skills classification mismatch');
       }
-      console.log(`✔ Test 3 Passed: Computed match score (${b.matchScore}%) matches 40/30/20/10 formula exactly`);
+      console.log(`✔ Test 3 Passed: Rule-based fallback matchScore (${b.matchScore}%) accurately driven by skillsScore (evaluationSource: fallback)`);
     } else {
       throw new Error(`Test 3 Failed: ${JSON.stringify(res3)}`);
     }

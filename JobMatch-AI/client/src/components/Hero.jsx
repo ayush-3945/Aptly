@@ -460,8 +460,19 @@ const Hero = () => {
         body: JSON.stringify({ jobDescription, resumeText }),
       });
 
-      const data = await response.json();
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (_jsonErr) {
+        // Fallback if response is not JSON
+      }
+
       if (!response.ok) {
+        if (response.status === 413) {
+          throw new Error(
+            data.message || data.error || 'Input text is too large. Please shorten your job description or resume (limit ~20KB).'
+          );
+        }
         if (response.status === 429) {
           const retryAfter = response.headers.get('Retry-After') || data.retryAfterSeconds;
           const mins = retryAfter ? Math.max(1, Math.ceil(Number(retryAfter) / 60)) : data.minutesRemaining || 15;
@@ -470,12 +481,7 @@ const Hero = () => {
               `Quick-check limit reached (10 requests per 15 minutes). Please wait ~${mins} minute${mins > 1 ? 's' : ''} before trying again, or sign in for full AI evaluation.`
           );
         }
-        if (response.status === 413) {
-          throw new Error(
-            data.error || 'Text size exceeds the 20KB limit for public quick-match. Please reduce the length.'
-          );
-        }
-        throw new Error(data.error || 'Failed to compute match score.');
+        throw new Error(data.message || data.error || 'Failed to compute match score.');
       }
 
       setPlaygroundResult(data);

@@ -35,6 +35,13 @@ const SAMPLE_APPLICATIONS = [
     status: 'shortlisted',
     appliedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     aiMatchScore: 88,
+    evaluationSource: 'ai',
+    scoreBreakdown: {
+      skillsScore: 90,
+      experienceScore: 85,
+      domainScore: 90,
+      educationScore: 80,
+    },
     recommendation: 'Strong Match',
     matchedSkills: ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL'],
     missingSkills: ['Docker'],
@@ -51,12 +58,19 @@ const SAMPLE_APPLICATIONS = [
     _id: 'app_sample_2',
     status: 'applied',
     appliedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    aiMatchScore: 72,
+    aiMatchScore: 60,
+    evaluationSource: 'fallback',
+    scoreBreakdown: {
+      skillsScore: 60,
+      experienceScore: null,
+      domainScore: null,
+      educationScore: null,
+    },
     recommendation: 'Moderate Match',
     matchedSkills: ['React', 'TypeScript', 'TailwindCSS'],
     missingSkills: ['PostgreSQL', 'Next.js'],
-    experienceFit: 'Solid frontend capabilities with minor gap in relational database architectures.',
-    fitSummary: 'Moderate candidate alignment. Capable frontend specialist who could quickly ramp up on full-stack technologies.',
+    experienceFit: 'Keyword match analysis based on candidate skills profile.',
+    fitSummary: 'Keyword-based match indicates 3 matching core skills.',
     job: {
       _id: 'job_fallback_2',
       title: 'Frontend Interface Architect',
@@ -500,9 +514,39 @@ const CandidateDashboard = () => {
           </h2>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '4rem 1.5rem', color: 'var(--text-secondary)' }}>
-              <Loader2 size={36} className="spin" style={{ margin: '0 auto 1rem', color: 'var(--accent-teal)' }} />
-              <p>Loading your application pipeline...</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="paper-card"
+                  style={{
+                    padding: '1.75rem',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-default)',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1rem',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <div className="skeleton-shimmer" style={{ width: '140px', height: '14px', borderRadius: '4px' }} />
+                      <div className="skeleton-shimmer" style={{ width: '240px', height: '22px', borderRadius: '4px' }} />
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.6rem' }}>
+                      <div className="skeleton-shimmer" style={{ width: '85px', height: '30px', borderRadius: '4px' }} />
+                      <div className="skeleton-shimmer" style={{ width: '80px', height: '30px', borderRadius: '4px' }} />
+                    </div>
+                  </div>
+                  <div className="skeleton-shimmer" style={{ width: '70%', height: '14px', borderRadius: '4px' }} />
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                    <div className="skeleton-shimmer" style={{ width: '65px', height: '24px', borderRadius: '12px' }} />
+                    <div className="skeleton-shimmer" style={{ width: '80px', height: '24px', borderRadius: '12px' }} />
+                    <div className="skeleton-shimmer" style={{ width: '60px', height: '24px', borderRadius: '12px' }} />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : applications.length === 0 ? (
             <div className="paper-card" style={{ textAlign: 'center', padding: '4rem 2rem', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px' }}>
@@ -576,7 +620,7 @@ const CandidateDashboard = () => {
                       </div>
 
                       {/* Status Pill & AI Score Badge */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
                         {/* Application Status */}
                         <span
                           style={{
@@ -613,6 +657,23 @@ const CandidateDashboard = () => {
                             {matchScore}% Fit
                           </span>
                         </div>
+
+                        {app.evaluationSource === 'fallback' && (
+                          <span
+                            style={{
+                              fontSize: '0.72rem',
+                              color: 'var(--text-muted)',
+                              background: 'rgba(0,0,0,0.03)',
+                              border: '1px solid var(--border-default)',
+                              padding: '0.22rem 0.55rem',
+                              borderRadius: '4px',
+                              fontWeight: 600,
+                            }}
+                            title="Keyword-based result (AI was unavailable)"
+                          >
+                            Keyword-based result (AI was unavailable)
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -758,6 +819,7 @@ const CandidateDashboard = () => {
                         {/* Interactive Skill Gap Roadmap, Score Factors & ATS Roast */}
                         <SkillGapRoadmapCard
                           scoreBreakdown={app.scoreBreakdown}
+                          evaluationSource={app.evaluationSource || 'ai'}
                           skillGapRoadmap={
                             app.skillGapRoadmap && app.skillGapRoadmap.length > 0
                               ? app.skillGapRoadmap

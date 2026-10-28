@@ -6,6 +6,7 @@ import {
   useSensor,
   useSensors,
   closestCorners,
+  useDroppable,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -166,6 +167,7 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, onGener
       ref={setNodeRef}
       style={style}
       className="kanban-card"
+      onClick={() => onViewResume && onViewResume(application)}
     >
       {/* Drag handle + candidate name */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
@@ -218,22 +220,40 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, onGener
           </span>
         </div>
 
-        {/* AI Score badge */}
-        <span
-          style={{
-            padding: '0.2rem 0.5rem',
-            borderRadius: '4px',
-            background: scoreBg,
-            border: `1px solid ${scoreBorder}`,
-            color: scoreColor,
-            fontSize: '0.72rem',
-            fontWeight: 800,
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
-          }}
-        >
-          {score}%
-        </span>
+        {/* AI Score badge + Fallback indicator */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.2rem', flexShrink: 0 }}>
+          <span
+            style={{
+              padding: '0.2rem 0.5rem',
+              borderRadius: '4px',
+              background: scoreBg,
+              border: `1px solid ${scoreBorder}`,
+              color: scoreColor,
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {score}%
+          </span>
+          {application.evaluationSource === 'fallback' && (
+            <span
+              style={{
+                fontSize: '0.62rem',
+                color: 'var(--text-muted)',
+                background: 'rgba(0,0,0,0.04)',
+                border: '1px solid var(--border-default)',
+                padding: '0.08rem 0.3rem',
+                borderRadius: '3px',
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+              }}
+              title="Keyword-based result (AI was unavailable)"
+            >
+              Keyword result
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Bottom row: date + action buttons */}
@@ -372,9 +392,16 @@ const CardOverlay = ({ application }) => {
         >
           {firstName}
         </h4>
-        <span style={{ fontSize: '0.72rem', fontWeight: 800, color: scoreColor }}>
-          {score}%
-        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.15rem' }}>
+          <span style={{ fontSize: '0.72rem', fontWeight: 800, color: scoreColor }}>
+            {score}%
+          </span>
+          {application.evaluationSource === 'fallback' && (
+            <span style={{ fontSize: '0.58rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+              Keyword result
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -384,18 +411,24 @@ const CardOverlay = ({ application }) => {
 const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview, onGenerateKit, job }) => {
   const IconComponent = stage.icon;
   const isRejected = stage.id === 'rejected';
+  const { setNodeRef, isOver } = useDroppable({
+    id: stage.id,
+  });
 
   return (
     <div
+      ref={setNodeRef}
       style={{
         borderRadius: '8px',
-        background: 'var(--bg-secondary)',
-        border: '1px solid var(--border-default)',
+        background: isOver ? 'rgba(15, 107, 92, 0.08)' : 'var(--bg-secondary)',
+        border: isOver ? '2px dashed var(--accent-teal)' : '1px solid var(--border-default)',
+        boxShadow: isOver ? '0 0 0 3px rgba(15, 107, 92, 0.15)' : 'none',
         display: 'flex',
         flexDirection: 'column',
         flex: 1,
         minWidth: '160px',
         maxWidth: '220px',
+        transition: 'background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease',
       }}
     >
       {/* Column header */}
@@ -476,14 +509,15 @@ const KanbanColumn = ({ stage, applications, onViewResume, onScheduleInterview, 
                 padding: '2.25rem 0.75rem',
                 textAlign: 'center',
                 borderRadius: '6px',
-                border: '1.5px dashed var(--border-default, #D1D5DB)',
-                color: 'var(--text-muted, #9CA3AF)',
+                border: isOver ? '1.5px dashed var(--accent-teal)' : '1.5px dashed var(--border-default, #D1D5DB)',
+                color: isOver ? 'var(--accent-teal)' : 'var(--text-muted, #9CA3AF)',
                 fontSize: '0.8rem',
                 fontWeight: 500,
-                backgroundColor: 'rgba(0,0,0,0.01)',
+                backgroundColor: isOver ? 'rgba(15, 107, 92, 0.05)' : 'rgba(0,0,0,0.01)',
+                transition: 'all 0.15s ease',
               }}
             >
-              Drop candidates here
+              {isOver ? 'Release to drop candidate' : 'Drop candidates here'}
             </div>
           ) : (
             applications.map((app) => (

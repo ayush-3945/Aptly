@@ -18,6 +18,7 @@ import {
  */
 export default function SkillGapRoadmapCard({
   scoreBreakdown,
+  evaluationSource = 'ai',
   skillGapRoadmap = [],
   resumeImprovements = [],
   matchScore = 0,
@@ -26,11 +27,11 @@ export default function SkillGapRoadmapCard({
   const [activeTab, setActiveTab] = useState('roadmap'); // 'roadmap' | 'breakdown' | 'resume'
   const [expandedIndex, setExpandedIndex] = useState(0);
 
-  const breakdown = scoreBreakdown || {
-    skillsScore: matchScore || 70,
-    experienceScore: Math.min(95, Math.max(50, Math.round((matchScore || 70) * 0.9 + 10))),
-    relevanceScore: matchScore || 70,
-  };
+  const isFallback = evaluationSource === 'fallback' || (!scoreBreakdown?.experienceScore && !scoreBreakdown?.domainScore && !scoreBreakdown?.educationScore);
+  const skillsScore = scoreBreakdown?.skillsScore ?? scoreBreakdown?.skills ?? matchScore ?? 0;
+  const experienceScore = scoreBreakdown?.experienceScore ?? 0;
+  const domainScore = scoreBreakdown?.domainScore ?? scoreBreakdown?.relevanceScore ?? 0;
+  const educationScore = scoreBreakdown?.educationScore ?? 0;
 
   const roadmapItems = Array.isArray(skillGapRoadmap) && skillGapRoadmap.length > 0
     ? skillGapRoadmap
@@ -346,59 +347,133 @@ export default function SkillGapRoadmapCard({
       {/* Tab 2: Score Factors Breakdown */}
       {activeTab === 'breakdown' && (
         <div style={{ marginTop: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.25rem' }}>
-              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Technical Skills Coverage</span>
-              <span style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>{breakdown.skillsScore}%</span>
-            </div>
-            <div style={{ width: '100%', height: '6px', background: 'var(--bg-secondary)', borderRadius: '3px', overflow: 'hidden' }}>
+          {isFallback ? (
+            <>
               <div
                 style={{
-                  width: `${breakdown.skillsScore}%`,
-                  height: '100%',
-                  background: 'var(--accent-teal)',
-                  borderRadius: '3px',
-                  transition: 'width 0.4s ease',
+                  padding: '0.55rem 0.75rem',
+                  borderRadius: '6px',
+                  background: 'rgba(0,0,0,0.03)',
+                  border: '1px solid var(--border-default)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontSize: '0.76rem',
+                  color: 'var(--text-secondary)',
                 }}
-              />
-            </div>
-          </div>
+              >
+                <span
+                  style={{
+                    padding: '0.12rem 0.45rem',
+                    borderRadius: '3px',
+                    background: 'var(--accent-teal-light)',
+                    color: 'var(--accent-teal)',
+                    fontWeight: 700,
+                    fontSize: '0.7rem',
+                  }}
+                >
+                  Keyword result
+                </span>
+                <span>Keyword-based result (AI was unavailable)</span>
+              </div>
 
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.25rem' }}>
-              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Seniority & Experience Match</span>
-              <span style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>{breakdown.experienceScore}%</span>
-            </div>
-            <div style={{ width: '100%', height: '6px', background: 'var(--bg-secondary)', borderRadius: '3px', overflow: 'hidden' }}>
-              <div
-                style={{
-                  width: `${breakdown.experienceScore}%`,
-                  height: '100%',
-                  background: 'var(--accent-teal-mid)',
-                  borderRadius: '3px',
-                  transition: 'width 0.4s ease',
-                }}
-              />
-            </div>
-          </div>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.25rem' }}>
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Technical Skills Coverage (100% of Match)</span>
+                  <span style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>{skillsScore}%</span>
+                </div>
+                <div style={{ width: '100%', height: '6px', background: 'var(--bg-secondary)', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div
+                    style={{
+                      width: `${skillsScore}%`,
+                      height: '100%',
+                      background: 'var(--accent-teal)',
+                      borderRadius: '3px',
+                      transition: 'width 0.4s ease',
+                    }}
+                  />
+                </div>
+              </div>
 
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.25rem' }}>
-              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Domain & Tech Stack Relevance</span>
-              <span style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>{breakdown.relevanceScore}%</span>
-            </div>
-            <div style={{ width: '100%', height: '6px', background: 'var(--bg-secondary)', borderRadius: '3px', overflow: 'hidden' }}>
-              <div
-                style={{
-                  width: `${breakdown.relevanceScore}%`,
-                  height: '100%',
-                  background: 'var(--semantic-green)',
-                  borderRadius: '3px',
-                  transition: 'width 0.4s ease',
-                }}
-              />
-            </div>
-          </div>
+              <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: 0, fontStyle: 'italic' }}>
+                Experience, domain relevance, and education sub-scores require full AI analysis and are not estimated when the fallback matcher is active.
+              </p>
+            </>
+          ) : (
+            <>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.25rem' }}>
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Technical Skills Coverage (40%)</span>
+                  <span style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>{skillsScore}%</span>
+                </div>
+                <div style={{ width: '100%', height: '6px', background: 'var(--bg-secondary)', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div
+                    style={{
+                      width: `${skillsScore}%`,
+                      height: '100%',
+                      background: 'var(--accent-teal)',
+                      borderRadius: '3px',
+                      transition: 'width 0.4s ease',
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.25rem' }}>
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Seniority & Experience Match (30%)</span>
+                  <span style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>{experienceScore}%</span>
+                </div>
+                <div style={{ width: '100%', height: '6px', background: 'var(--bg-secondary)', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div
+                    style={{
+                      width: `${experienceScore}%`,
+                      height: '100%',
+                      background: 'var(--accent-teal-mid)',
+                      borderRadius: '3px',
+                      transition: 'width 0.4s ease',
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.25rem' }}>
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Domain & Tech Stack Relevance (20%)</span>
+                  <span style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>{domainScore}%</span>
+                </div>
+                <div style={{ width: '100%', height: '6px', background: 'var(--bg-secondary)', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div
+                    style={{
+                      width: `${domainScore}%`,
+                      height: '100%',
+                      background: 'var(--semantic-green)',
+                      borderRadius: '3px',
+                      transition: 'width 0.4s ease',
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.25rem' }}>
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Education & Credentials (10%)</span>
+                  <span style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>{educationScore}%</span>
+                </div>
+                <div style={{ width: '100%', height: '6px', background: 'var(--bg-secondary)', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div
+                    style={{
+                      width: `${educationScore}%`,
+                      height: '100%',
+                      background: 'var(--accent-teal)',
+                      borderRadius: '3px',
+                      transition: 'width 0.4s ease',
+                    }}
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
 

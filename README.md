@@ -329,9 +329,9 @@ Open your browser at **`http://localhost:5173`** and sign in using the Quick Dem
 
 ## 🛡️ Resilience & Circuit Breakers
 
-Aptly is engineered for bulletproof production reliability:
-1. **Deterministic Heuristic Fallbacks**: Every AI integration (`matchScoreService`, `jdScorerService`, `interviewQuestionService`, and `analyticsService`) includes a local heuristic fallback engine. If the Gemini API experiences network timeouts, quota exhaustion, or temporary outages, the system seamlessly fulfills the request without user-facing crashes.
-2. **Strict JSON Schema Enforcement**: LLM queries leverage `responseMimeType: 'application/json'` and programmatic JSON sanitizers to eliminate markdown fences (` ```json `), preventing JSON parse syntax errors.
+Aptly is engineered for dependable, transparent production behavior:
+1. **Graceful Fallback When AI Is Unavailable (With Strict Honesty)**: Every AI integration includes a local heuristic engine. When Google Gemini experiences network timeouts, quota limits, or temporary outages, the system seamlessly fulfills evaluations using our shared deterministic rule-based matcher (`ruleBasedMatcher.js`). Evaluated records are tagged with `evaluationSource: 'fallback'`. Rather than fabricating arbitrary experience or education numbers, the fallback score is driven purely by verified skill matches (`matchScore = skillsScore`), and the UI marks the result with *"Keyword-based result (AI was unavailable)"* while hiding the non-derived sub-score bars.
+2. **Strict JSON Schema Enforcement & Code-Side Weighting**: LLM queries leverage `responseMimeType: 'application/json'` and explicit schemas. For AI evaluations (`evaluationSource: 'ai'`), Gemini provides 4 sub-scores (skills, experience, domain, education), and the final match score is calculated deterministically in Node.js (`skills * 0.4 + experience * 0.3 + domain * 0.2 + education * 0.1`).
 3. **Graceful Database Offline Handling**: If MongoDB is slow to respond or offline, the client seamlessly renders pre-calculated demo applications, ensuring offline demos, campus presentations, and recruitment showcases remain fully functional.
 
 ---
@@ -339,13 +339,13 @@ Aptly is engineered for bulletproof production reliability:
 ## 🧠 Architectural Q&A — Technical Defense Guide
 
 #### Q1: Why did you choose Google Gemini 2.5 Flash over OpenAI GPT-4o?
-> **Answer**: Gemini 2.5 Flash offers the ideal balance of sub-second inference latency, high token throughput, and native JSON mode enforcement (`responseMimeType: 'application/json'`). For real-time applications like our **1.5s debounced JD Scorer** and rapid PDF resume evaluation, Gemini Flash provides near-instant response times at significantly lower compute costs while maintaining deep semantic comprehension of technical developer stacks.
+> **Answer**: Gemini 2.5 Flash offers low inference latency, high token throughput, and native JSON mode enforcement (`responseMimeType: 'application/json'`). For real-time applications like our **1.5s debounced JD Scorer** and rapid PDF resume evaluation, Gemini Flash provides near-instant response times at significantly lower compute costs while maintaining deep semantic comprehension of technical developer stacks.
 
 #### Q2: How does Aptly prevent AI hallucinations in ATS scoring?
 > **Answer**: We employ three layers of defense:
-> 1. **Structured Rubric Prompting**: The LLM is constrained to evaluate solely against explicit skills extracted from the candidate's actual text and the job requisition.
-> 2. **Boundary Normalization**: All scores are clamped between 0 and 100, and recommendations are constrained to a fixed enum (`Strong Match`, `Moderate Match`, `Low Match`).
-> 3. **Validation & Fallback**: If the returned payload lacks required keys, a deterministic heuristic analyzer recalculates the score using exact and synonym token matching.
+> 1. **Structured Rubric Prompting**: The LLM is constrained to evaluate 4 explicit dimensions (skills, experience, domain, education) extracted from candidate text.
+> 2. **Boundary Normalization & Code-Side Weighting**: Sub-scores are validated in code and combined deterministically (`skills * 0.4 + experience * 0.3 + domain * 0.2 + education * 0.1`). Recommendation tiers (`Strong Match`, `Moderate Match`, `Low Match`) are calculated in code from score brackets.
+> 3. **Graceful Heuristic Fallback with Scoring Transparency**: If the API call times out or returns unexpected keys, our shared rule-based matcher (`ruleBasedMatcher.js`) calculates the score purely from verified skills (`matchScore = skillsScore`). The evaluation is tagged `evaluationSource: 'fallback'`, non-derived sub-scores are set to null, and the UI marks the result as keyword-based, guaranteeing complete transparency without fabricated metrics.
 
 #### Q3: How do optimistic updates work in the Kanban Board?
 > **Answer**: When a recruiter drags a card from `Applied` to `Shortlisted`, `@dnd-kit` immediately updates the client-side state. Simultaneously, an asynchronous `PATCH /api/applications/:id/status` request is dispatched to MongoDB. If the network request fails, the card automatically rolls back to its original column and triggers a red toast alert, ensuring data integrity without UI lag.
