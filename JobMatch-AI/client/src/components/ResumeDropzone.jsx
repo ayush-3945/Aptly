@@ -166,7 +166,7 @@ const ResumeDropzone = ({
                   marginTop: '0.25rem',
                 }}
               >
-                {parseProgressText || 'Extracting profile, experience, and competencies...'}
+                {parseProgressText || 'Extracting profile, experience, and skills...'}
               </div>
             </div>
           </div>

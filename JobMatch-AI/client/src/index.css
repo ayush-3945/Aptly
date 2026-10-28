@@ -220,12 +220,6 @@ a {
   border-radius: var(--radius-xs);
 }
 
-.badge-moderate, .badge-warning {
-  background: var(--warning-bg);
-  color: var(--warning-text);
-  border: 1px solid var(--warning-border);
-}
-
 .badge-teal, .badge-clinical {
   background: var(--accent-teal-light);
   color: var(--accent-teal);
@@ -238,7 +232,7 @@ a {
   border: 1px solid var(--success-border);
 }
 
-.badge-moderate {
+.badge-moderate, .badge-warning {
   background: var(--warning-bg);
   color: var(--semantic-amber);
   border: 1px solid var(--warning-border);
@@ -451,16 +445,6 @@ a {
 .kanban-scroll-container::-webkit-scrollbar-thumb {
   background: var(--border-medium);
   border-radius: var(--radius-xs);
-}
-
-/* Spin Animation */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .animate-spin {

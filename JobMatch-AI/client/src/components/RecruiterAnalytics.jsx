@@ -134,7 +134,7 @@ const RecruiterAnalytics = () => {
             {
               type: 'risk',
               title: 'Declining Legacy Stack Alignment',
-              description: 'Fewer candidates possess legacy Python and standalone REST competencies without TypeScript.',
+              description: 'Fewer candidates possess legacy Python and standalone REST skills without TypeScript.',
               metric: '18% Lower Volume',
               action: 'Offer onboarding micro-trainings or adjust senior criteria to evaluate polyglot fundamentals.',
             },
@@ -993,7 +993,7 @@ const RecruiterAnalytics = () => {
               </h3>
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: '0 0 1.25rem 0' }}>
-              Top demanded technical competencies & market trend trajectory.
+              Most requested skills across open roles.
             </p>
 
             {/* Horizontal Bar Chart for Skills */}

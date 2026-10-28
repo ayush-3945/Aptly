@@ -360,7 +360,7 @@ const CandidateDashboard = () => {
             {metrics.avgScore}%
           </div>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
-            ATS semantic compatibility
+            Match score
           </div>
         </div>
       </div>

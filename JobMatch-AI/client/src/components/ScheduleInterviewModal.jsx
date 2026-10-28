@@ -217,7 +217,7 @@ const ScheduleInterviewModal = ({
                 Schedule Interview
               </h2>
               <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                Direct native booking with automated Clinical Teal email dispatch
+                Automatic calendar invite and email notification
               </p>
             </div>
           </div>

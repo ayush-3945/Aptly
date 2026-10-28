@@ -37,7 +37,7 @@ const Footer = () => {
               </span>
             </div>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem', maxWidth: '420px', lineHeight: 1.55 }}>
-              Clinical talent intelligence and evaluation ATS, replacing blind keyword filters with structured semantic competency evaluations.
+              AI-powered hiring platform that matches candidates to jobs by skills, not keywords.
             </p>
           </div>
 

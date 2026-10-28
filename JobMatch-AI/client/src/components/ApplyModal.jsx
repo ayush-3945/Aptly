@@ -158,11 +158,11 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
         strengthSummary:
           matched.length > 0
             ? `Strong technical alignment demonstrated in ${matched.slice(0, 3).join(', ')}.`
-            : 'Candidate brings versatile software foundations ready to develop role-specific competencies.',
+            : 'Candidate brings versatile software foundations ready to develop role-specific skills.',
         gapSummary:
           missing.length > 0
-            ? `Potential competencies to review: ${missing.slice(0, 3).join(', ')}.`
-            : 'No critical competency gaps identified against the posted requirements.',
+            ? `Skills to review: ${missing.slice(0, 3).join(', ')}.`
+            : 'No critical skill gaps identified against the posted requirements.',
       });
     } finally {
       setPreviewLoading(false);
@@ -196,7 +196,7 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
       recommendation,
       matchedSkills: matched,
       missingSkills: missing,
-      experienceFit: `Candidate profile matches ${matched.length} of ${required.length} required competencies with strong foundational engineering skills.`,
+      experienceFit: `Candidate profile matches ${matched.length} of ${required.length} required skills with strong foundational engineering skills.`,
       fitSummary: `Strong semantic alignment observed for ${jobData.title}. Recommended for technical recruiter screening.`,
     };
   };
@@ -749,7 +749,7 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
                           ))
                         ) : (
                           <span style={{ fontSize: '0.78rem', color: 'var(--semantic-green)' }}>
-                            All required competencies satisfied!
+                            All required skills satisfied!
                           </span>
                         )}
                       </div>

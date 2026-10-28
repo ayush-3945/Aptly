@@ -241,7 +241,7 @@ const JobsList = () => {
                 letterSpacing: '0.01em',
               }}
             >
-              Clinical competence registry
+              Job Directory
             </span>
           </div>
 
@@ -270,7 +270,7 @@ const JobsList = () => {
                   lineHeight: 1.55,
                 }}
               >
-                Browse open positions and compare your competencies against role requirements with transparent match evaluations.
+                Browse open positions and see how your skills match each role.
               </p>
             </div>
           </div>
@@ -425,7 +425,7 @@ const JobsList = () => {
                 marginRight: '0.35rem',
               }}
             >
-              Filter by competency:
+              Filter by skill:
             </span>
             {POPULAR_SKILLS.map((skill) => {
               const isSelected = selectedSkill.toLowerCase() === skill.toLowerCase();
@@ -544,7 +544,7 @@ const JobsList = () => {
               style={{ margin: '0 auto 0.75rem', color: '#0d9488' }}
             />
             <p style={{ color: '#475569', fontSize: '0.94rem', margin: 0 }}>
-              Analyzing clinical competence registry and compiling matching roles...
+              Loading available jobs...
             </p>
           </div>
         ) : jobs.length === 0 ? (
@@ -928,7 +928,7 @@ const JobsList = () => {
                           gap: '0.35rem',
                         }}
                       >
-                        <span>Competencies & fit analysis:</span>
+                        <span>Skills & fit:</span>
                       </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
                         {job.requiredSkills?.map((skill, idx) => {
@@ -940,8 +940,8 @@ const JobsList = () => {
                               onClick={() => handleSkillClick(skill)}
                               title={
                                 isMatched
-                                  ? `You match ${skill} (Click to filter by this competency)`
-                                  : `Competency gap: ${skill} (Click to filter by this competency)`
+                                  ? `You match ${skill} (Click to filter)`
+                                  : `Missing skill: ${skill} (Click to filter)`
                               }
                               style={{
                                 display: 'inline-flex',
@@ -1064,7 +1064,7 @@ const JobsList = () => {
                             transition: 'all 0.15s ease',
                             whiteSpace: 'nowrap',
                           }}
-                          title="Review personalized competence match and interview talking points"
+                          title="Review skill match and interview tips"
                           onMouseEnter={(e) => {
                             e.currentTarget.style.backgroundColor = '#CCFBF1';
                             e.currentTarget.style.borderColor = '#99F6E4';

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   MessageSquare,
   X,
@@ -47,7 +48,7 @@ const CONVERSATIONAL_KNOWLEDGE = [
   {
     patterns: ['score', 'match score', 'calculate', 'percentage', 'fit score', 'ranking'],
     response:
-      "Aptly evaluates candidates across **3 Multi-Vectors**:\n\n1. **Core Competency Overlap:** Compares resume technical skills against job requirements.\n2. **Adjacent Framework Equivalencies:** Recognizes transferable skills (e.g. knowing PostgreSQL translates to strong relational SQL depth; React proficiency bridges smoothly to Next.js or Vue).\n3. **Production Depth & Tenure:** Assesses real-world project impact and architectural complexity rather than superficial keyword density.",
+      "Aptly evaluates candidates across 4 dimensions:\n\n1. **Skills (40%):** Compares resume technical skills against job requirements.\n2. **Experience (30%):** Assesses years of experience and seniority level.\n3. **Domain Relevance (20%):** Checks alignment with the industry and tech stack.\n4. **Education (10%):** Evaluates relevant degrees and credentials.",
     suggestions: ['How does the resume parser work?', 'What is the recruiter pipeline?'],
   },
   {
@@ -77,10 +78,12 @@ const CONVERSATIONAL_KNOWLEDGE = [
 ];
 
 export default function ChatBot() {
+  const location = useLocation();
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Gemini API Key from localStorage or environment
   const [apiKey, setApiKey] = useState(() => {
@@ -347,6 +350,11 @@ export default function ChatBot() {
     );
   };
 
+  // Hide floating chatbot on the login page
+  if (location.pathname === '/login') {
+    return null;
+  }
+
   return (
     <div
       style={{
@@ -357,36 +365,36 @@ export default function ChatBot() {
         fontFamily: 'var(--font-main)',
       }}
     >
-      {/* 1. Floating Launch Button */}
+      {/* 1. Floating Launch Button - Round icon by default, expands on hover */}
       {!isOpen && (
         <button
           onClick={() => {
             setIsOpen(true);
             setIsMinimized(false);
           }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           aria-label="Open Aptly AI Assistant"
+          title="Open Aptly AI Assistant"
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.65rem',
-            padding: '0.75rem 1.15rem',
+            justifyContent: 'center',
+            gap: isHovered ? '0.55rem' : 0,
+            height: '46px',
+            minWidth: '46px',
+            padding: isHovered ? '0 1.05rem 0 0.8rem' : '0',
             borderRadius: '9999px',
             background: 'var(--accent-teal)',
             color: '#FFFFFF',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
+            border: '1px solid rgba(255, 255, 255, 0.25)',
             boxShadow: '0 8px 24px -4px rgba(15, 107, 92, 0.4), 0 2px 6px rgba(0, 0, 0, 0.12)',
             cursor: 'pointer',
-            transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+            transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
             fontWeight: 600,
-            fontSize: '0.9rem',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-            e.currentTarget.style.background = 'var(--accent-teal-mid)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0) scale(1)';
-            e.currentTarget.style.background = 'var(--accent-teal)';
+            fontSize: '0.88rem',
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
           }}
         >
           <div
@@ -398,18 +406,27 @@ export default function ChatBot() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              flexShrink: 0,
             }}
           >
             <Sparkles size={14} color="#FFFFFF" />
           </div>
-          <span>Aptly.AI</span>
+          {isHovered && (
+            <span style={{ fontSize: '0.88rem', fontWeight: 600 }}>
+              Aptly.AI
+            </span>
+          )}
           <span
             style={{
-              width: '8px',
-              height: '8px',
+              width: '7px',
+              height: '7px',
               borderRadius: '50%',
               background: apiKey ? '#34D399' : '#60A5FA',
               boxShadow: `0 0 6px ${apiKey ? '#34D399' : '#60A5FA'}`,
+              flexShrink: 0,
+              marginLeft: isHovered ? '0.15rem' : '-5px',
+              marginTop: isHovered ? 0 : '-16px',
+              alignSelf: isHovered ? 'center' : 'flex-start',
             }}
           />
         </button>

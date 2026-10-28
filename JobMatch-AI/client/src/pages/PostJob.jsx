@@ -754,7 +754,7 @@ const PostJob = () => {
               </div>
               <textarea
                 rows={6}
-                placeholder="List technical prerequisites, years of experience, core competencies, and preferred credentials..."
+                placeholder="List required skills, years of experience, and responsibilities..."
                 value={requirements}
                 onChange={(e) => setRequirements(e.target.value)}
                 className="form-input"

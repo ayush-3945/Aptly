@@ -23,7 +23,7 @@ const Dashboard = () => {
       {/* Recruiter Native Upcoming Interviews Section */}
       <UpcomingInterviews viewMode="recruiter" />
 
-      {/* Recruiter Talent Analytics & Hiring Telemetry */}
+      {/* Recruiter Talent Analytics */}
       <RecruiterAnalytics />
 
       {/* Recruiter Lifecycle Overview Section */}

@@ -46,7 +46,7 @@ const Navbar = () => {
           height: '68px',
         }}
       >
-        {/* Brand Logo with Clinical Geometric Mark */}
+        {/* Brand Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
           <Logo size={32} />
           <div>

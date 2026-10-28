@@ -7,48 +7,22 @@ import {
   Zap,
   Target,
   Terminal,
-  ExternalLink,
   FileCheck,
   UserCheck,
   Briefcase,
   Sparkles,
   Loader2,
 } from 'lucide-react';
-import ApplyModal from './ApplyModal';
-import { FALLBACK_JOBS } from '../data/fallbackJobs';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
-const SAMPLE_EVALUATION = {
-  aiMatchScore: 88,
-  recommendation: 'Strong Match',
-  fitSummary:
-    'Subject candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and REST services. The candidate exhibits strong alignment with target role requirements.',
-  matchedSkills: ['React.js', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'REST APIs', 'Git'],
-  missingSkills: ['Docker Containerization', 'Kubernetes Orchestration'],
-  experienceFit:
-    'Candidate exhibits 4+ years of relevant MERN production engineering with deep API integration experience. Missing containerization competencies are easily bridgeable on the job.',
-};
-
 const Hero = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalEvaluation, setModalEvaluation] = useState(null);
   const [demoRoleLoading, setDemoRoleLoading] = useState(null); // 'recruiter' | 'candidate' | null
   const [wakeUpNotice, setWakeUpNotice] = useState(false);
 
   const navigate = useNavigate();
   const { user, isAuthenticated, login } = useAuth();
   const { showToast } = useToast();
-
-  const openSampleReport = () => {
-    setModalEvaluation(SAMPLE_EVALUATION);
-    setIsModalOpen(true);
-  };
-
-  const openLiveBenchmark = () => {
-    setModalEvaluation(null);
-    setIsModalOpen(true);
-  };
 
   const handle1ClickDemo = async (role) => {
     setDemoRoleLoading(role);
@@ -107,12 +81,12 @@ const Hero = () => {
             style={{
               fontSize: 'clamp(1.05rem, 2vw, 1.22rem)',
               color: 'var(--text-secondary)',
-              maxWidth: '700px',
+              maxWidth: '680px',
               margin: '0 auto 1.5rem',
               lineHeight: 1.6,
             }}
           >
-            Aptly evaluates candidates based on actual skill competence, seniority, and conceptual depth—providing transparent skill-gap insights to candidates and precision ranking to recruiters.
+            Aptly.AI scores candidates on real skills, not just keywords, and shows them exactly what to improve.
           </p>
 
           {/* Built with Strip */}
@@ -268,11 +242,7 @@ const Hero = () => {
                 marginBottom: '1.35rem',
               }}
             >
-              <div
-                onClick={openSampleReport}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', cursor: 'pointer' }}
-                title="Click to open interactive evaluation scorecard"
-              >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                 <div
                   style={{
                     width: '38px',
@@ -314,17 +284,12 @@ const Hero = () => {
                       letterSpacing: '0.01em',
                     }}
                   >
-                    Sample candidate • Sample company •{' '}
-                    <span style={{ color: 'var(--accent-teal)', fontWeight: 600 }}>Click to inspect</span>
+                    Sample candidate • Sample company
                   </div>
                 </div>
               </div>
 
-              <div
-                onClick={openSampleReport}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}
-                title="Click to inspect detailed match breakdown"
-              >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <span
                   style={{
                     display: 'inline-flex',
@@ -465,7 +430,7 @@ const Hero = () => {
                     letterSpacing: '0.01em',
                   }}
                 >
-                  Matched core competencies
+                  Skills you have
                 </span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginTop: '0.6rem' }}>
                   {['React.js', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'REST APIs', 'Git'].map((skill) => (
@@ -496,7 +461,7 @@ const Hero = () => {
                     letterSpacing: '0.01em',
                   }}
                 >
-                  Identified skill gaps
+                  Missing skills
                 </span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginTop: '0.6rem' }}>
                   {['Docker Containerization', 'Kubernetes Orchestration'].map((skill) => (
@@ -543,7 +508,7 @@ const Hero = () => {
                   marginBottom: '0.3rem',
                 }}
               >
-                Evaluation synthesis:
+                AI summary:
               </span>
               Subject candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and REST services. The candidate exhibits strong alignment with target role requirements.
             </div>
@@ -571,31 +536,25 @@ const Hero = () => {
                 }}
               >
                 <ShieldCheck size={15} color="var(--accent-teal)" />
-                <span>AI Evaluation Engine • Graceful fallback when AI is unavailable</span>
+                <span>AI Evaluation Engine • Graceful fallback if AI is offline</span>
               </div>
 
-              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <div>
                 <button
                   type="button"
-                  onClick={openSampleReport}
-                  className="btn btn-secondary"
-                  style={{ fontSize: '0.82rem', padding: '0.45rem 0.95rem' }}
-                >
-                  <ExternalLink size={14} color="var(--accent-teal)" />
-                  <span>Open Full Scorecard</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={openLiveBenchmark}
+                  onClick={() => navigate(isAuthenticated ? '/dashboard' : '/login')}
                   className="btn btn-primary"
                   style={{
-                    fontSize: '0.82rem',
-                    padding: '0.45rem 1.05rem',
+                    fontSize: '0.84rem',
+                    padding: '0.5rem 1.25rem',
                     fontWeight: 600,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.45rem',
                   }}
                 >
+                  <span>Try it with your own resume</span>
                   <ArrowRight size={14} />
-                  <span>Benchmark Your CV</span>
                 </button>
               </div>
             </div>
@@ -680,10 +639,10 @@ const Hero = () => {
                 </span>
               </div>
               <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--text-primary)' }}>
-                1. Upload & Secure Parse
+                1. Upload & Parse
               </h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem', lineHeight: 1.55, margin: 0 }}>
-                Upload your PDF resume. Server extracts machine text via <code style={{ fontSize: '0.78rem' }}>pdf-parse</code> with strict MIME type validation and zero path traversal vulnerability.
+                Upload your PDF resume. Aptly extracts machine text from your PDF and parses your experience.
               </p>
             </div>
 
@@ -731,10 +690,10 @@ const Hero = () => {
                 </span>
               </div>
               <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--text-primary)' }}>
-                2. AI Semantic Evaluation
+                2. AI Semantic Matching
               </h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem', lineHeight: 1.55, margin: 0 }}>
-                Google Gemini evaluates 4 sub-scores (skills, experience, domain, education). Protected by a graceful heuristic fallback when AI is unavailable.
+                Evaluates your real skills, project depth, and experience against role requirements.
               </p>
             </div>
 
@@ -782,10 +741,10 @@ const Hero = () => {
                 </span>
               </div>
               <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--text-primary)' }}>
-                3. Scorecard & Kanban Ranking
+                3. Scorecard & Pipeline
               </h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem', lineHeight: 1.55, margin: 0 }}>
-                Recruiters manage ranked candidate pipelines with optimistic UI updates; applicants receive actionable feedback and skill gap roadmaps.
+                Recruiters view ranked candidates in a Kanban pipeline; candidates see clear feedback and next steps.
               </p>
             </div>
           </div>
@@ -828,7 +787,7 @@ const Hero = () => {
               Semantic Parsing
             </h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem', lineHeight: 1.55, margin: 0 }}>
-              Extracts technical competencies and adjacent skills without blind keyword rejections.
+              Extracts technical skills and experience without blind keyword rejections.
             </p>
           </div>
 
@@ -897,14 +856,6 @@ const Hero = () => {
           </div>
         </div>
       </div>
-
-      {/* Interactive Diagnostic Modal */}
-      <ApplyModal
-        job={FALLBACK_JOBS[0]}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        initialEvaluation={modalEvaluation}
-      />
     </section>
   );
 };

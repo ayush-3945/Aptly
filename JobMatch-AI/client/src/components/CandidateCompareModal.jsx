@@ -126,10 +126,10 @@ export default function CandidateCompareModal({
               <strong style={{ color: 'var(--accent-teal)' }}>AI Hiring Recommendation: </strong>
               {highestScorer ? (
                 <>
-                  <strong>{highestScorer.candidate?.name || highestScorer.candidateName || 'Candidate'}</strong> exhibits the strongest overall alignment ({highestScorer.aiMatchScore || 75}% match) with deep coverage in core competencies. We recommend prioritizing them for the technical interview round.
+                  <strong>{highestScorer.candidate?.name || highestScorer.candidateName || 'Candidate'}</strong> exhibits the strongest overall alignment ({highestScorer.aiMatchScore || 75}% match) with deep coverage in key skills. We recommend prioritizing them for the technical interview round.
                 </>
               ) : (
-                'Review matched competencies below to determine optimal candidate fit.'
+                'Review matched skills below to determine candidate fit.'
               )}
             </div>
           </div>

@@ -397,7 +397,7 @@ const CandidateProfile = () => {
           Candidate Profile & Resume Intake
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginTop: '0.35rem' }}>
-          Upload your resume PDF to automatically populate all clinical qualification fields, or edit details directly.
+          Upload your resume PDF to automatically populate your profile fields, or edit details directly.
         </p>
       </div>
 
@@ -664,7 +664,7 @@ const CandidateProfile = () => {
                   margin: 0,
                 }}
               >
-                Skills & Technical Competencies
+                Skills & Expertise
               </h2>
             </div>
             {aiFilledFields.has('skills') && <span className="ai-tag-indicator">Auto-filled</span>}

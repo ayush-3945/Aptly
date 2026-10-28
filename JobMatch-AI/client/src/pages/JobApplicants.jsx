@@ -1372,7 +1372,7 @@ const ResumeDetailModal = ({ candidateApp, onClose, onTransition, onScheduleInte
         {/* Missing / Gap Skills */}
         <div style={{ marginBottom: '1.5rem' }}>
           <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '0.6rem', color: 'var(--semantic-red)' }}>
-            Identified Skill Gaps ({candidateApp.missingSkills?.length || 0})
+            Missing Skills ({candidateApp.missingSkills?.length || 0})
           </h4>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
             {candidateApp.missingSkills && candidateApp.missingSkills.length > 0 ? (
