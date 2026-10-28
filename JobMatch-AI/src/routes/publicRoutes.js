@@ -136,9 +136,11 @@ router.post('/quick-match', (req, res) => {
       summary,
     });
   } catch (err) {
-    console.error('[Public Quick-Match Error]:', err);
+    // Only log error message - never log user-submitted resume or job description text
+    console.error('[Public Quick-Match Error]:', err.message || 'Unexpected failure');
     return res.status(500).json({ error: 'Failed to evaluate match. Please try again.' });
   }
 });
 
 module.exports = router;
+

@@ -131,7 +131,7 @@ const JobsList = () => {
         }
       }
 
-      // 3. Competency filter
+      // 3. Skill filter
       if (selectedSkill !== 'All') {
         const hasSkill = job.requiredSkills?.some(
           (s) => s.toLowerCase() === selectedSkill.toLowerCase()
@@ -188,8 +188,8 @@ const JobsList = () => {
         recommendation: job.isStrongMatch ? 'Strong Match' : 'Moderate Match',
         matchedSkills: job.matchedSkills,
         missingSkills: job.missingSkills,
-        experienceFit: `Candidate profile aligns with ${job.matchedSkills.length} of ${job.requiredSkills?.length || 0} evaluated competencies.`,
-        fitSummary: `Clinical diagnostic evaluation for ${job.title} at ${job.company}. Review competency breakdown and interview strategy below.`,
+        experienceFit: `Candidate profile aligns with ${job.matchedSkills.length} of ${job.requiredSkills?.length || 0} evaluated skills.`,
+        fitSummary: `Evaluation summary for ${job.title} at ${job.company}. Review skill breakdown and interview strategy below.`,
       });
     } else {
       setInitialEvaluationForModal(null);
@@ -406,7 +406,7 @@ const JobsList = () => {
             )}
           </div>
 
-          {/* Row 2: Slender Competency Filter Strip with High-Contrast Active State */}
+          {/* Row 2: Skill Filter Strip */}
           <div
             style={{
               display: 'flex',
@@ -656,7 +656,7 @@ const JobsList = () => {
               No matching positions found
             </h3>
             <p style={{ color: '#64748B', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
-              Try adjusting your search keyword, selecting "All Locations", or resetting competency filters.
+              Try adjusting your search keyword, selecting "All Locations", or resetting skill filters.
             </p>
             <button
               onClick={handleClearFilters}

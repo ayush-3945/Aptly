@@ -222,7 +222,7 @@ const SkillChip = ({ skill, isGap }) => {
               color: isGap ? '#FCA5A5' : '#5EEAD4',
             }}
           >
-            {isGap ? 'Missing Skill Gap' : 'Matched Competency'}
+            {isGap ? 'Missing Skill Gap' : 'Matched Skill'}
           </div>
           <div style={{ color: '#E2E8F0', marginBottom: isGap ? '0.35rem' : 0 }}>
             {skill.reason}
@@ -278,6 +278,7 @@ const Hero = () => {
   const [jobDescription, setJobDescription] = useState('');
   const [resumeText, setResumeText] = useState('');
   const [playgroundLoading, setPlaygroundLoading] = useState(false);
+  const [playgroundWakeUpNotice, setPlaygroundWakeUpNotice] = useState(false);
   const [playgroundResult, setPlaygroundResult] = useState(null);
   const [playgroundError, setPlaygroundError] = useState(null);
 
@@ -439,13 +440,18 @@ const Hero = () => {
   const handlePlaygroundSubmit = async (e) => {
     e.preventDefault();
     if (!jobDescription.trim() || !resumeText.trim()) {
-      setPlaygroundError('Please provide both a job description and resume text to calculate match.');
+      setPlaygroundError('Please provide both a job description and resume text to check match.');
       return;
     }
 
     setPlaygroundLoading(true);
     setPlaygroundError(null);
     setPlaygroundResult(null);
+    setPlaygroundWakeUpNotice(false);
+
+    const wakeUpTimer = setTimeout(() => {
+      setPlaygroundWakeUpNotice(true);
+    }, 2500);
 
     try {
       const response = await fetch('/api/public/quick-match', {
@@ -456,14 +462,29 @@ const Hero = () => {
 
       const data = await response.json();
       if (!response.ok) {
+        if (response.status === 429) {
+          const retryAfter = response.headers.get('Retry-After') || data.retryAfterSeconds;
+          const mins = retryAfter ? Math.max(1, Math.ceil(Number(retryAfter) / 60)) : data.minutesRemaining || 15;
+          throw new Error(
+            data.error ||
+              `Quick-check limit reached (10 requests per 15 minutes). Please wait ~${mins} minute${mins > 1 ? 's' : ''} before trying again, or sign in for full AI evaluation.`
+          );
+        }
+        if (response.status === 413) {
+          throw new Error(
+            data.error || 'Text size exceeds the 20KB limit for public quick-match. Please reduce the length.'
+          );
+        }
         throw new Error(data.error || 'Failed to compute match score.');
       }
 
       setPlaygroundResult(data);
     } catch (err) {
-      setPlaygroundError(err.message || 'Error running match engine. Please retry.');
+      setPlaygroundError(err.message || 'Error running match check. Please retry.');
     } finally {
+      clearTimeout(wakeUpTimer);
       setPlaygroundLoading(false);
+      setPlaygroundWakeUpNotice(false);
     }
   };
 
@@ -649,6 +670,8 @@ const Hero = () => {
             </div>
 
             <div
+              role="tablist"
+              aria-label="Candidate Archetypes"
               style={{
                 display: 'inline-flex',
                 flexWrap: 'wrap',
@@ -665,6 +688,11 @@ const Hero = () => {
                 return (
                   <button
                     key={cand.id}
+                    id={`tab-${cand.id}`}
+                    role="tab"
+                    aria-selected={isActive}
+                    aria-controls="sample-evaluation-panel"
+                    tabIndex={isActive ? 0 : -1}
                     type="button"
                     onClick={() => setActiveTab(cand.id)}
                     style={{
@@ -703,6 +731,9 @@ const Hero = () => {
           {/* Sample Card */}
           <div
             ref={cardRef}
+            id="sample-evaluation-panel"
+            role="tabpanel"
+            aria-labelledby={`tab-${activeTab}`}
             className="paper-card interactive-card"
             style={{
               padding: '1.75rem',
@@ -1054,12 +1085,14 @@ const Hero = () => {
             How Aptly.AI Works
           </h2>
           <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', marginBottom: '2rem' }}>
-            Auto-advances every 3s • Hover to pause • Click any step to inspect
+            Auto-advances every 3s • Hover or focus to pause • Click any step to inspect
           </p>
 
           <div
             onMouseEnter={() => setIsStepPaused(true)}
             onMouseLeave={() => setIsStepPaused(false)}
+            onFocus={() => setIsStepPaused(true)}
+            onBlur={() => setIsStepPaused(false)}
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))',
@@ -1069,7 +1102,16 @@ const Hero = () => {
           >
             {/* Step 1 */}
             <div
+              tabIndex={0}
+              role="button"
+              aria-label={`Step 1: Upload & Parse${activeStep === 0 ? ' (selected)' : ''}`}
               onClick={() => setActiveStep(0)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setActiveStep(0);
+                }
+              }}
               className="paper-card interactive-card"
               style={{
                 padding: '1.6rem',
@@ -1132,7 +1174,16 @@ const Hero = () => {
 
             {/* Step 2 */}
             <div
+              tabIndex={0}
+              role="button"
+              aria-label={`Step 2: AI Semantic Matching${activeStep === 1 ? ' (selected)' : ''}`}
               onClick={() => setActiveStep(1)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setActiveStep(1);
+                }
+              }}
               className="paper-card interactive-card"
               style={{
                 padding: '1.6rem',
@@ -1195,7 +1246,16 @@ const Hero = () => {
 
             {/* Step 3 */}
             <div
+              tabIndex={0}
+              role="button"
+              aria-label={`Step 3: Scorecard & Pipeline${activeStep === 2 ? ' (selected)' : ''}`}
               onClick={() => setActiveStep(2)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setActiveStep(2);
+                }
+              }}
               className="paper-card interactive-card"
               style={{
                 padding: '1.6rem',
@@ -1287,7 +1347,7 @@ const Hero = () => {
               Try the ATS Matcher Live
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', maxWidth: '620px', margin: '0 auto' }}>
-              Paste any job description and resume snippet below to test rule-based semantic evaluation instantly. No signup required.
+              Paste any job description and resume snippet below to test rule-based keyword matching instantly. No signup required.
             </p>
 
             {/* Quick Fill Sample Buttons */}
@@ -1396,6 +1456,20 @@ const Hero = () => {
               </div>
             </div>
 
+            {/* Privacy Notice Under Textareas */}
+            <div
+              style={{
+                fontSize: '0.76rem',
+                color: 'var(--text-muted)',
+                marginBottom: '1.15rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+              }}
+            >
+              <span>🔒 Don't paste personal data. Text is not saved.</span>
+            </div>
+
             {/* Error Notification */}
             {playgroundError && (
               <div
@@ -1465,108 +1539,66 @@ const Hero = () => {
             >
               <Loader2 size={28} className="animate-spin" style={{ color: 'var(--accent-teal)', margin: '0 auto 0.75rem' }} />
               <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                Evaluating candidate alignment against requirements...
+                Checking keyword alignment against prerequisites...
               </div>
               <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-                Applying 40/30/20/10 weighted formula
+                Rule-based keyword matching (Skills evaluation)
               </div>
+
+              {playgroundWakeUpNotice && (
+                <div
+                  style={{
+                    marginTop: '1.15rem',
+                    fontSize: '0.82rem',
+                    color: 'var(--accent-teal)',
+                    fontWeight: 600,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.45rem',
+                    padding: '0.35rem 0.75rem',
+                    background: 'var(--accent-teal-light)',
+                    borderRadius: '4px',
+                    border: '1px solid rgba(15, 107, 92, 0.25)',
+                  }}
+                >
+                  <Loader2 size={14} className="animate-spin" />
+                  <span>Waking up server... this can take up to a minute</span>
+                </div>
+              )}
             </div>
           )}
 
           {!playgroundLoading && playgroundResult && (
-            <div
-              className="paper-card"
-              style={{
-                marginTop: '1.5rem',
-                padding: '1.65rem',
-                border: '1px solid var(--border-default)',
-                borderRadius: '6px',
-                background: 'var(--bg-card)',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-                animation: 'fadeIn 0.25s ease-out forwards',
-              }}
-            >
+            <div style={{ marginTop: '1.5rem' }}>
+              {/* Label above the playground result */}
               <div
                 style={{
+                  marginBottom: '0.85rem',
+                  padding: '0.65rem 1rem',
+                  background: 'rgba(15, 107, 92, 0.08)',
+                  border: '1px solid rgba(15, 107, 92, 0.22)',
+                  borderRadius: '6px',
+                  fontSize: '0.82rem',
+                  color: 'var(--accent-teal)',
+                  fontWeight: 600,
                   display: 'flex',
-                  justifyContent: 'space-between',
                   alignItems: 'center',
-                  borderBottom: '1px solid var(--border-default)',
-                  paddingBottom: '1rem',
-                  marginBottom: '1.25rem',
-                  flexWrap: 'wrap',
-                  gap: '0.75rem',
+                  gap: '0.5rem',
                 }}
               >
-                <div>
-                  <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                    Evaluation Scorecard
-                  </h4>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                    Public sandbox evaluation result
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.35rem',
-                      padding: '0.3rem 0.75rem',
-                      borderRadius: '4px',
-                      fontSize: '0.78rem',
-                      fontWeight: 600,
-                      background:
-                        playgroundResult.matchScore >= 75
-                          ? 'rgba(45, 122, 58, 0.1)'
-                          : playgroundResult.matchScore >= 45
-                          ? 'rgba(180, 83, 9, 0.1)'
-                          : 'rgba(185, 28, 28, 0.08)',
-                      color:
-                        playgroundResult.matchScore >= 75
-                          ? 'var(--semantic-green)'
-                          : playgroundResult.matchScore >= 45
-                          ? 'var(--semantic-amber)'
-                          : 'var(--semantic-red)',
-                      border: `1px solid ${
-                        playgroundResult.matchScore >= 75
-                          ? 'rgba(45, 122, 58, 0.25)'
-                          : playgroundResult.matchScore >= 45
-                          ? 'rgba(180, 83, 9, 0.25)'
-                          : 'rgba(185, 28, 28, 0.22)'
-                      }`,
-                    }}
-                  >
-                    <CheckCircle2 size={13} />
-                    {playgroundResult.recommendation}
-                  </span>
-
-                  <div
-                    style={{
-                      padding: '0.3rem 0.75rem',
-                      background: 'var(--accent-teal-light)',
-                      border: '1px solid rgba(15, 107, 92, 0.25)',
-                      borderRadius: '4px',
-                      fontWeight: 700,
-                      fontSize: '0.92rem',
-                      color: 'var(--accent-teal)',
-                      fontFamily: 'monospace',
-                    }}
-                  >
-                    {playgroundResult.matchScore}% Match
-                  </div>
-                </div>
+                <Sliders size={15} style={{ flexShrink: 0 }} />
+                <span>Quick check (rule-based keyword matching). Full AI evaluation runs after login.</span>
               </div>
 
-              {/* 4 Sub-Score Progress Bars */}
               <div
+                className="paper-card"
                 style={{
-                  marginBottom: '1.25rem',
-                  padding: '0.95rem 1.15rem',
-                  background: 'var(--bg-primary)',
-                  borderRadius: '4px',
+                  padding: '1.65rem',
                   border: '1px solid var(--border-default)',
+                  borderRadius: '6px',
+                  background: 'var(--bg-card)',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                  animation: 'fadeIn 0.25s ease-out forwards',
                 }}
               >
                 <div
@@ -1574,91 +1606,115 @@ const Hero = () => {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    marginBottom: '0.75rem',
+                    borderBottom: '1px solid var(--border-default)',
+                    paddingBottom: '1rem',
+                    marginBottom: '1.25rem',
                     flexWrap: 'wrap',
-                    gap: '0.4rem',
+                    gap: '0.75rem',
                   }}
                 >
-                  <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                    Weighted Score Breakdown
-                  </span>
-                  <span style={{ fontSize: '0.74rem', color: 'var(--accent-teal)', fontWeight: 600, fontFamily: 'monospace' }}>
-                    {playgroundResult.scoreBreakdown.skills}×0.4 + {playgroundResult.scoreBreakdown.experience}×0.3 +{' '}
-                    {playgroundResult.scoreBreakdown.domain}×0.2 + {playgroundResult.scoreBreakdown.education}×0.1 ={' '}
-                    {playgroundResult.matchScore}%
-                  </span>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.85rem' }}>
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: '0.2rem' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Skills (40%)</span>
-                      <span style={{ fontWeight: 700 }}>{playgroundResult.scoreBreakdown.skills}%</span>
-                    </div>
-                    <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
-                      <div
-                        style={{
-                          width: `${playgroundResult.scoreBreakdown.skills}%`,
-                          height: '100%',
-                          background: 'var(--accent-teal)',
-                          borderRadius: '2px',
-                        }}
-                      />
+                    <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                      Quick Check Scorecard
+                    </h4>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                      Rule-based keyword match result
                     </div>
                   </div>
 
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: '0.2rem' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Experience (30%)</span>
-                      <span style={{ fontWeight: 700 }}>{playgroundResult.scoreBreakdown.experience}%</span>
-                    </div>
-                    <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
-                      <div
-                        style={{
-                          width: `${playgroundResult.scoreBreakdown.experience}%`,
-                          height: '100%',
-                          background: 'var(--accent-teal)',
-                          borderRadius: '2px',
-                        }}
-                      />
-                    </div>
-                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        padding: '0.3rem 0.75rem',
+                        borderRadius: '4px',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        background:
+                          (playgroundResult.scoreBreakdown?.skills ?? playgroundResult.matchScore) >= 75
+                            ? 'rgba(45, 122, 58, 0.1)'
+                            : (playgroundResult.scoreBreakdown?.skills ?? playgroundResult.matchScore) >= 45
+                            ? 'rgba(180, 83, 9, 0.1)'
+                            : 'rgba(185, 28, 28, 0.08)',
+                        color:
+                          (playgroundResult.scoreBreakdown?.skills ?? playgroundResult.matchScore) >= 75
+                            ? 'var(--semantic-green)'
+                            : (playgroundResult.scoreBreakdown?.skills ?? playgroundResult.matchScore) >= 45
+                            ? 'var(--semantic-amber)'
+                            : 'var(--semantic-red)',
+                        border: `1px solid ${
+                          (playgroundResult.scoreBreakdown?.skills ?? playgroundResult.matchScore) >= 75
+                            ? 'rgba(45, 122, 58, 0.25)'
+                            : (playgroundResult.scoreBreakdown?.skills ?? playgroundResult.matchScore) >= 45
+                            ? 'rgba(180, 83, 9, 0.25)'
+                            : 'rgba(185, 28, 28, 0.22)'
+                        }`,
+                      }}
+                    >
+                      <CheckCircle2 size={13} />
+                      {playgroundResult.recommendation}
+                    </span>
 
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: '0.2rem' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Domain (20%)</span>
-                      <span style={{ fontWeight: 700 }}>{playgroundResult.scoreBreakdown.domain}%</span>
-                    </div>
-                    <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
-                      <div
-                        style={{
-                          width: `${playgroundResult.scoreBreakdown.domain}%`,
-                          height: '100%',
-                          background: 'var(--accent-teal)',
-                          borderRadius: '2px',
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: '0.2rem' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Education (10%)</span>
-                      <span style={{ fontWeight: 700 }}>{playgroundResult.scoreBreakdown.education}%</span>
-                    </div>
-                    <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
-                      <div
-                        style={{
-                          width: `${playgroundResult.scoreBreakdown.education}%`,
-                          height: '100%',
-                          background: 'var(--accent-teal)',
-                          borderRadius: '2px',
-                        }}
-                      />
+                    <div
+                      style={{
+                        padding: '0.3rem 0.75rem',
+                        background: 'var(--accent-teal-light)',
+                        border: '1px solid rgba(15, 107, 92, 0.25)',
+                        borderRadius: '4px',
+                        fontWeight: 700,
+                        fontSize: '0.92rem',
+                        color: 'var(--accent-teal)',
+                        fontFamily: 'monospace',
+                      }}
+                    >
+                      {playgroundResult.scoreBreakdown?.skills ?? playgroundResult.matchScore}% Skills Match
                     </div>
                   </div>
                 </div>
-              </div>
+
+                {/* Single Skills Match Progress Bar - Experience, Domain and Education hidden since they lack real relational signals in rule matcher */}
+                <div
+                  style={{
+                    marginBottom: '1.25rem',
+                    padding: '0.95rem 1.15rem',
+                    background: 'var(--bg-primary)',
+                    borderRadius: '4px',
+                    border: '1px solid var(--border-default)',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '0.5rem',
+                    }}
+                  >
+                    <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                      Skills Match (Keyword Overlap)
+                    </span>
+                    <span style={{ fontSize: '0.84rem', color: 'var(--accent-teal)', fontWeight: 700, fontFamily: 'monospace' }}>
+                      {playgroundResult.scoreBreakdown?.skills ?? playgroundResult.matchScore}%
+                    </span>
+                  </div>
+
+                  <div style={{ height: '7px', background: 'var(--border-default)', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div
+                      style={{
+                        width: `${playgroundResult.scoreBreakdown?.skills ?? playgroundResult.matchScore}%`,
+                        height: '100%',
+                        background: 'var(--accent-teal)',
+                        borderRadius: '4px',
+                        transition: 'width 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                      }}
+                    />
+                  </div>
+                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '0.45rem' }}>
+                    Based on {playgroundResult.matchedSkills?.length || 0} matched of {(playgroundResult.matchedSkills?.length || 0) + (playgroundResult.missingSkills?.length || 0)} detected required skills. Experience depth, domain nuance, and education are evaluated via AI after signing in.
+                  </div>
+                </div>
 
               {/* Matched & Missing Skills */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
@@ -1739,7 +1795,8 @@ const Hero = () => {
                 {playgroundResult.summary}
               </div>
             </div>
-          )}
+          </div>
+        )}
         </div>
 
         {/* =========================================================================

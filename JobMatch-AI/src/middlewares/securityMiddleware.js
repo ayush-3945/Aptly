@@ -80,10 +80,15 @@ const quickMatchLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    status: 'error',
-    statusCode: 429,
-    message: 'Playground limit reached (10 requests per 15 minutes). Please try again later or sign in.',
+  handler: (req, res) => {
+    const retryAfter = res.getHeader('Retry-After');
+    const secondsRemaining = retryAfter ? parseInt(retryAfter, 10) : 900;
+    const minutesRemaining = Math.max(1, Math.ceil(secondsRemaining / 60));
+    return res.status(429).json({
+      error: `Quick-check rate limit reached (10 requests per 15 min). Please wait ${minutesRemaining} minute${minutesRemaining > 1 ? 's' : ''} (or ~${secondsRemaining}s) before trying again, or sign in for full AI evaluation.`,
+      retryAfterSeconds: secondsRemaining,
+      minutesRemaining,
+    });
   },
 });
 

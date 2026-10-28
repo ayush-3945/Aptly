@@ -47,13 +47,27 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
-
 // Public Health Check Route (uncapped for monitoring probes)
 app.use('/api/health', require('./routes/healthRoutes'));
 
-// Public Playground Quick-Match Route (capped to 10 req / 15 min, 0 DB writes, 0 AI cost)
-app.use('/api/public', quickMatchLimiter, require('./routes/publicRoutes'));
+// Public Playground Quick-Match Route (capped to 10 req / 15 min, 20kb JSON body limit, 0 DB writes, 0 AI cost)
+app.use(
+  '/api/public',
+  express.json({ limit: '20kb' }),
+  (err, req, res, next) => {
+    if (err && (err.type === 'entity.too.large' || err.status === 413)) {
+      return res.status(413).json({
+        error: 'Payload size exceeds the 20KB limit for public quick-match. Please reduce the text length.',
+      });
+    }
+    next(err);
+  },
+  quickMatchLimiter,
+  require('./routes/publicRoutes')
+);
+
+// General body parser for remaining routes
+app.use(express.json());
 
 // Apply General Rate Limiter to all standard API routes
 app.use('/api', generalLimiter);

@@ -93,8 +93,20 @@ async function runQuickMatchTests() {
       throw new Error(`Test 3 Failed: ${JSON.stringify(res3)}`);
     }
 
+    // Test 4: Body Size Exceeding 20KB is rejected with HTTP 413
+    const bigPayload = {
+      jobDescription: 'React developer',
+      resumeText: 'a'.repeat(25 * 1024), // 25KB
+    };
+    const res4 = await postJSON('/api/public/quick-match', bigPayload);
+    if (res4.status === 413) {
+      console.log('✔ Test 4 Passed: Payload exceeding 20KB properly rejected with HTTP 413');
+    } else {
+      throw new Error(`Test 4 Failed: Expected 413, got ${res4.status}`);
+    }
+
     console.log('\n======================================================');
-    console.log('Results: All Public Quick-Match Tests Passed (3/3)');
+    console.log('Results: All Public Quick-Match Tests Passed (4/4)');
     console.log('======================================================\n');
   } finally {
     server.close();
@@ -105,3 +117,4 @@ runQuickMatchTests().catch((err) => {
   console.error('Quick Match Test Failure:', err);
   process.exit(1);
 });
+
