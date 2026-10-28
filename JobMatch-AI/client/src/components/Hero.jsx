@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   CheckCircle2,
@@ -12,28 +12,382 @@ import {
   Briefcase,
   Sparkles,
   Loader2,
+  HelpCircle,
+  RotateCcw,
+  Sliders,
+  Check,
+  AlertTriangle,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+
+// 3 Archetype Candidate Profiles for Sample Switcher
+const SAMPLE_CANDIDATES = {
+  strong: {
+    id: 'strong',
+    label: 'Strong match',
+    badgeText: 'Strong Match',
+    badgeBg: 'rgba(45, 122, 58, 0.1)',
+    badgeColor: 'var(--semantic-green)',
+    badgeBorder: '1px solid rgba(45, 122, 58, 0.25)',
+    roleTitle: 'Full-Stack MERN Systems Engineer',
+    targetScore: 88,
+    formulaMath: '90×0.4 + 85×0.3 + 90×0.2 + 80×0.1 = 88%',
+    subScores: {
+      skills: 90,
+      experience: 85,
+      domain: 90,
+      education: 80,
+    },
+    matchedSkills: [
+      { name: 'React.js', reason: 'Demonstrates 4+ years building high-throughput UI client architectures.' },
+      { name: 'Node.js', reason: 'Extensive production experience developing asynchronous RESTful microservices.' },
+      { name: 'Express', reason: 'Used extensively for modular middleware, route guards, and payload validation.' },
+      { name: 'MongoDB', reason: 'Hands-on aggregation pipelines and index optimization on high-volume collections.' },
+      { name: 'PostgreSQL', reason: 'Solid relational database schema modeling and transaction management.' },
+      { name: 'REST APIs', reason: 'Designed clean, versioned public and internal API specifications.' },
+      { name: 'Git', reason: 'Proficient with trunk-based development, branch protection, and code reviews.' },
+    ],
+    missingSkills: [
+      {
+        name: 'Docker Containerization',
+        reason: 'Required by role for container orchestration, but not listed in candidate resume.',
+        tip: 'Build a multi-container Docker Compose setup for a React + Node app and push to GitHub.',
+      },
+      {
+        name: 'Kubernetes Orchestration',
+        reason: 'Production cluster management needed for enterprise deployment pipeline.',
+        tip: 'Practice deploying a local Minikube cluster with deployment manifests and service ingresses.',
+      },
+    ],
+    summary:
+      'Subject candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and REST services. Strong alignment with target role requirements.',
+  },
+  moderate: {
+    id: 'moderate',
+    label: 'Moderate match',
+    badgeText: 'Moderate Match',
+    badgeBg: 'rgba(180, 83, 9, 0.1)',
+    badgeColor: 'var(--semantic-amber)',
+    badgeBorder: '1px solid rgba(180, 83, 9, 0.25)',
+    roleTitle: 'Full-Stack Software Engineer',
+    targetScore: 66,
+    formulaMath: '65×0.4 + 70×0.3 + 60×0.2 + 70×0.1 = 66%',
+    subScores: {
+      skills: 65,
+      experience: 70,
+      domain: 60,
+      education: 70,
+    },
+    matchedSkills: [
+      { name: 'React.js', reason: 'Demonstrated frontend SPA component development and state management.' },
+      { name: 'Node.js', reason: 'Practical backend runtime usage for lightweight services and scripts.' },
+      { name: 'REST APIs', reason: 'Consumed and built standard CRUD endpoints for internal tools.' },
+      { name: 'Git', reason: 'Familiar with standard GitHub PR workflows and version control.' },
+    ],
+    missingSkills: [
+      {
+        name: 'MongoDB',
+        reason: 'Core primary database for the platform; candidate primarily used SQLite.',
+        tip: 'Complete MongoDB University free fundamentals and model a realistic document schema.',
+      },
+      {
+        name: 'PostgreSQL',
+        reason: 'Complex queries and relational joins required for financial reporting.',
+        tip: 'Write complex SQL queries involving window functions and explain-plan analysis.',
+      },
+      {
+        name: 'Docker Containerization',
+        reason: 'Mandatory for local dev parity and CI/CD staging environments.',
+        tip: 'Containerize an existing Node.js API with a lightweight Alpine Dockerfile.',
+      },
+      {
+        name: 'System Design',
+        reason: 'Role requires designing for high concurrency and distributed caching.',
+        tip: 'Study distributed caching patterns using Redis and message queues.',
+      },
+    ],
+    summary:
+      'Solid frontend and JavaScript foundation with practical REST API experience. Needs further hands-on experience with production database optimization and containerized deployment.',
+  },
+  low: {
+    id: 'low',
+    label: 'Low match',
+    badgeText: 'Low Match',
+    badgeBg: 'rgba(185, 28, 28, 0.08)',
+    badgeColor: 'var(--semantic-red)',
+    badgeBorder: '1px solid rgba(185, 28, 28, 0.22)',
+    roleTitle: 'Junior Web Developer',
+    targetScore: 38,
+    formulaMath: '35×0.4 + 40×0.3 + 30×0.2 + 60×0.1 = 38%',
+    subScores: {
+      skills: 35,
+      experience: 40,
+      domain: 30,
+      education: 60,
+    },
+    matchedSkills: [
+      { name: 'HTML/CSS', reason: 'Good understanding of semantic markup and responsive flexbox layouts.' },
+      { name: 'JavaScript', reason: 'Basic ES6 scripting and DOM manipulation on frontend landing pages.' },
+      { name: 'Git', reason: 'Familiar with commit, push, pull, and basic GitHub repository usage.' },
+    ],
+    missingSkills: [
+      {
+        name: 'React.js',
+        reason: 'Role requires advanced hooks, context, and modern component architecture.',
+        tip: 'Build 2 full-stack React projects utilizing custom hooks, Vite, and state managers.',
+      },
+      {
+        name: 'Node.js & Express',
+        reason: 'Backend services require robust middleware, authentication, and error handling.',
+        tip: 'Construct an end-to-end Express REST API with JWT authentication and rate limiting.',
+      },
+      {
+        name: 'MongoDB & PostgreSQL',
+        reason: 'Required for schema design, indexing, and data persistence layers.',
+        tip: 'Build a database-backed CRUD application using Mongoose or Prisma ORM.',
+      },
+      {
+        name: 'Docker',
+        reason: 'Platform relies on containerized microservices deployment.',
+        tip: 'Learn container basics and run multi-service development stacks locally.',
+      },
+    ],
+    summary:
+      'Early-career background with foundational web development skills. Lacks required depth in production backend frameworks and scalable database architectures.',
+  },
+};
+
+/**
+ * Interactive Skill Chip with Accessible Hover & Mobile Tap Tooltip
+ */
+const SkillChip = ({ skill, isGap }) => {
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  return (
+    <div
+      style={{ position: 'relative', display: 'inline-block' }}
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+      onClick={() => setShowTooltip((prev) => !prev)}
+    >
+      <button
+        type="button"
+        aria-label={`${skill.name}: ${isGap ? 'Skill gap' : 'Matched skill'}`}
+        style={{
+          fontSize: '0.76rem',
+          padding: '0.22rem 0.6rem',
+          background: isGap ? 'rgba(185, 28, 28, 0.08)' : 'var(--accent-teal-light)',
+          border: `1px solid ${isGap ? 'rgba(185, 28, 28, 0.25)' : 'rgba(15, 107, 92, 0.25)'}`,
+          borderRadius: '4px',
+          color: isGap ? 'var(--semantic-red)' : 'var(--accent-teal)',
+          fontWeight: 600,
+          cursor: 'pointer',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.35rem',
+          transition: 'all 0.15s ease',
+        }}
+      >
+        <span>{skill.name}</span>
+        <HelpCircle size={11} style={{ opacity: 0.65 }} />
+      </button>
+
+      {showTooltip && (
+        <div
+          role="tooltip"
+          style={{
+            position: 'absolute',
+            bottom: 'calc(100% + 8px)',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 'clamp(210px, 75vw, 280px)',
+            background: '#1E293B',
+            color: '#F8FAFC',
+            padding: '0.65rem 0.8rem',
+            borderRadius: '6px',
+            fontSize: '0.74rem',
+            lineHeight: 1.45,
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
+            zIndex: 100,
+            pointerEvents: 'none',
+            textAlign: 'left',
+          }}
+        >
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: '0.76rem',
+              marginBottom: '0.2rem',
+              color: isGap ? '#FCA5A5' : '#5EEAD4',
+            }}
+          >
+            {isGap ? 'Missing Skill Gap' : 'Matched Competency'}
+          </div>
+          <div style={{ color: '#E2E8F0', marginBottom: isGap ? '0.35rem' : 0 }}>
+            {skill.reason}
+          </div>
+          {isGap && skill.tip && (
+            <div
+              style={{
+                borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+                paddingTop: '0.35rem',
+                color: '#93C5FD',
+                fontSize: '0.72rem',
+              }}
+            >
+              💡 <strong>Learning tip:</strong> {skill.tip}
+            </div>
+          )}
+          {/* Arrow */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '100%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              borderWidth: '5px',
+              borderStyle: 'solid',
+              borderColor: '#1E293B transparent transparent transparent',
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
 
 const Hero = () => {
   const [demoRoleLoading, setDemoRoleLoading] = useState(null); // 'recruiter' | 'candidate' | null
   const [wakeUpNotice, setWakeUpNotice] = useState(false);
 
+  // 1. Interactive Sample Card Switcher & Animation State
+  const [activeTab, setActiveTab] = useState('strong'); // 'strong' | 'moderate' | 'low'
+  const currentCandidate = SAMPLE_CANDIDATES[activeTab];
+
+  const cardRef = useRef(null);
+  const [isCardInView, setIsCardInView] = useState(false);
+  const [displayScore, setDisplayScore] = useState(0);
+  const [barsFilled, setBarsFilled] = useState(false);
+
+  // 2. "How It Works" Auto-Advance State
+  const [activeStep, setActiveStep] = useState(0);
+  const [isStepPaused, setIsStepPaused] = useState(false);
+
+  // 3. Free Match Playground State
+  const [jobDescription, setJobDescription] = useState('');
+  const [resumeText, setResumeText] = useState('');
+  const [playgroundLoading, setPlaygroundLoading] = useState(false);
+  const [playgroundResult, setPlaygroundResult] = useState(null);
+  const [playgroundError, setPlaygroundError] = useState(null);
+
   const navigate = useNavigate();
   const { user, isAuthenticated, login } = useAuth();
   const { showToast } = useToast();
 
+  // Scroll Reveal Observer
+  useEffect(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) {
+      document.querySelectorAll('.reveal-on-scroll').forEach((el) => {
+        el.classList.add('is-revealed');
+      });
+      return;
+    }
+
+    const elements = document.querySelectorAll('.reveal-on-scroll');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  // Card In-View Observer for Count-Up Trigger
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsCardInView(true);
+        }
+      },
+      { threshold: 0.25 }
+    );
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Animated Count-Up & Sub-Score Progress Fill
+  useEffect(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) {
+      setDisplayScore(currentCandidate.targetScore);
+      setBarsFilled(true);
+      return;
+    }
+
+    if (!isCardInView) return;
+
+    setBarsFilled(false);
+    setDisplayScore(0);
+
+    const target = currentCandidate.targetScore;
+    const duration = 750; // ms
+    const startTime = performance.now();
+
+    let animationFrame;
+    const step = (now) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+      setDisplayScore(Math.round(ease * target));
+
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(step);
+      } else {
+        setDisplayScore(target);
+        setBarsFilled(true);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [isCardInView, activeTab]);
+
+  // "How It Works" Auto-Advance (Every 3 seconds, paused on hover)
+  useEffect(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced || isStepPaused) return;
+
+    const timer = setInterval(() => {
+      setActiveStep((prev) => (prev + 1) % 3);
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [isStepPaused]);
+
+  // 1-Click Demo Login Handler
   const handle1ClickDemo = async (role) => {
     setDemoRoleLoading(role);
     setWakeUpNotice(false);
 
-    // After 2.5s of waiting, show friendly server wake-up notice
     const noticeTimer = setTimeout(() => {
       setWakeUpNotice(true);
     }, 2500);
 
-    // 60-second timeout guard
     const timeoutPromise = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('TIMEOUT')), 60000)
     );
@@ -44,7 +398,7 @@ const Hero = () => {
       const res = await Promise.race([loginPromise, timeoutPromise]);
       clearTimeout(noticeTimer);
       showToast(`Signed in as demo ${role} (${res.name})!`, 'success');
-      navigate(role === 'recruiter' ? '/dashboard' : '/dashboard');
+      navigate('/dashboard');
     } catch (err) {
       clearTimeout(noticeTimer);
       console.error('Demo login error:', err);
@@ -59,11 +413,67 @@ const Hero = () => {
     }
   };
 
+  // Playground Sample Loaders
+  const loadPlaygroundSenior = () => {
+    setJobDescription(
+      'Senior Full-Stack Engineer @ Acme Payments.\nRequirements:\n- 4+ years production experience with React and Node.js\n- Deep knowledge of Express, MongoDB, and PostgreSQL\n- Experience deploying with Docker containerization\n- Strong background in building REST APIs and Git workflows\n- B.S. in Computer Science or equivalent practical experience'
+    );
+    setResumeText(
+      'Alex Rivera — Senior Software Engineer (5+ years)\n\nSummary: Full-stack engineer specialized in high-performance web applications and asynchronous API architectures.\n\nTechnical Skills: React, Node.js, Express, MongoDB, PostgreSQL, REST APIs, Git, JavaScript, TypeScript.\n\nExperience: Led backend architecture at a fintech startup, building high-throughput payment processing APIs handling 25k daily requests. Engineered component library in React.\n\nEducation: Bachelor of Science in Computer Science, 2020.'
+    );
+    setPlaygroundError(null);
+    setPlaygroundResult(null);
+  };
+
+  const loadPlaygroundJunior = () => {
+    setJobDescription(
+      'Junior Full-Stack Developer @ Nova Logistics.\nRequirements:\n- 1-2 years experience with web development\n- Proficiency in JavaScript, HTML, CSS\n- Familiarity with React and Node.js\n- Experience with Git version control and REST APIs'
+    );
+    setResumeText(
+      'Jordan Lee — Junior Web Developer (1 year)\n\nSkills: HTML, CSS, JavaScript, Git, Tailwind, basic React.\n\nExperience: Junior Developer at a creative agency building responsive websites and consuming third-party REST APIs. Maintained client portals and optimized page speed.\n\nEducation: Associate Degree in Information Technology, 2023.'
+    );
+    setPlaygroundError(null);
+    setPlaygroundResult(null);
+  };
+
+  const handlePlaygroundSubmit = async (e) => {
+    e.preventDefault();
+    if (!jobDescription.trim() || !resumeText.trim()) {
+      setPlaygroundError('Please provide both a job description and resume text to calculate match.');
+      return;
+    }
+
+    setPlaygroundLoading(true);
+    setPlaygroundError(null);
+    setPlaygroundResult(null);
+
+    try {
+      const response = await fetch('/api/public/quick-match', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobDescription, resumeText }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to compute match score.');
+      }
+
+      setPlaygroundResult(data);
+    } catch (err) {
+      setPlaygroundError(err.message || 'Error running match engine. Please retry.');
+    } finally {
+      setPlaygroundLoading(false);
+    }
+  };
+
   return (
     <section style={{ padding: '4.5rem 0 5rem', position: 'relative', background: 'var(--bg-primary)' }}>
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-        {/* Hero Title & Subtitle */}
-        <div style={{ textAlign: 'center', maxWidth: '880px', margin: '0 auto 3rem' }}>
+        {/* =========================================================================
+            SECTION 1: Hero Title, Subtitle, Built with Strip, Demo Actions
+            ========================================================================= */}
+        <div className="reveal-on-scroll" style={{ textAlign: 'center', maxWidth: '880px', margin: '0 auto 3rem' }}>
           <h1
             style={{
               fontFamily: "'Newsreader', 'Charter', Georgia, serif",
@@ -77,6 +487,7 @@ const Hero = () => {
             Stop Losing Top Talent to <br />
             <span style={{ color: 'var(--accent-teal)', fontWeight: 700 }}>Blind ATS Keyword Filters</span>
           </h1>
+
           <p
             style={{
               fontSize: 'clamp(1.05rem, 2vw, 1.22rem)',
@@ -89,7 +500,7 @@ const Hero = () => {
             Aptly.AI scores candidates on real skills, not just keywords, and shows them exactly what to improve.
           </p>
 
-          {/* Built with Strip */}
+          {/* Built with Strip - Appears only once */}
           <div
             style={{
               display: 'inline-flex',
@@ -115,7 +526,7 @@ const Hero = () => {
             <span style={{ color: 'var(--accent-teal)', fontWeight: 600 }}>Google Gemini</span>
           </div>
 
-          {/* Hero Action Buttons: Only 2 Buttons (or 1 "Go to Dashboard" if logged in) */}
+          {/* Hero Action Buttons */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '0.85rem', flexWrap: 'wrap', alignItems: 'center' }}>
             {isAuthenticated && user ? (
               <Link
@@ -197,7 +608,7 @@ const Hero = () => {
             )}
           </div>
 
-          {/* Cold-start friendly notice while server wakes up */}
+          {/* Cold-start wake-up notification */}
           {demoRoleLoading && wakeUpNotice && (
             <div
               style={{
@@ -217,10 +628,82 @@ const Hero = () => {
           )}
         </div>
 
-        {/* Interactive Sample ATS Evaluation Card Preview */}
-        <div id="preview" style={{ maxWidth: '940px', margin: '0 auto' }}>
+        {/* =========================================================================
+            SECTION 2: Interactive Animated Sample Card & 3-Tab Switcher
+            ========================================================================= */}
+        <div id="preview" className="reveal-on-scroll" style={{ maxWidth: '940px', margin: '0 auto' }}>
+          {/* 3 Tabs Switcher */}
           <div
-            className="paper-card"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '0.75rem',
+              marginBottom: '0.85rem',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              <Sliders size={14} color="var(--accent-teal)" />
+              <span style={{ fontWeight: 600 }}>Interactive candidate archetypes:</span>
+            </div>
+
+            <div
+              style={{
+                display: 'inline-flex',
+                flexWrap: 'wrap',
+                maxWidth: '100%',
+                background: 'var(--bg-secondary)',
+                padding: '0.25rem',
+                borderRadius: '6px',
+                border: '1px solid var(--border-default)',
+                gap: '0.25rem',
+              }}
+            >
+              {Object.values(SAMPLE_CANDIDATES).map((cand) => {
+                const isActive = activeTab === cand.id;
+                return (
+                  <button
+                    key={cand.id}
+                    type="button"
+                    onClick={() => setActiveTab(cand.id)}
+                    style={{
+                      border: 'none',
+                      background: isActive ? '#FFFFFF' : 'transparent',
+                      color: isActive ? 'var(--accent-teal)' : 'var(--text-secondary)',
+                      fontWeight: isActive ? 700 : 500,
+                      fontSize: '0.8rem',
+                      padding: '0.35rem 0.85rem',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      boxShadow: isActive ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                      transition: 'all 0.15s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                    }}
+                  >
+                    <span>{cand.label}</span>
+                    <span
+                      style={{
+                        fontSize: '0.72rem',
+                        opacity: 0.8,
+                        fontFamily: 'monospace',
+                        fontWeight: 700,
+                      }}
+                    >
+                      ({cand.targetScore}%)
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Sample Card */}
+          <div
+            ref={cardRef}
+            className="paper-card interactive-card"
             style={{
               padding: '1.75rem',
               border: '1px solid var(--border-default)',
@@ -258,9 +741,9 @@ const Hero = () => {
                   <Terminal size={18} color="var(--accent-teal)" />
                 </div>
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem', flexWrap: 'wrap' }}>
                     <h4 style={{ fontSize: '1.1rem', margin: 0, fontWeight: 700, color: 'var(--text-primary)' }}>
-                      Full-Stack MERN Systems Engineer
+                      {currentCandidate.roleTitle}
                     </h4>
                     <span
                       style={{
@@ -277,18 +760,13 @@ const Hero = () => {
                       Sample evaluation
                     </span>
                   </div>
-                  <div
-                    style={{
-                      fontSize: '0.78rem',
-                      color: 'var(--text-muted)',
-                      letterSpacing: '0.01em',
-                    }}
-                  >
-                    Sample candidate • Sample company
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                    Sample candidate • Acme Payments
                   </div>
                 </div>
               </div>
 
+              {/* Animated Target Match Score */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <span
                   style={{
@@ -299,14 +777,15 @@ const Hero = () => {
                     borderRadius: '4px',
                     fontSize: '0.78rem',
                     fontWeight: 600,
-                    background: 'rgba(45, 122, 58, 0.1)',
-                    color: 'var(--semantic-green)',
-                    border: '1px solid rgba(45, 122, 58, 0.25)',
+                    background: currentCandidate.badgeBg,
+                    color: currentCandidate.badgeColor,
+                    border: currentCandidate.badgeBorder,
                   }}
                 >
                   <CheckCircle2 size={13} />
-                  Strong Match
+                  {currentCandidate.badgeText}
                 </span>
+
                 <div
                   style={{
                     padding: '0.3rem 0.75rem',
@@ -314,11 +793,14 @@ const Hero = () => {
                     border: '1px solid rgba(15, 107, 92, 0.25)',
                     borderRadius: '4px',
                     fontWeight: 700,
-                    fontSize: '0.88rem',
+                    fontSize: '0.92rem',
                     color: 'var(--accent-teal)',
+                    fontFamily: 'monospace',
+                    minWidth: '78px',
+                    textAlign: 'center',
                   }}
                 >
-                  88% Fit
+                  {displayScore}% Fit
                 </div>
               </div>
             </div>
@@ -354,15 +836,15 @@ const Hero = () => {
                 >
                   How the score is built
                 </span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--accent-teal)', fontWeight: 600 }}>
-                  90×0.4 + 85×0.3 + 90×0.2 + 80×0.1 = 88%
+                <span style={{ fontSize: '0.75rem', color: 'var(--accent-teal)', fontWeight: 600, fontFamily: 'monospace' }}>
+                  {currentCandidate.formulaMath}
                 </span>
               </div>
 
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
                   gap: '0.85rem',
                 }}
               >
@@ -370,10 +852,18 @@ const Hero = () => {
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.25rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Skills (40%)</span>
-                    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>90%</span>
+                    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{currentCandidate.subScores.skills}%</span>
                   </div>
-                  <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
-                    <div style={{ width: '90%', height: '100%', background: 'var(--accent-teal)', borderRadius: '2px' }} />
+                  <div style={{ height: '5px', background: 'var(--border-default)', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div
+                      style={{
+                        width: barsFilled ? `${currentCandidate.subScores.skills}%` : '0%',
+                        height: '100%',
+                        background: 'var(--accent-teal)',
+                        borderRadius: '3px',
+                        transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+                      }}
+                    />
                   </div>
                 </div>
 
@@ -381,10 +871,18 @@ const Hero = () => {
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.25rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Experience (30%)</span>
-                    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>85%</span>
+                    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{currentCandidate.subScores.experience}%</span>
                   </div>
-                  <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
-                    <div style={{ width: '85%', height: '100%', background: 'var(--accent-teal)', borderRadius: '2px' }} />
+                  <div style={{ height: '5px', background: 'var(--border-default)', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div
+                      style={{
+                        width: barsFilled ? `${currentCandidate.subScores.experience}%` : '0%',
+                        height: '100%',
+                        background: 'var(--accent-teal)',
+                        borderRadius: '3px',
+                        transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+                      }}
+                    />
                   </div>
                 </div>
 
@@ -392,10 +890,18 @@ const Hero = () => {
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.25rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Domain (20%)</span>
-                    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>90%</span>
+                    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{currentCandidate.subScores.domain}%</span>
                   </div>
-                  <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
-                    <div style={{ width: '90%', height: '100%', background: 'var(--accent-teal)', borderRadius: '2px' }} />
+                  <div style={{ height: '5px', background: 'var(--border-default)', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div
+                      style={{
+                        width: barsFilled ? `${currentCandidate.subScores.domain}%` : '0%',
+                        height: '100%',
+                        background: 'var(--accent-teal)',
+                        borderRadius: '3px',
+                        transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+                      }}
+                    />
                   </div>
                 </div>
 
@@ -403,88 +909,56 @@ const Hero = () => {
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.25rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Education (10%)</span>
-                    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>80%</span>
+                    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{currentCandidate.subScores.education}%</span>
                   </div>
-                  <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
-                    <div style={{ width: '80%', height: '100%', background: 'var(--accent-teal)', borderRadius: '2px' }} />
+                  <div style={{ height: '5px', background: 'var(--border-default)', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div
+                      style={{
+                        width: barsFilled ? `${currentCandidate.subScores.education}%` : '0%',
+                        height: '100%',
+                        background: 'var(--accent-teal)',
+                        borderRadius: '3px',
+                        transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+                      }}
+                    />
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Grid of details inside card */}
+            {/* Interactive Skills Grid with Hover/Tap Tooltips */}
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))',
                 gap: '1.35rem',
                 marginBottom: '1.35rem',
               }}
             >
               <div>
-                <span
-                  style={{
-                    fontSize: '0.74rem',
-                    color: 'var(--text-muted)',
-                    fontWeight: 700,
-                    letterSpacing: '0.01em',
-                  }}
-                >
-                  Skills you have
+                <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.01em' }}>
+                  Skills you have (hover or tap for details):
                 </span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginTop: '0.6rem' }}>
-                  {['React.js', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'REST APIs', 'Git'].map((skill) => (
-                    <span
-                      key={skill}
-                      style={{
-                        fontSize: '0.76rem',
-                        padding: '0.2rem 0.6rem',
-                        background: 'var(--accent-teal-light)',
-                        border: '1px solid rgba(15, 107, 92, 0.2)',
-                        borderRadius: '3px',
-                        color: 'var(--accent-teal)',
-                        fontWeight: 500,
-                      }}
-                    >
-                      {skill}
-                    </span>
+                  {currentCandidate.matchedSkills.map((skill) => (
+                    <SkillChip key={skill.name} skill={skill} isGap={false} />
                   ))}
                 </div>
               </div>
 
               <div>
-                <span
-                  style={{
-                    fontSize: '0.74rem',
-                    color: 'var(--text-muted)',
-                    fontWeight: 700,
-                    letterSpacing: '0.01em',
-                  }}
-                >
-                  Missing skills
+                <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.01em' }}>
+                  Missing skills (hover or tap for action tips):
                 </span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginTop: '0.6rem' }}>
-                  {['Docker Containerization', 'Kubernetes Orchestration'].map((skill) => (
-                    <span
-                      key={skill}
-                      style={{
-                        fontSize: '0.76rem',
-                        padding: '0.2rem 0.6rem',
-                        background: 'rgba(185, 28, 28, 0.08)',
-                        border: '1px solid rgba(185, 28, 28, 0.22)',
-                        borderRadius: '3px',
-                        color: 'var(--semantic-red)',
-                        fontWeight: 500,
-                      }}
-                    >
-                      {skill}
-                    </span>
+                  {currentCandidate.missingSkills.map((skill) => (
+                    <SkillChip key={skill.name} skill={skill} isGap={true} />
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Recruiter Executive Summary in Clean Quotebox */}
+            {/* AI Summary Quotebox */}
             <div
               style={{
                 background: 'var(--bg-primary)',
@@ -510,10 +984,10 @@ const Hero = () => {
               >
                 AI summary:
               </span>
-              Subject candidate profile demonstrates robust technical proficiency across full-stack MERN engineering, asynchronous API architectures, and REST services. The candidate exhibits strong alignment with target role requirements.
+              {currentCandidate.summary}
             </div>
 
-            {/* Interactive Card Action Bar */}
+            {/* Card Action Bar */}
             <div
               style={{
                 display: 'flex',
@@ -526,23 +1000,14 @@ const Hero = () => {
                 borderTop: '1px solid var(--border-default)',
               }}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontSize: '0.8rem',
-                  color: 'var(--text-muted)',
-                }}
-              >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                 <ShieldCheck size={15} color="var(--accent-teal)" />
                 <span>AI Evaluation Engine • Graceful fallback if AI is offline</span>
               </div>
 
               <div>
-                <button
-                  type="button"
-                  onClick={() => navigate(isAuthenticated ? '/dashboard' : '/login')}
+                <a
+                  href="#playground"
                   className="btn btn-primary"
                   style={{
                     fontSize: '0.84rem',
@@ -555,14 +1020,16 @@ const Hero = () => {
                 >
                   <span>Try it with your own resume</span>
                   <ArrowRight size={14} />
-                </button>
+                </a>
               </div>
             </div>
           </div>
         </div>
 
-        {/* 3-Step "How It Works" Section */}
-        <div style={{ marginTop: '4rem', textAlign: 'center' }}>
+        {/* =========================================================================
+            SECTION 3: "How It Works" 3-Step Auto-Advancing Pipeline
+            ========================================================================= */}
+        <div className="reveal-on-scroll" style={{ marginTop: '4.5rem', textAlign: 'center' }}>
           <div
             style={{
               fontSize: '0.78rem',
@@ -580,51 +1047,68 @@ const Hero = () => {
               fontFamily: "'Newsreader', 'Charter', Georgia, serif",
               fontSize: 'clamp(1.75rem, 3.2vw, 2.3rem)',
               color: 'var(--text-primary)',
-              marginBottom: '2rem',
+              marginBottom: '0.6rem',
               letterSpacing: '-0.02em',
             }}
           >
             How Aptly.AI Works
           </h2>
+          <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', marginBottom: '2rem' }}>
+            Auto-advances every 3s • Hover to pause • Click any step to inspect
+          </p>
 
           <div
+            onMouseEnter={() => setIsStepPaused(true)}
+            onMouseLeave={() => setIsStepPaused(false)}
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))',
               gap: '1.35rem',
               textAlign: 'left',
             }}
           >
             {/* Step 1 */}
             <div
-              className="paper-card"
+              onClick={() => setActiveStep(0)}
+              className="paper-card interactive-card"
               style={{
                 padding: '1.6rem',
                 background: 'var(--bg-card)',
-                border: '1px solid var(--border-default)',
+                border: activeStep === 0 ? '1.5px solid var(--accent-teal)' : '1px solid var(--border-default)',
                 borderRadius: '6px',
+                cursor: 'pointer',
+                boxShadow: activeStep === 0 ? '0 6px 20px rgba(15, 107, 92, 0.12)' : 'none',
+                position: 'relative',
+                transition: 'all 0.2s ease',
               }}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginBottom: '1rem',
-                }}
-              >
+              {activeStep === 0 && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '3px',
+                    background: 'var(--accent-teal)',
+                    borderRadius: '6px 6px 0 0',
+                  }}
+                />
+              )}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <div
                   style={{
                     width: '36px',
                     height: '36px',
                     borderRadius: '4px',
-                    background: 'var(--accent-teal-light)',
+                    background: activeStep === 0 ? 'var(--accent-teal)' : 'var(--accent-teal-light)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    transition: 'all 0.2s ease',
                   }}
                 >
-                  <FileCheck size={18} color="var(--accent-teal)" />
+                  <FileCheck size={18} color={activeStep === 0 ? '#FFFFFF' : 'var(--accent-teal)'} />
                 </div>
                 <span
                   style={{
@@ -632,7 +1116,7 @@ const Hero = () => {
                     fontWeight: 800,
                     fontFamily: 'monospace',
                     color: 'var(--accent-teal)',
-                    opacity: 0.5,
+                    opacity: activeStep === 0 ? 1 : 0.4,
                   }}
                 >
                   01
@@ -648,34 +1132,46 @@ const Hero = () => {
 
             {/* Step 2 */}
             <div
-              className="paper-card"
+              onClick={() => setActiveStep(1)}
+              className="paper-card interactive-card"
               style={{
                 padding: '1.6rem',
                 background: 'var(--bg-card)',
-                border: '1px solid var(--border-default)',
+                border: activeStep === 1 ? '1.5px solid var(--accent-teal)' : '1px solid var(--border-default)',
                 borderRadius: '6px',
+                cursor: 'pointer',
+                boxShadow: activeStep === 1 ? '0 6px 20px rgba(15, 107, 92, 0.12)' : 'none',
+                position: 'relative',
+                transition: 'all 0.2s ease',
               }}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginBottom: '1rem',
-                }}
-              >
+              {activeStep === 1 && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '3px',
+                    background: 'var(--accent-teal)',
+                    borderRadius: '6px 6px 0 0',
+                  }}
+                />
+              )}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <div
                   style={{
                     width: '36px',
                     height: '36px',
                     borderRadius: '4px',
-                    background: 'rgba(45, 122, 58, 0.1)',
+                    background: activeStep === 1 ? 'var(--semantic-green)' : 'rgba(45, 122, 58, 0.1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    transition: 'all 0.2s ease',
                   }}
                 >
-                  <Sparkles size={18} color="var(--semantic-green)" />
+                  <Sparkles size={18} color={activeStep === 1 ? '#FFFFFF' : 'var(--semantic-green)'} />
                 </div>
                 <span
                   style={{
@@ -683,7 +1179,7 @@ const Hero = () => {
                     fontWeight: 800,
                     fontFamily: 'monospace',
                     color: 'var(--semantic-green)',
-                    opacity: 0.5,
+                    opacity: activeStep === 1 ? 1 : 0.4,
                   }}
                 >
                   02
@@ -699,34 +1195,46 @@ const Hero = () => {
 
             {/* Step 3 */}
             <div
-              className="paper-card"
+              onClick={() => setActiveStep(2)}
+              className="paper-card interactive-card"
               style={{
                 padding: '1.6rem',
                 background: 'var(--bg-card)',
-                border: '1px solid var(--border-default)',
+                border: activeStep === 2 ? '1.5px solid var(--accent-teal)' : '1px solid var(--border-default)',
                 borderRadius: '6px',
+                cursor: 'pointer',
+                boxShadow: activeStep === 2 ? '0 6px 20px rgba(15, 107, 92, 0.12)' : 'none',
+                position: 'relative',
+                transition: 'all 0.2s ease',
               }}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginBottom: '1rem',
-                }}
-              >
+              {activeStep === 2 && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '3px',
+                    background: 'var(--accent-teal)',
+                    borderRadius: '6px 6px 0 0',
+                  }}
+                />
+              )}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <div
                   style={{
                     width: '36px',
                     height: '36px',
                     borderRadius: '4px',
-                    background: 'var(--accent-teal-light)',
+                    background: activeStep === 2 ? 'var(--accent-teal)' : 'var(--accent-teal-light)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    transition: 'all 0.2s ease',
                   }}
                 >
-                  <Target size={18} color="var(--accent-teal)" />
+                  <Target size={18} color={activeStep === 2 ? '#FFFFFF' : 'var(--accent-teal)'} />
                 </div>
                 <span
                   style={{
@@ -734,7 +1242,7 @@ const Hero = () => {
                     fontWeight: 800,
                     fontFamily: 'monospace',
                     color: 'var(--accent-teal)',
-                    opacity: 0.5,
+                    opacity: activeStep === 2 ? 1 : 0.4,
                   }}
                 >
                   03
@@ -750,17 +1258,504 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Feature Highlights Grid - Concise One-Liners */}
+        {/* =========================================================================
+            SECTION 4: Free Interactive Playground ("Try it now", no login needed)
+            ========================================================================= */}
+        <div id="playground" className="reveal-on-scroll" style={{ marginTop: '5rem', maxWidth: '940px', margin: '5rem auto 0' }}>
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <div
+              style={{
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                color: 'var(--accent-teal)',
+                marginBottom: '0.4rem',
+              }}
+            >
+              Public Sandbox
+            </div>
+            <h2
+              style={{
+                fontFamily: "'Newsreader', 'Charter', Georgia, serif",
+                fontSize: 'clamp(1.8rem, 3.2vw, 2.35rem)',
+                color: 'var(--text-primary)',
+                letterSpacing: '-0.02em',
+                marginBottom: '0.6rem',
+              }}
+            >
+              Try the ATS Matcher Live
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', maxWidth: '620px', margin: '0 auto' }}>
+              Paste any job description and resume snippet below to test rule-based semantic evaluation instantly. No signup required.
+            </p>
+
+            {/* Quick Fill Sample Buttons */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', marginTop: '1.25rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={loadPlaygroundSenior}
+                className="btn btn-secondary"
+                style={{ fontSize: '0.78rem', padding: '0.35rem 0.85rem' }}
+              >
+                <span>Sample: Senior MERN Engineer</span>
+              </button>
+              <button
+                type="button"
+                onClick={loadPlaygroundJunior}
+                className="btn btn-secondary"
+                style={{ fontSize: '0.78rem', padding: '0.35rem 0.85rem' }}
+              >
+                <span>Sample: Junior Developer</span>
+              </button>
+              {(jobDescription || resumeText) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setJobDescription('');
+                    setResumeText('');
+                    setPlaygroundResult(null);
+                    setPlaygroundError(null);
+                  }}
+                  className="btn btn-ghost"
+                  style={{ fontSize: '0.78rem', padding: '0.35rem 0.65rem' }}
+                >
+                  <RotateCcw size={13} />
+                  <span>Clear</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          <form
+            onSubmit={handlePlaygroundSubmit}
+            className="paper-card"
+            style={{
+              padding: '1.85rem',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-default)',
+              borderRadius: '6px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+            }}
+          >
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
+              {/* Job Description Textarea */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <label htmlFor="playground-jd" style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                    Job Description / Prerequisites
+                  </label>
+                  <span
+                    style={{
+                      fontSize: '0.72rem',
+                      color: jobDescription.length > 2800 ? 'var(--semantic-red)' : 'var(--text-muted)',
+                      fontFamily: 'monospace',
+                    }}
+                  >
+                    {jobDescription.length}/3000
+                  </span>
+                </div>
+                <textarea
+                  id="playground-jd"
+                  rows={6}
+                  maxLength={3000}
+                  placeholder="Paste target job prerequisites (e.g. React, Node.js, Express, MongoDB, Docker, 4+ years experience)..."
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
+                  className="form-input"
+                  style={{ fontSize: '0.86rem', resize: 'vertical', minHeight: '140px', lineHeight: 1.5 }}
+                />
+              </div>
+
+              {/* Resume Text Textarea */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <label htmlFor="playground-resume" style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                    Resume Experience & Skills
+                  </label>
+                  <span
+                    style={{
+                      fontSize: '0.72rem',
+                      color: resumeText.length > 2800 ? 'var(--semantic-red)' : 'var(--text-muted)',
+                      fontFamily: 'monospace',
+                    }}
+                  >
+                    {resumeText.length}/3000
+                  </span>
+                </div>
+                <textarea
+                  id="playground-resume"
+                  rows={6}
+                  maxLength={3000}
+                  placeholder="Paste candidate background or skills summary (e.g. 4 years of experience with React, Node.js, Express, Bachelor in CS)..."
+                  value={resumeText}
+                  onChange={(e) => setResumeText(e.target.value)}
+                  className="form-input"
+                  style={{ fontSize: '0.86rem', resize: 'vertical', minHeight: '140px', lineHeight: 1.5 }}
+                />
+              </div>
+            </div>
+
+            {/* Error Notification */}
+            {playgroundError && (
+              <div
+                style={{
+                  background: 'rgba(185, 28, 28, 0.08)',
+                  border: '1px solid rgba(185, 28, 28, 0.25)',
+                  borderRadius: '4px',
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.82rem',
+                  color: 'var(--semantic-red)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  marginBottom: '1.25rem',
+                }}
+              >
+                <AlertTriangle size={15} style={{ flexShrink: 0 }} />
+                <span>{playgroundError}</span>
+              </div>
+            )}
+
+            {/* Action Bar */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+                Rule-based matcher • 10 req / 15 min per IP • 0 data stored
+              </div>
+
+              <button
+                type="submit"
+                disabled={playgroundLoading || !jobDescription.trim() || !resumeText.trim()}
+                className="btn btn-primary"
+                style={{
+                  padding: '0.65rem 1.45rem',
+                  fontSize: '0.9rem',
+                  fontWeight: 600,
+                  opacity: playgroundLoading || !jobDescription.trim() || !resumeText.trim() ? 0.6 : 1,
+                  cursor: playgroundLoading ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {playgroundLoading ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>Analyzing Match...</span>
+                  </>
+                ) : (
+                  <>
+                    <Zap size={15} />
+                    <span>Check Match</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+
+          {/* Playground Result Card */}
+          {playgroundLoading && (
+            <div
+              className="paper-card"
+              style={{
+                marginTop: '1.5rem',
+                padding: '2rem',
+                border: '1px dashed var(--border-default)',
+                borderRadius: '6px',
+                textAlign: 'center',
+                background: 'var(--bg-card)',
+              }}
+            >
+              <Loader2 size={28} className="animate-spin" style={{ color: 'var(--accent-teal)', margin: '0 auto 0.75rem' }} />
+              <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                Evaluating candidate alignment against requirements...
+              </div>
+              <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                Applying 40/30/20/10 weighted formula
+              </div>
+            </div>
+          )}
+
+          {!playgroundLoading && playgroundResult && (
+            <div
+              className="paper-card"
+              style={{
+                marginTop: '1.5rem',
+                padding: '1.65rem',
+                border: '1px solid var(--border-default)',
+                borderRadius: '6px',
+                background: 'var(--bg-card)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                animation: 'fadeIn 0.25s ease-out forwards',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  borderBottom: '1px solid var(--border-default)',
+                  paddingBottom: '1rem',
+                  marginBottom: '1.25rem',
+                  flexWrap: 'wrap',
+                  gap: '0.75rem',
+                }}
+              >
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                    Evaluation Scorecard
+                  </h4>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                    Public sandbox evaluation result
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      padding: '0.3rem 0.75rem',
+                      borderRadius: '4px',
+                      fontSize: '0.78rem',
+                      fontWeight: 600,
+                      background:
+                        playgroundResult.matchScore >= 75
+                          ? 'rgba(45, 122, 58, 0.1)'
+                          : playgroundResult.matchScore >= 45
+                          ? 'rgba(180, 83, 9, 0.1)'
+                          : 'rgba(185, 28, 28, 0.08)',
+                      color:
+                        playgroundResult.matchScore >= 75
+                          ? 'var(--semantic-green)'
+                          : playgroundResult.matchScore >= 45
+                          ? 'var(--semantic-amber)'
+                          : 'var(--semantic-red)',
+                      border: `1px solid ${
+                        playgroundResult.matchScore >= 75
+                          ? 'rgba(45, 122, 58, 0.25)'
+                          : playgroundResult.matchScore >= 45
+                          ? 'rgba(180, 83, 9, 0.25)'
+                          : 'rgba(185, 28, 28, 0.22)'
+                      }`,
+                    }}
+                  >
+                    <CheckCircle2 size={13} />
+                    {playgroundResult.recommendation}
+                  </span>
+
+                  <div
+                    style={{
+                      padding: '0.3rem 0.75rem',
+                      background: 'var(--accent-teal-light)',
+                      border: '1px solid rgba(15, 107, 92, 0.25)',
+                      borderRadius: '4px',
+                      fontWeight: 700,
+                      fontSize: '0.92rem',
+                      color: 'var(--accent-teal)',
+                      fontFamily: 'monospace',
+                    }}
+                  >
+                    {playgroundResult.matchScore}% Match
+                  </div>
+                </div>
+              </div>
+
+              {/* 4 Sub-Score Progress Bars */}
+              <div
+                style={{
+                  marginBottom: '1.25rem',
+                  padding: '0.95rem 1.15rem',
+                  background: 'var(--bg-primary)',
+                  borderRadius: '4px',
+                  border: '1px solid var(--border-default)',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '0.75rem',
+                    flexWrap: 'wrap',
+                    gap: '0.4rem',
+                  }}
+                >
+                  <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                    Weighted Score Breakdown
+                  </span>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--accent-teal)', fontWeight: 600, fontFamily: 'monospace' }}>
+                    {playgroundResult.scoreBreakdown.skills}×0.4 + {playgroundResult.scoreBreakdown.experience}×0.3 +{' '}
+                    {playgroundResult.scoreBreakdown.domain}×0.2 + {playgroundResult.scoreBreakdown.education}×0.1 ={' '}
+                    {playgroundResult.matchScore}%
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.85rem' }}>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: '0.2rem' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>Skills (40%)</span>
+                      <span style={{ fontWeight: 700 }}>{playgroundResult.scoreBreakdown.skills}%</span>
+                    </div>
+                    <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
+                      <div
+                        style={{
+                          width: `${playgroundResult.scoreBreakdown.skills}%`,
+                          height: '100%',
+                          background: 'var(--accent-teal)',
+                          borderRadius: '2px',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: '0.2rem' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>Experience (30%)</span>
+                      <span style={{ fontWeight: 700 }}>{playgroundResult.scoreBreakdown.experience}%</span>
+                    </div>
+                    <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
+                      <div
+                        style={{
+                          width: `${playgroundResult.scoreBreakdown.experience}%`,
+                          height: '100%',
+                          background: 'var(--accent-teal)',
+                          borderRadius: '2px',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: '0.2rem' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>Domain (20%)</span>
+                      <span style={{ fontWeight: 700 }}>{playgroundResult.scoreBreakdown.domain}%</span>
+                    </div>
+                    <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
+                      <div
+                        style={{
+                          width: `${playgroundResult.scoreBreakdown.domain}%`,
+                          height: '100%',
+                          background: 'var(--accent-teal)',
+                          borderRadius: '2px',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: '0.2rem' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>Education (10%)</span>
+                      <span style={{ fontWeight: 700 }}>{playgroundResult.scoreBreakdown.education}%</span>
+                    </div>
+                    <div style={{ height: '4px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
+                      <div
+                        style={{
+                          width: `${playgroundResult.scoreBreakdown.education}%`,
+                          height: '100%',
+                          background: 'var(--accent-teal)',
+                          borderRadius: '2px',
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Matched & Missing Skills */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
+                <div>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700 }}>
+                    Matched Skills ({playgroundResult.matchedSkills?.length || 0}):
+                  </span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.5rem' }}>
+                    {playgroundResult.matchedSkills && playgroundResult.matchedSkills.length > 0 ? (
+                      playgroundResult.matchedSkills.map((s) => (
+                        <span
+                          key={s}
+                          style={{
+                            fontSize: '0.76rem',
+                            padding: '0.2rem 0.55rem',
+                            background: 'var(--accent-teal-light)',
+                            border: '1px solid rgba(15, 107, 92, 0.25)',
+                            borderRadius: '3px',
+                            color: 'var(--accent-teal)',
+                            fontWeight: 600,
+                          }}
+                        >
+                          {s}
+                        </span>
+                      ))
+                    ) : (
+                      <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>None detected</span>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700 }}>
+                    Missing Skills ({playgroundResult.missingSkills?.length || 0}):
+                  </span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.5rem' }}>
+                    {playgroundResult.missingSkills && playgroundResult.missingSkills.length > 0 ? (
+                      playgroundResult.missingSkills.map((s) => (
+                        <span
+                          key={s}
+                          style={{
+                            fontSize: '0.76rem',
+                            padding: '0.2rem 0.55rem',
+                            background: 'rgba(185, 28, 28, 0.08)',
+                            border: '1px solid rgba(185, 28, 28, 0.22)',
+                            borderRadius: '3px',
+                            color: 'var(--semantic-red)',
+                            fontWeight: 600,
+                          }}
+                        >
+                          {s}
+                        </span>
+                      ))
+                    ) : (
+                      <span style={{ fontSize: '0.78rem', color: 'var(--semantic-green)' }}>
+                        ✓ All required skills matched!
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Summary */}
+              <div
+                style={{
+                  background: 'var(--bg-primary)',
+                  borderRadius: '4px',
+                  padding: '0.85rem 1.15rem',
+                  borderLeft: '3px solid var(--accent-teal)',
+                  fontSize: '0.86rem',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.5,
+                }}
+              >
+                <strong style={{ color: 'var(--accent-teal)', display: 'block', marginBottom: '0.2rem' }}>
+                  Summary feedback:
+                </strong>
+                {playgroundResult.summary}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* =========================================================================
+            SECTION 5: Feature Highlights Grid - Concise One-Liners
+            ========================================================================= */}
         <div
+          className="reveal-on-scroll"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))',
             gap: '1.35rem',
-            marginTop: '3.5rem',
+            marginTop: '5rem',
           }}
         >
           <div
-            className="paper-card"
+            className="paper-card interactive-card"
             style={{
               padding: '1.5rem',
               background: 'var(--bg-card)',
@@ -792,7 +1787,7 @@ const Hero = () => {
           </div>
 
           <div
-            className="paper-card"
+            className="paper-card interactive-card"
             style={{
               padding: '1.5rem',
               background: 'var(--bg-card)',
@@ -824,7 +1819,7 @@ const Hero = () => {
           </div>
 
           <div
-            className="paper-card"
+            className="paper-card interactive-card"
             style={{
               padding: '1.5rem',
               background: 'var(--bg-card)',

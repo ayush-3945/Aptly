@@ -71,9 +71,26 @@ const aiUploadLimiter = rateLimit({
   },
 });
 
+/**
+ * Public Quick Match Playground Limiter:
+ * 10 requests per 15 minutes per IP to defend the free sandbox.
+ */
+const quickMatchLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    status: 'error',
+    statusCode: 429,
+    message: 'Playground limit reached (10 requests per 15 minutes). Please try again later or sign in.',
+  },
+});
+
 module.exports = {
   helmetMiddleware,
   generalLimiter,
   authLimiter,
   aiUploadLimiter,
+  quickMatchLimiter,
 };

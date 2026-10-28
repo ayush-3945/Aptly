@@ -5,6 +5,7 @@ const {
   generalLimiter,
   authLimiter,
   aiUploadLimiter,
+  quickMatchLimiter,
 } = require('./middlewares/securityMiddleware');
 
 const app = express();
@@ -50,6 +51,9 @@ app.use(express.json());
 
 // Public Health Check Route (uncapped for monitoring probes)
 app.use('/api/health', require('./routes/healthRoutes'));
+
+// Public Playground Quick-Match Route (capped to 10 req / 15 min, 0 DB writes, 0 AI cost)
+app.use('/api/public', quickMatchLimiter, require('./routes/publicRoutes'));
 
 // Apply General Rate Limiter to all standard API routes
 app.use('/api', generalLimiter);
