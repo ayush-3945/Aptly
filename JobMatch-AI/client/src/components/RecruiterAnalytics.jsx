@@ -6,12 +6,10 @@ import {
   AlertTriangle,
   CheckCircle2,
   Lightbulb,
-  ShieldAlert,
   ArrowRight,
   Filter,
   BarChart2,
   Award,
-  ChevronRight,
 } from 'lucide-react';
 import api from '../services/api';
 
@@ -21,166 +19,123 @@ const RecruiterAnalytics = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [hoveredWeek, setHoveredWeek] = useState(null);
 
-  // Fetch Pipeline Analytics & AI Insights from API
+  // Fetch Pipeline Analytics from Single Source of Truth (/api/analytics/overview)
   const fetchAnalytics = async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
 
     try {
-      const res = await api.get('/analytics/insights');
+      const res = await api.get('/analytics/overview');
       if (res.data && res.data.data) {
         setData(res.data.data);
       }
     } catch (err) {
-      console.warn('[RecruiterAnalytics] Failed to fetch live analytics, using fallback:', err.message);
-      // Fallback data is automatically returned by backend controller, but in case of network offline:
+      console.warn('[RecruiterAnalytics] Failed to fetch live analytics, using verified sample:', err.message);
+      // Consistent sample data fallback if server is offline
       setData({
-        aggregatedData: {
-          totalApplicants: 48,
-          totalJobs: 4,
-          conversionRate: 8.3,
-          hasHistoricalData: false,
-          conversionTrend: null,
-          avgAiMatchScore: 78.4,
-          screeningVelocity: '< 2.5s',
-          avgDaysToHire: 18,
-          industryAvgDays: 23,
-          stageDistribution: [
-            { stage: 'applied', label: 'Applied', count: 18, pct: 37.5, color: '#0F766E' },
-            { stage: 'shortlisted', label: 'Shortlisted', count: 14, pct: 29.2, color: '#0D9488' },
-            { stage: 'interview', label: 'Interview', count: 10, pct: 20.8, color: '#B45309' },
-            { stage: 'offer', label: 'Offer', count: 4, pct: 8.3, color: '#2D7A3A' },
-            { stage: 'hired', label: 'Hired', count: 4, pct: 8.3, color: '#15803D' },
-            { stage: 'rejected', label: 'Rejected', count: 2, pct: 4.2, color: '#B91C1C' },
-          ],
-          funnelSteps: [
-            { stage: 'Applied', count: 48, pct: 100, dropOff: 0 },
-            { stage: 'Shortlisted', count: 32, pct: 66.7, dropOff: 33.3 },
-            { stage: 'Interview', count: 18, pct: 37.5, dropOff: 43.8 },
-            { stage: 'Offer', count: 6, pct: 12.5, dropOff: 66.7 },
-            { stage: 'Hired', count: 4, pct: 8.3, dropOff: 33.3 },
-          ],
-          qualityTiers: [
-            {
-              tier: 'strong',
-              label: 'Strong Match (≥ 75%)',
-              count: 24,
-              percentage: 50.0,
-              color: '#2D7A3A',
-              desc: 'High technical alignment with core required skills and experience.',
-            },
-            {
-              tier: 'moderate',
-              label: 'Moderate Match (50% – 74%)',
-              count: 18,
-              percentage: 37.5,
-              color: '#B45309',
-              desc: 'Solid foundations with 1–2 minor gaps in specific platform tools.',
-            },
-            {
-              tier: 'low',
-              label: 'Low Match (< 50%)',
-              count: 6,
-              percentage: 12.5,
-              color: '#B91C1C',
-              desc: 'Significant divergence from required technical stack.',
-            },
-          ],
-          topSkills: [
-            { skill: 'React', count: 42, frequency: 88, demandScore: 94, trend: 'rising' },
-            { skill: 'Node.js', count: 37, frequency: 78, demandScore: 88, trend: 'stable' },
-            { skill: 'REST API', count: 40, frequency: 84, demandScore: 86, trend: 'stable' },
-            { skill: 'Cloud Architecture & LLMs', count: 30, frequency: 62, demandScore: 92, trend: 'rising' },
-            { skill: 'MongoDB', count: 33, frequency: 68, demandScore: 78, trend: 'stable' },
-            { skill: 'TypeScript', count: 27, frequency: 56, demandScore: 84, trend: 'rising' },
-            { skill: 'Docker', count: 22, frequency: 46, demandScore: 72, trend: 'stable' },
-            { skill: 'Python', count: 18, frequency: 38, demandScore: 68, trend: 'declining' },
-          ],
-          weeklyTimeline: [
-            { week: 'W1', count: 3, label: '7 wks ago' },
-            { week: 'W2', count: 5, label: '6 wks ago' },
-            { week: 'W3', count: 4, label: '5 wks ago' },
-            { week: 'W4', count: 7, label: '4 wks ago' },
-            { week: 'W5', count: 6, label: '3 wks ago' },
-            { week: 'W6', count: 9, label: '2 wks ago' },
-            { week: 'W7', count: 11, label: 'Last wk' },
-            { week: 'W8', count: 13, label: 'Current' },
-          ],
-        },
-        aiInsights: {
-          pipelineHealth: 'Good',
-          keyInsights: [
-            {
-              type: 'success',
-              title: 'High Semantic Match Quality',
-              description: '62.5% of applicants align closely with core technical stack requirements.',
-              metric: '30 Strong Matches',
-              action: 'Fast-track strong matches directly to technical screens within 48h to secure acceptance.',
-            },
-            {
-              type: 'opportunity',
-              title: 'Surging Demand for Generative & LLM Skills',
-              description: 'Candidate requisitions specifying LLM integration and structured outputs convert 35% faster.',
-              metric: '92% Demand Index',
-              action: 'Incorporate modern architectural questions in the technical interview scorecard.',
-            },
-            {
-              type: 'warning',
-              title: 'Interview-to-Offer Funnel Friction',
-              description: 'Candidate drop-off peaks between technical interview and final offer stage (43.8% drop-off).',
-              metric: '43.8% Drop-Off',
-              action: 'Standardize interview rubric and consolidate take-home assessments into live pairing.',
-            },
-            {
-              type: 'risk',
-              title: 'Declining Legacy Stack Alignment',
-              description: 'Fewer candidates possess legacy Python and standalone REST skills without TypeScript.',
-              metric: '18% Lower Volume',
-              action: 'Offer onboarding micro-trainings or adjust senior criteria to evaluate polyglot fundamentals.',
-            },
-          ],
-          bottleneck: {
-            stage: 'Interview → Offer Stage',
-            dropOffRate: 43.8,
-            reason: 'Multi-round technical interview processes without clear turnaround expectations increase candidate drop-off.',
-            suggestion: 'Consolidate 3 rounds into a 90-minute unified technical pairing session and communicate decisions within 48 hours.',
+        isSampleData: true,
+        totalApplicants: 24,
+        totalJobs: 3,
+        stageCounts: { applied: 8, shortlisted: 6, interview: 6, offer: 2, hired: 2, rejected: 0 },
+        stageDistribution: [
+          { stage: 'applied', label: 'Applied', count: 8, pct: 33.3, color: '#0F766E' },
+          { stage: 'shortlisted', label: 'Shortlisted', count: 6, pct: 25.0, color: '#0D9488' },
+          { stage: 'interview', label: 'Interview', count: 6, pct: 25.0, color: '#B45309' },
+          { stage: 'offer', label: 'Offer', count: 2, pct: 8.3, color: '#2D7A3A' },
+          { stage: 'hired', label: 'Hired', count: 2, pct: 8.3, color: '#15803D' },
+          { stage: 'rejected', label: 'Rejected', count: 0, pct: 0.0, color: '#B91C1C' },
+        ],
+        funnelSteps: [
+          { stage: 'Applied', count: 24, pct: 100, dropOff: 0 },
+          { stage: 'Shortlisted', count: 16, pct: 66.7, dropOff: 33.3 },
+          { stage: 'Interview', count: 10, pct: 41.7, dropOff: 37.5 },
+          { stage: 'Offer', count: 4, pct: 16.7, dropOff: 60.0 },
+          { stage: 'Hired', count: 2, pct: 8.3, dropOff: 50.0 },
+        ],
+        qualityTiers: [
+          {
+            tier: 'strong',
+            label: 'Strong Match (≥ 75%)',
+            count: 12,
+            percentage: 50.0,
+            color: '#2D7A3A',
+            desc: 'High technical alignment with core required skills and experience.',
           },
-          skillDemandTrends: [
-            { skill: 'React & Frontend Frameworks', demandScore: 94, trend: 'rising' },
-            { skill: 'Generative AI & LLM Integration', demandScore: 92, trend: 'rising' },
-            { skill: 'Node.js & Express Microservices', demandScore: 88, trend: 'stable' },
-            { skill: 'TypeScript & Type Safety', demandScore: 84, trend: 'rising' },
-            { skill: 'MongoDB Aggregations', demandScore: 78, trend: 'stable' },
-            { skill: 'Docker Containerization', demandScore: 72, trend: 'stable' },
-            { skill: 'Python Scripting', demandScore: 68, trend: 'declining' },
-            { skill: 'AWS Cloud Deployment', demandScore: 65, trend: 'stable' },
-          ],
-          hiringVelocity: {
-            avgDaysToHire: 18,
-            benchmark: '23 days industry standard',
-            assessment: 'Hiring velocity is 22% faster than industry standard with automated ATS screening.',
+          {
+            tier: 'moderate',
+            label: 'Moderate Match (50% – 74%)',
+            count: 9,
+            percentage: 37.5,
+            color: '#B45309',
+            desc: 'Solid foundations with minor gaps in specific platform tools.',
           },
-          recommendations: [
-            {
-              priority: 'high',
-              title: 'Compress Interview Turnaround from 6 Days to 48 Hours',
-              description: 'Top-tier candidates receive competing offers within 5 business days. Shorten scheduling lag.',
-              expectedImpact: '+24% offer acceptance rate and 4 days reduction in time-to-hire.',
-            },
-            {
-              priority: 'medium',
-              title: 'Broaden Skill Weighting for TypeScript & React Candidates',
-              description: 'High technical synergy observed between modern React developers adapting to full-stack Node.js.',
-              expectedImpact: 'Expands qualified applicant pool by approximately 30%.',
-            },
-            {
-              priority: 'low',
-              title: 'Automate Status Notifications for Rejected Applicants',
-              description: 'Provide constructive automated feedback based on missing skill rubrics to maintain strong employer brand.',
-              expectedImpact: '+18% brand sentiment and increased candidate re-application rate.',
-            },
-          ],
+          {
+            tier: 'low',
+            label: 'Low Match (< 50%)',
+            count: 3,
+            percentage: 12.5,
+            color: '#B91C1C',
+            desc: 'Significant divergence from required technical stack.',
+          },
+        ],
+        scoreMetrics: {
+          averageMatchScore: 82.5,
+          aiEvaluationCount: 20,
+          fallbackEvaluationCount: 4,
+          totalScored: 24,
         },
+        topRequiredSkills: [
+          { skill: 'React', jobCount: 3, candidateMatches: 21, percentOfJobs: 100 },
+          { skill: 'Node.js', jobCount: 3, candidateMatches: 19, percentOfJobs: 100 },
+          { skill: 'MongoDB', jobCount: 2, candidateMatches: 15, percentOfJobs: 67 },
+          { skill: 'TypeScript', jobCount: 2, candidateMatches: 13, percentOfJobs: 67 },
+          { skill: 'Docker', jobCount: 2, candidateMatches: 11, percentOfJobs: 67 },
+          { skill: 'REST API', jobCount: 1, candidateMatches: 18, percentOfJobs: 33 },
+        ],
+        applicationsPerWeek: [
+          { week: 'W1', count: 1, label: '7 wks ago' },
+          { week: 'W2', count: 2, label: '6 wks ago' },
+          { week: 'W3', count: 2, label: '5 wks ago' },
+          { week: 'W4', count: 3, label: '4 wks ago' },
+          { week: 'W5', count: 4, label: '3 wks ago' },
+          { week: 'W6', count: 3, label: '2 wks ago' },
+          { week: 'W7', count: 4, label: 'Last wk' },
+          { week: 'W8', count: 5, label: 'Current' },
+        ],
+        avgDaysToHire: 14,
+        conversionRate: 8.3,
+        pipelineHealth: {
+          status: 'Good',
+          rule: 'Derived from AI Match Score (82.5%) and conversion rate (8.3%). Rule: Excellent if score >= 80% & conversion >= 15%, Good if score >= 70%, Fair if score >= 55%, Needs Attention if score < 55%.',
+        },
+        bottleneck: {
+          stage: 'Interview → Offer',
+          dropOffRate: 60.0,
+          previousStage: 'Interview',
+          currentStage: 'Offer',
+          previousCount: 10,
+          currentCount: 4,
+        },
+        strategicRecommendations: [
+          {
+            priority: 'high',
+            title: 'Funnel Friction: Interview → Offer (60.0% drop)',
+            description: 'Candidate count drops from 10 at Interview to 4 at Offer (60.0% drop-off). Evaluate interview scorecard criteria and turnaround time.',
+            label: 'Rule-based tip',
+          },
+          {
+            priority: 'medium',
+            title: 'Evaluation Integrity: 4 Fallback Evaluations',
+            description: '4 of 24 applications were evaluated using keyword matching fallback while AI was unreachable. Consider re-evaluating when Gemini AI is active.',
+            label: 'Rule-based tip',
+          },
+          {
+            priority: 'low',
+            title: 'Core Stack Alignment: React & Node.js in 100% of Roles',
+            description: 'React and Node.js are required across all 3 open requisitions. Maintain high screening weight on modern component lifecycle and backend patterns.',
+            label: 'Rule-based tip',
+          },
+        ],
         lastUpdated: new Date().toISOString(),
       });
     } finally {
@@ -205,8 +160,8 @@ const RecruiterAnalytics = () => {
   };
 
   // Pipeline Health badge colors
-  const getHealthBadge = (health) => {
-    const h = (health || 'Good').toLowerCase();
+  const getHealthBadge = (healthStatus) => {
+    const h = (typeof healthStatus === 'string' ? healthStatus : healthStatus?.status || 'Good').toLowerCase();
     if (h === 'excellent') {
       return { label: 'Excellent', color: '#2D7A3A', bg: 'rgba(45, 122, 58, 0.1)', border: 'rgba(45, 122, 58, 0.25)' };
     }
@@ -216,66 +171,7 @@ const RecruiterAnalytics = () => {
     if (h === 'fair') {
       return { label: 'Fair', color: '#B45309', bg: 'rgba(180, 83, 9, 0.1)', border: 'rgba(180, 83, 9, 0.25)' };
     }
-    return { label: 'Poor', color: '#B91C1C', bg: 'rgba(185, 28, 28, 0.1)', border: 'rgba(185, 28, 28, 0.25)' };
-  };
-
-  // Insight card theme by type
-  const getInsightStyle = (type) => {
-    const t = (type || 'opportunity').toLowerCase();
-    if (t === 'success') {
-      return {
-        borderLeft: '4px solid #2D7A3A',
-        badgeBg: 'rgba(45, 122, 58, 0.1)',
-        badgeColor: '#2D7A3A',
-        icon: <CheckCircle2 size={16} color="#2D7A3A" />,
-      };
-    }
-    if (t === 'warning') {
-      return {
-        borderLeft: '4px solid #B45309',
-        badgeBg: 'rgba(180, 83, 9, 0.1)',
-        badgeColor: '#B45309',
-        icon: <AlertTriangle size={16} color="#B45309" />,
-      };
-    }
-    if (t === 'risk') {
-      return {
-        borderLeft: '4px solid #B91C1C',
-        badgeBg: 'rgba(185, 28, 28, 0.1)',
-        badgeColor: '#B91C1C',
-        icon: <ShieldAlert size={16} color="#B91C1C" />,
-      };
-    }
-    return {
-      borderLeft: '4px solid #0F766E',
-      badgeBg: 'rgba(15, 118, 110, 0.1)',
-      badgeColor: '#0F766E',
-      icon: <Lightbulb size={16} color="#0F766E" />,
-    };
-  };
-
-  // Trend badge formatting for skills
-  const getTrendBadge = (trend) => {
-    const tr = (trend || 'stable').toLowerCase();
-    if (tr === 'rising') {
-      return (
-        <span style={{ fontSize: '0.72rem', color: '#2D7A3A', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-          <TrendingUp size={11} /> Rising
-        </span>
-      );
-    }
-    if (tr === 'declining') {
-      return (
-        <span style={{ fontSize: '0.72rem', color: '#8A8A86', fontWeight: 500 }}>
-          ↘ Declining
-        </span>
-      );
-    }
-    return (
-      <span style={{ fontSize: '0.72rem', color: '#0F766E', fontWeight: 500 }}>
-        → Stable
-      </span>
-    );
+    return { label: 'Needs Attention', color: '#B91C1C', bg: 'rgba(185, 28, 28, 0.1)', border: 'rgba(185, 28, 28, 0.25)' };
   };
 
   // Priority badge formatting for recommendations
@@ -295,8 +191,7 @@ const RecruiterAnalytics = () => {
   // ----------------------------------------------------
   if (loading && !data) {
     return (
-      <div className="recruiter-analytics-widget" style={{ marginTop: '3rem' }}>
-        {/* Header Skeleton */}
+      <div className="recruiter-analytics-widget" style={{ marginTop: '1rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <div>
             <div className="skeleton-shimmer" style={{ width: '220px', height: '18px', marginBottom: '0.5rem' }} />
@@ -305,17 +200,14 @@ const RecruiterAnalytics = () => {
           <div className="skeleton-shimmer" style={{ width: '180px', height: '38px' }} />
         </div>
 
-        {/* 4 Metric Cards Skeleton */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="skeleton-shimmer" style={{ height: '140px', borderRadius: '8px' }} />
           ))}
         </div>
 
-        {/* Insights Skeleton */}
         <div className="skeleton-shimmer" style={{ height: '240px', borderRadius: '8px', marginBottom: '2.5rem' }} />
 
-        {/* Charts Row Skeleton */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
           {[1, 2, 3].map((i) => (
             <div key={i} className="skeleton-shimmer" style={{ height: '300px', borderRadius: '8px' }} />
@@ -325,34 +217,18 @@ const RecruiterAnalytics = () => {
     );
   }
 
-  const { aggregatedData, aiInsights, lastUpdated } = data;
-  const healthBadge = getHealthBadge(aiInsights?.pipelineHealth);
+  const overview = data;
+  const healthBadge = getHealthBadge(overview.pipelineHealth);
+  const funnel = overview.funnelSteps || [];
 
-  // SVG Funnel calculation data
-  const funnel = aggregatedData.funnelSteps || [];
-
-  // Fix 1: Pipeline Conversion Rate Calculation
-  // Formula: (Hired candidates / Total applied candidates) * 100
-  // Cap at 99% maximum. If 0 or empty, display "—"
-  const hiredCount =
-    aggregatedData.stageDistribution?.find((s) => (s.stage || '').toLowerCase() === 'hired')?.count ??
-    funnel[funnel.length - 1]?.count ??
-    0;
-  const totalApplied =
-    aggregatedData.totalApplicants ||
-    funnel[0]?.count ||
-    aggregatedData.stageDistribution?.reduce((acc, s) => acc + (s.count || 0), 0) ||
-    0;
-
-  const rawConversionRate = totalApplied > 0 ? (hiredCount / totalApplied) * 100 : 0;
-  const cappedConversionRate = Math.min(99, rawConversionRate);
+  // Conversion rate display
   const displayConversionRate =
-    cappedConversionRate <= 0
-      ? '—'
-      : `${cappedConversionRate % 1 === 0 ? cappedConversionRate.toFixed(0) : cappedConversionRate.toFixed(1)}%`;
+    overview.conversionRate > 0
+      ? `${overview.conversionRate % 1 === 0 ? overview.conversionRate.toFixed(0) : overview.conversionRate.toFixed(1)}%`
+      : '—';
 
   // Weekly timeline max calculation for SVG line chart
-  const weeklyTimeline = aggregatedData.weeklyTimeline || [];
+  const weeklyTimeline = overview.applicationsPerWeek || [];
   const maxWeeklyCount = Math.max(...weeklyTimeline.map((w) => w.count), 1);
   const chartWidth = 600;
   const chartHeight = 160;
@@ -360,14 +236,13 @@ const RecruiterAnalytics = () => {
   const paddingY = 25;
 
   const points = weeklyTimeline.map((item, index) => {
-    const x = paddingX + (index / (weeklyTimeline.length - 1)) * (chartWidth - paddingX * 2);
+    const x = paddingX + (index / Math.max(1, weeklyTimeline.length - 1)) * (chartWidth - paddingX * 2);
     const y = chartHeight - paddingY - (item.count / maxWeeklyCount) * (chartHeight - paddingY * 2);
     return { x, y, count: item.count, week: item.week, label: item.label };
   });
 
   const pathD = points.reduce((acc, p, idx) => {
     if (idx === 0) return `M ${p.x} ${p.y}`;
-    // Catmull-Rom or cubic Bezier for smooth curves
     const prev = points[idx - 1];
     const cpX1 = prev.x + (p.x - prev.x) / 2;
     const cpY1 = prev.y;
@@ -376,10 +251,16 @@ const RecruiterAnalytics = () => {
     return `${acc} C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${p.x} ${p.y}`;
   }, '');
 
-  const areaD = `${pathD} L ${points[points.length - 1].x} ${chartHeight - paddingY} L ${points[0].x} ${chartHeight - paddingY} Z`;
+  const areaD = points.length > 0
+    ? `${pathD} L ${points[points.length - 1].x} ${chartHeight - paddingY} L ${points[0].x} ${chartHeight - paddingY} Z`
+    : '';
+
+  const aiScore = overview.scoreMetrics?.averageMatchScore;
+  const aiCount = overview.scoreMetrics?.aiEvaluationCount ?? 0;
+  const fallbackCount = overview.scoreMetrics?.fallbackEvaluationCount ?? 0;
 
   return (
-    <div className="recruiter-analytics-widget" style={{ marginTop: '3.5rem' }}>
+    <div className="recruiter-analytics-widget">
       {/* =========================================================================
           SECTION 1 — PIPELINE HEALTH HEADER
          ========================================================================= */}
@@ -396,7 +277,7 @@ const RecruiterAnalytics = () => {
         }}
       >
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.35rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
             <span
               style={{
                 display: 'inline-flex',
@@ -413,8 +294,30 @@ const RecruiterAnalytics = () => {
             >
               Pipeline Intelligence
             </span>
+
+            {/* Requirement 8: Sample data badge */}
+            {overview.isSampleData && (
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  padding: '0.2rem 0.6rem',
+                  borderRadius: '4px',
+                  background: 'rgba(180, 83, 9, 0.1)',
+                  color: '#B45309',
+                  border: '1px solid rgba(180, 83, 9, 0.3)',
+                }}
+                title="Telemetry rendered from seeded sample portfolio"
+              >
+                Sample data
+              </span>
+            )}
+
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Updated {formatTime(lastUpdated)}
+              Updated {formatTime(overview.lastUpdated)}
             </span>
           </div>
 
@@ -431,13 +334,13 @@ const RecruiterAnalytics = () => {
             Talent Pipeline Intelligence
           </h2>
           <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.86rem', color: 'var(--text-secondary)' }}>
-            Real-time candidate conversion funnel, skill demand velocity, and strategic recommendations.
+            Single source of truth metrics aggregated from active candidate applications.
           </p>
         </div>
 
         {/* Right Action: Health Status Badge + Refresh Button */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-          {/* Pipeline Health Badge */}
+          {/* Pipeline Health Badge with Documented Rule Tooltip */}
           <div
             style={{
               display: 'inline-flex',
@@ -450,7 +353,9 @@ const RecruiterAnalytics = () => {
               color: healthBadge.color,
               fontSize: '0.82rem',
               fontWeight: 700,
+              cursor: 'help',
             }}
+            title={typeof overview.pipelineHealth === 'object' ? overview.pipelineHealth.rule : 'Documented rule: Excellent (Score ≥ 80% & Conversion ≥ 15%), Good (Score ≥ 70%), Fair (Score ≥ 55%), Needs Attention (< 55%)'}
           >
             <span
               style={{
@@ -484,10 +389,10 @@ const RecruiterAnalytics = () => {
               transition: 'all 0.15s ease',
               boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
             }}
-            title="Re-aggregate pipeline metrics and rerun intelligence analysis"
+            title="Re-aggregate pipeline metrics directly from database"
           >
             <RefreshCw size={13} className={refreshing ? 'spin' : ''} />
-            <span>{refreshing ? 'Analyzing...' : 'Refresh Insights'}</span>
+            <span>{refreshing ? 'Aggregating...' : 'Refresh Metrics'}</span>
           </button>
         </div>
       </div>
@@ -526,19 +431,14 @@ const RecruiterAnalytics = () => {
               <div style={{ fontSize: '2.4rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
                 {displayConversionRate}
               </div>
-              {aggregatedData.hasHistoricalData && aggregatedData.conversionTrend && (
-                <span style={{ fontSize: '0.8rem', color: '#2D7A3A', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-                  <TrendingUp size={13} /> {aggregatedData.conversionTrend}
-                </span>
-              )}
             </div>
           </div>
           <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '0.75rem', margin: 0 }}>
-            Candidates successfully hired out of total applications received
+            {overview.stageCounts?.hired ?? overview.funnelSteps?.[overview.funnelSteps.length - 1]?.count ?? 0} hired out of {overview.totalApplicants} total applicants
           </p>
         </div>
 
-        {/* Metric 2: AI Match Score Health + Distribution Mini-bar */}
+        {/* Metric 2: AI Match Score Health (Only AI source records) */}
         <div
           className="paper-card"
           style={{
@@ -554,14 +454,14 @@ const RecruiterAnalytics = () => {
         >
           <div>
             <span style={{ fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.02em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-              AI Match Score Health
+              Average AI Match Score
             </span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginTop: '0.5rem' }}>
               <div style={{ fontSize: '2.4rem', fontWeight: 700, color: 'var(--accent-teal)', fontFamily: "'Newsreader', Georgia, serif" }}>
-                {aggregatedData.avgAiMatchScore}%
+                {aiScore !== null && aiScore !== undefined ? `${aiScore}%` : '—'}
               </div>
               <span style={{ fontSize: '0.8rem', color: '#2D7A3A', fontWeight: 600 }}>
-                Optimal Range
+                AI Evaluated
               </span>
             </div>
 
@@ -575,22 +475,22 @@ const RecruiterAnalytics = () => {
                 marginTop: '0.65rem',
                 background: '#ECEAE4',
               }}
-              title={`Strong: ${aggregatedData.qualityTiers?.[0]?.percentage || 62.5}%, Moderate: ${aggregatedData.qualityTiers?.[1]?.percentage || 29.2}%, Low: ${aggregatedData.qualityTiers?.[2]?.percentage || 8.3}%`}
+              title={`Strong: ${overview.qualityTiers?.[0]?.percentage || 50}%, Moderate: ${overview.qualityTiers?.[1]?.percentage || 37.5}%, Low: ${overview.qualityTiers?.[2]?.percentage || 12.5}%`}
             >
-              <div style={{ width: `${aggregatedData.qualityTiers?.[0]?.percentage || 62.5}%`, background: '#2D7A3A' }} />
-              <div style={{ width: `${aggregatedData.qualityTiers?.[1]?.percentage || 29.2}%`, background: '#B45309' }} />
-              <div style={{ width: `${aggregatedData.qualityTiers?.[2]?.percentage || 8.3}%`, background: '#B91C1C' }} />
+              <div style={{ width: `${overview.qualityTiers?.[0]?.percentage || 50}%`, background: '#2D7A3A' }} />
+              <div style={{ width: `${overview.qualityTiers?.[1]?.percentage || 37.5}%`, background: '#B45309' }} />
+              <div style={{ width: `${overview.qualityTiers?.[2]?.percentage || 12.5}%`, background: '#B91C1C' }} />
             </div>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-            <span>Strong: {aggregatedData.qualityTiers?.[0]?.count || 30}</span>
-            <span>Moderate: {aggregatedData.qualityTiers?.[1]?.count || 14}</span>
-            <span>Low: {aggregatedData.qualityTiers?.[2]?.count || 4}</span>
+            <span>Strong: {overview.qualityTiers?.[0]?.count || 0}</span>
+            <span>Moderate: {overview.qualityTiers?.[1]?.count || 0}</span>
+            <span>Low: {overview.qualityTiers?.[2]?.count || 0}</span>
           </div>
         </div>
 
-        {/* Metric 3: ATS Screening Velocity */}
+        {/* Metric 3: Match Engine Mix (Verifiable AI vs Fallback counts) */}
         <div
           className="paper-card"
           style={{
@@ -606,23 +506,24 @@ const RecruiterAnalytics = () => {
         >
           <div>
             <span style={{ fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.02em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-              ATS Screening Velocity
+              Evaluation Source Mix
             </span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginTop: '0.5rem' }}>
               <div style={{ fontSize: '2.4rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
-                {aggregatedData.screeningVelocity}
+                {aiCount}{' '}
+                <span style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--semantic-green)' }}>AI</span>
+                <span style={{ fontSize: '1.1rem', color: 'var(--text-muted)', margin: '0 0.35rem' }}>/</span>
+                <span style={{ color: 'var(--text-secondary)' }}>{fallbackCount}</span>{' '}
+                <span style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--semantic-amber)' }}>Fallback</span>
               </div>
-              <span style={{ fontSize: '0.8rem', color: '#2D7A3A', fontWeight: 600 }}>
-                Real-Time
-              </span>
             </div>
           </div>
           <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '0.75rem', margin: 0 }}>
-            Instant PDF parsing & structured AI evaluation per candidate resume
+            {fallbackCount > 0 ? `${fallbackCount} evaluation(s) ran via keyword fallback` : 'All candidate resumes evaluated by Gemini AI'}
           </p>
         </div>
 
-        {/* Metric 4: Avg Days to Hire (NEW) */}
+        {/* Metric 4: Real Avg Days to Hire (Verifiable or null) */}
         <div
           className="paper-card"
           style={{
@@ -642,181 +543,77 @@ const RecruiterAnalytics = () => {
             </span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginTop: '0.5rem' }}>
               <div style={{ fontSize: '2.4rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
-                {aggregatedData.avgDaysToHire} <span style={{ fontSize: '1.1rem', fontWeight: 500, color: 'var(--text-muted)' }}>days</span>
+                {overview.avgDaysToHire !== null && overview.avgDaysToHire !== undefined ? (
+                  <>
+                    {overview.avgDaysToHire}{' '}
+                    <span style={{ fontSize: '1.1rem', fontWeight: 500, color: 'var(--text-muted)' }}>days</span>
+                  </>
+                ) : (
+                  <span style={{ fontSize: '1.8rem', color: 'var(--text-muted)' }}>—</span>
+                )}
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: '#2D7A3A', fontWeight: 600, marginTop: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.75rem' }}>
             <Clock size={13} />
-            <span>Industry avg: {aggregatedData.industryAvgDays} days (22% faster)</span>
+            <span>
+              {overview.avgDaysToHire !== null && overview.avgDaysToHire !== undefined
+                ? 'Computed from application to hire timestamps'
+                : 'No hire history recorded in portfolio yet'}
+            </span>
           </div>
         </div>
       </div>
 
       {/* =========================================================================
-          SECTION 3 — AI INSIGHTS PANEL & BOTTLENECK ALERT (NEW)
+          SECTION 3 — BOTTLENECK ALERT (Strictly correct consecutive stages)
          ========================================================================= */}
-      <div
-        className="paper-card"
-        style={{
-          padding: '2rem',
-          borderRadius: '8px',
-          background: '#FFFFFF',
-          border: '1px solid var(--border-default)',
-          marginBottom: '2.5rem',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
-        }}
-      >
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
-              Pipeline Insights
-            </h3>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-              Synthesized from active applicant patterns
-            </span>
-          </div>
-
-          {refreshing && (
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                fontSize: '0.78rem',
-                color: 'var(--accent-teal)',
-                fontWeight: 600,
-              }}
-            >
-              <RefreshCw size={13} className="spin" /> Generating insights...
-            </span>
-          )}
-        </div>
-
-        {/* 2-Column Grid of Actionable Insight Cards */}
+      {overview.bottleneck && (
         <div
-          className="analytics-insights-grid"
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '1rem',
-            marginBottom: '1.75rem',
+            padding: '1.25rem 1.5rem',
+            borderRadius: '8px',
+            background: 'rgba(180, 83, 9, 0.04)',
+            border: '1px solid rgba(180, 83, 9, 0.25)',
+            borderLeft: '5px solid #B45309',
+            marginBottom: '2.5rem',
           }}
         >
-          {aiInsights?.keyInsights?.map((insight, index) => {
-            const style = getInsightStyle(insight.type);
-            return (
-              <div
-                key={index}
-                style={{
-                  padding: '1.15rem 1.25rem',
-                  borderRadius: '6px',
-                  background: '#FAF9F5',
-                  border: '1px solid var(--border-default)',
-                  borderLeft: style.borderLeft,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  gap: '0.75rem',
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.4rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                      {style.icon}
-                      <h4 style={{ fontSize: '0.92rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
-                        {insight.title}
-                      </h4>
-                    </div>
-                    {insight.metric && (
-                      <span
-                        style={{
-                          fontSize: '0.72rem',
-                          fontWeight: 700,
-                          padding: '0.15rem 0.5rem',
-                          borderRadius: '4px',
-                          background: style.badgeBg,
-                          color: style.badgeColor,
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {insight.metric}
-                      </span>
-                    )}
-                  </div>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
-                    {insight.description}
-                  </p>
-                </div>
-
-                {insight.action && (
-                  <div
-                    style={{
-                      paddingTop: '0.5rem',
-                      borderTop: '1px dashed var(--border-default)',
-                      display: 'flex',
-                      alignItems: 'baseline',
-                      gap: '0.35rem',
-                      fontSize: '0.76rem',
-                      color: 'var(--text-muted)',
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    <span style={{ fontWeight: 700, color: 'var(--text-secondary)' }}>Recommended action:</span>
-                    <span>{insight.action}</span>
-                  </div>
-                )}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+            <div style={{ color: '#B45309', marginTop: '0.15rem' }}>
+              <AlertTriangle size={20} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#92400E' }}>
+                  Pipeline Bottleneck Alert: {overview.bottleneck.stage} Stage
+                </span>
+                <span
+                  style={{
+                    fontSize: '0.74rem',
+                    fontWeight: 700,
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '4px',
+                    background: 'rgba(180, 83, 9, 0.12)',
+                    color: '#B45309',
+                  }}
+                >
+                  {overview.bottleneck.dropOffRate}% Candidate Drop-Off
+                </span>
               </div>
-            );
-          })}
-        </div>
-
-        {/* Pipeline Bottleneck Alert Box */}
-        {aiInsights?.bottleneck && (
-          <div
-            style={{
-              padding: '1.25rem 1.5rem',
-              borderRadius: '8px',
-              background: 'rgba(180, 83, 9, 0.04)',
-              border: '1px solid rgba(180, 83, 9, 0.25)',
-              borderLeft: '5px solid #B45309',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
-              <div style={{ color: '#B45309', marginTop: '0.15rem' }}>
-                <AlertTriangle size={20} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.35rem' }}>
-                  <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#92400E' }}>
-                    Pipeline Bottleneck Alert: {aiInsights.bottleneck.stage}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '0.74rem',
-                      fontWeight: 700,
-                      padding: '0.2rem 0.6rem',
-                      borderRadius: '4px',
-                      background: 'rgba(180, 83, 9, 0.12)',
-                      color: '#B45309',
-                    }}
-                  >
-                    {aiInsights.bottleneck.dropOffRate}% Candidate Drop-Off
-                  </span>
-                </div>
-                <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: '0 0 0.5rem 0' }}>
-                  <strong style={{ color: 'var(--text-primary)' }}>Why it happens:</strong> {aiInsights.bottleneck.reason}
-                </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', color: 'var(--accent-teal)', fontWeight: 600 }}>
-                  <ArrowRight size={14} />
-                  <span>Strategic Fix: {aiInsights.bottleneck.suggestion}</span>
-                </div>
+              <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: '0 0 0.5rem 0' }}>
+                <strong style={{ color: 'var(--text-primary)' }}>Why it happens:</strong> Candidate attrition is highest transitioning between{' '}
+                <strong>{overview.bottleneck.previousStage || 'previous stage'}</strong> ({overview.bottleneck.previousCount ?? '—'} candidates) and{' '}
+                <strong>{overview.bottleneck.currentStage || 'current stage'}</strong> ({overview.bottleneck.currentCount ?? '—'} candidates).
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', color: 'var(--accent-teal)', fontWeight: 600 }}>
+                <ArrowRight size={14} />
+                <span>Strategic Fix: Audit evaluation rubrics and reduce interview turnaround latency between consecutive stages.</span>
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* =========================================================================
           SECTION 4 — CHARTS ROW (Funnel, Quality Tiers, Skill Heatmap)
@@ -851,13 +648,12 @@ const RecruiterAnalytics = () => {
               </h3>
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: '0 0 1.5rem 0' }}>
-              Sequential stage-by-stage attrition across active requisitions.
+              Consecutive stage-by-stage attrition across active requisitions.
             </p>
 
-            {/* Funnel SVG / Tiered trapezoid bars */}
+            {/* Funnel bars */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', alignItems: 'center' }}>
               {funnel.map((step, idx) => {
-                // Tier width narrows as funnel progresses: 100% -> 85% -> 70% -> 55% -> 40%
                 const widths = ['100%', '86%', '72%', '58%', '46%'];
                 const bgColors = ['#0F766E', '#115E59', '#14B8A6', '#0D9488', '#2D7A3A'];
                 const width = widths[idx] || '50%';
@@ -877,7 +673,7 @@ const RecruiterAnalytics = () => {
                       alignItems: 'center',
                       boxShadow: '0 2px 4px rgba(0,0,0,0.06)',
                     }}
-                    title={`${step.stage}: ${step.count} candidates (${step.pct}% through, ${step.dropOff}% drop-off from previous)`}
+                    title={`${step.stage}: ${step.count} candidates (${step.pct}% through, -${step.dropOff}% drop-off from previous)`}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                       <span style={{ fontSize: '0.75rem', opacity: 0.85 }}>{idx + 1}.</span>
@@ -898,8 +694,10 @@ const RecruiterAnalytics = () => {
           </div>
 
           <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--border-default)', fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between' }}>
-            <span>Top of funnel: {funnel[0]?.count || 48} entries</span>
-            <span style={{ color: '#2D7A3A', fontWeight: 600 }}>Hired: {funnel[funnel.length - 1]?.count || hiredCount} ({displayConversionRate})</span>
+            <span>Top of funnel: {funnel[0]?.count || overview.totalApplicants} entries</span>
+            <span style={{ color: '#2D7A3A', fontWeight: 600 }}>
+              Hired: {funnel[funnel.length - 1]?.count || 0} ({displayConversionRate})
+            </span>
           </div>
         </div>
 
@@ -924,12 +722,12 @@ const RecruiterAnalytics = () => {
               </h3>
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: '0 0 1.5rem 0' }}>
-              Candidate evaluation scoring distribution across applicants.
+              Scored distribution across evaluated applications.
             </p>
 
             {/* Quality Tier Bars */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
-              {aggregatedData.qualityTiers?.map((tier) => (
+              {overview.qualityTiers?.map((tier) => (
                 <div key={tier.label}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                     <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)' }}>
@@ -968,11 +766,12 @@ const RecruiterAnalytics = () => {
           </div>
 
           <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--border-default)', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            Average compatibility across portfolio: <strong style={{ color: 'var(--text-primary)' }}>{aggregatedData.avgAiMatchScore}%</strong>
+            Average AI compatibility: <strong style={{ color: 'var(--text-primary)' }}>{aiScore ?? '—'}%</strong>{' '}
+            <span style={{ color: 'var(--text-muted)' }}>({aiCount} AI reviews, {fallbackCount} fallback)</span>
           </div>
         </div>
 
-        {/* Chart 3: Skill Demand Heatmap (NEW) */}
+        {/* Chart 3: Skill Demand Breakdown */}
         <div
           className="paper-card"
           style={{
@@ -989,36 +788,32 @@ const RecruiterAnalytics = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
               <BarChart2 size={18} color="var(--accent-teal)" />
               <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
-                Skill Demand Heatmap
+                Top Required Skills
               </h3>
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: '0 0 1.25rem 0' }}>
-              Most requested skills across open roles.
+              Required across active job requisitions & matched candidates.
             </p>
 
             {/* Horizontal Bar Chart for Skills */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
-              {aggregatedData.topSkills?.slice(0, 8).map((s) => {
-                const tr = (s.trend || 'stable').toLowerCase();
-                const barColor = tr === 'rising' ? '#2D7A3A' : tr === 'declining' ? '#64748B' : '#0F766E';
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {overview.topRequiredSkills?.slice(0, 6).map((s) => {
+                const pct = s.percentOfJobs || 50;
 
                 return (
                   <div key={s.skill}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.2rem' }}>
-                      <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                      <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                         {s.skill}
                       </span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        {getTrendBadge(s.trend)}
-                        <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
-                          {s.demandScore}
-                        </span>
-                      </div>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                        {s.jobCount} role(s) • {s.candidateMatches} matched
+                      </span>
                     </div>
                     <div
                       style={{
-                        height: '6px',
-                        borderRadius: '3px',
+                        height: '7px',
+                        borderRadius: '3.5px',
                         background: '#ECEAE4',
                         overflow: 'hidden',
                       }}
@@ -1026,9 +821,9 @@ const RecruiterAnalytics = () => {
                       <div
                         style={{
                           height: '100%',
-                          width: `${s.demandScore}%`,
-                          background: barColor,
-                          borderRadius: '3px',
+                          width: `${pct}%`,
+                          background: 'var(--accent-teal)',
+                          borderRadius: '3.5px',
                           transition: 'width 0.5s ease',
                         }}
                       />
@@ -1040,13 +835,13 @@ const RecruiterAnalytics = () => {
           </div>
 
           <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--border-default)', fontSize: '0.76rem', color: 'var(--text-muted)' }}>
-            Green: Rising velocity • Teal: Stable core • Gray: Declining
+            Aggregated directly from open role specs and applicant profiles
           </div>
         </div>
       </div>
 
       {/* =========================================================================
-          SECTION 5 — STRATEGIC RECOMMENDATIONS & HIRING TIMELINE (NEW)
+          SECTION 5 — STRATEGIC RECOMMENDATIONS & TIMELINE (Rule-based Tips)
          ========================================================================= */}
       <div
         className="paper-card"
@@ -1078,7 +873,7 @@ const RecruiterAnalytics = () => {
               Strategic Recommendations
             </h3>
             <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-              Targeted high-leverage interventions prioritized by pipeline impact
+              Deterministic insights synthesized from pipeline metrics
             </span>
           </div>
         </div>
@@ -1093,7 +888,7 @@ const RecruiterAnalytics = () => {
             marginBottom: '2.5rem',
           }}
         >
-          {aiInsights?.recommendations?.map((rec, index) => {
+          {overview.strategicRecommendations?.map((rec, index) => {
             const priorityBadge = getPriorityBadge(rec.priority);
             return (
               <div
@@ -1110,28 +905,46 @@ const RecruiterAnalytics = () => {
                 }}
               >
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.6rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                      <span
+                        style={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          background: priorityBadge.dot,
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          padding: '0.15rem 0.5rem',
+                          borderRadius: '4px',
+                          background: priorityBadge.bg,
+                          color: priorityBadge.color,
+                        }}
+                      >
+                        {priorityBadge.label}
+                      </span>
+                    </div>
+
+                    {/* Rule-based tip badge */}
                     <span
                       style={{
-                        width: '8px',
-                        height: '8px',
-                        borderRadius: '50%',
-                        background: priorityBadge.dot,
-                      }}
-                    />
-                    <span
-                      style={{
-                        fontSize: '0.72rem',
-                        fontWeight: 700,
-                        padding: '0.15rem 0.5rem',
-                        borderRadius: '4px',
-                        background: priorityBadge.bg,
-                        color: priorityBadge.color,
+                        fontSize: '0.7rem',
+                        fontWeight: 600,
+                        padding: '0.12rem 0.45rem',
+                        borderRadius: '3px',
+                        background: 'rgba(15, 107, 92, 0.08)',
+                        color: 'var(--accent-teal)',
+                        border: '1px solid rgba(15, 107, 92, 0.2)',
                       }}
                     >
-                      {priorityBadge.label}
+                      Rule-based tip
                     </span>
                   </div>
+
                   <h4 style={{ fontSize: '0.94rem', fontWeight: 700, margin: '0 0 0.4rem 0', color: 'var(--text-primary)', lineHeight: 1.4 }}>
                     {rec.title}
                   </h4>
@@ -1139,29 +952,12 @@ const RecruiterAnalytics = () => {
                     {rec.description}
                   </p>
                 </div>
-
-                {rec.expectedImpact && (
-                  <div
-                    style={{
-                      padding: '0.5rem 0.75rem',
-                      borderRadius: '5px',
-                      background: 'rgba(15, 118, 110, 0.08)',
-                      border: '1px solid rgba(15, 118, 110, 0.2)',
-                      fontSize: '0.76rem',
-                      color: 'var(--accent-teal)',
-                      fontWeight: 600,
-                    }}
-                  >
-                    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>Expected Impact: </span>
-                    {rec.expectedImpact}
-                  </div>
-                )}
               </div>
             );
           })}
         </div>
 
-        {/* Hiring Velocity Timeline (SVG Line & Area Chart) */}
+        {/* Hiring Inflow Velocity (SVG Line & Area Chart) */}
         <div style={{ paddingTop: '1.75rem', borderTop: '1px solid var(--border-default)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div>
@@ -1169,11 +965,11 @@ const RecruiterAnalytics = () => {
                 Application Inflow Velocity (Last 8 Weeks)
               </h4>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Weekly submission volume and pipeline acceleration trends
+                Weekly submission volume recorded from candidate application timestamps
               </span>
             </div>
             <div style={{ fontSize: '0.82rem', color: '#2D7A3A', fontWeight: 600 }}>
-              Peak Volume: {Math.max(...weeklyTimeline.map((w) => w.count))} resumes/wk
+              Peak Volume: {Math.max(...weeklyTimeline.map((w) => w.count), 0)} resumes/wk
             </div>
           </div>
 
@@ -1208,17 +1004,19 @@ const RecruiterAnalytics = () => {
               })}
 
               {/* Area fill under the line */}
-              <path d={areaD} fill="url(#velocityGradient)" />
+              {areaD && <path d={areaD} fill="url(#velocityGradient)" />}
 
               {/* Line path */}
-              <path
-                d={pathD}
-                fill="none"
-                stroke="var(--accent-teal)"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              {pathD && (
+                <path
+                  d={pathD}
+                  fill="none"
+                  stroke="var(--accent-teal)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              )}
 
               {/* Data points */}
               {points.map((p, idx) => (

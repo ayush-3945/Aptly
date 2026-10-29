@@ -112,6 +112,15 @@ const updateJob = async (req, res) => {
 // Delete a job (only the recruiter who posted it)
 const deleteJob = async (req, res) => {
   try {
+    // Demo safety: prevent deletion of listings for demo accounts
+    const DEMO_EMAILS = ['recruiter@aptly.ai', 'candidate@aptly.ai', 'recruiter@jobmatch.ai', 'candidate@jobmatch.ai'];
+    if (req.user && DEMO_EMAILS.includes(req.user.email)) {
+      return res.status(403).json({
+        message: 'Action disabled in demo mode. Job listings cannot be deleted for demo accounts to preserve shared test data.',
+        isDemoProtected: true,
+      });
+    }
+
     const job = await Job.findById(req.params.id);
 
     if (!job) {

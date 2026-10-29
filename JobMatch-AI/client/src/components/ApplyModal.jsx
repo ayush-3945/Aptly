@@ -23,6 +23,7 @@ import SkillGapRoadmapCard from './SkillGapRoadmapCard';
 const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluation }) => {
   const navigate = useNavigate();
   const location = useLocation();
+
   const { user, isAuthenticated } = useAuth();
   const { showToast } = useToast();
 
@@ -67,8 +68,8 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
     candidateProfile?.skills && candidateProfile.skills.length > 0
       ? candidateProfile.skills
       : user?.skills && user.skills.length > 0
-      ? user.skills
-      : [];
+        ? user.skills
+        : [];
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -302,8 +303,8 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
     score >= 75
       ? 'var(--semantic-green)'
       : score >= 45
-      ? 'var(--semantic-amber)'
-      : 'var(--semantic-red)';
+        ? 'var(--semantic-amber)'
+        : 'var(--semantic-red)';
 
   return (
     <div className="modal-overlay" onClick={handleClose}>
@@ -551,21 +552,20 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
                           previewMatchData.matchScore >= 75
                             ? 'rgba(45, 122, 58, 0.12)'
                             : previewMatchData.matchScore >= 50
-                            ? 'rgba(180, 83, 9, 0.12)'
-                            : 'rgba(185, 28, 28, 0.12)',
+                              ? 'rgba(180, 83, 9, 0.12)'
+                              : 'rgba(185, 28, 28, 0.12)',
                         color:
                           previewMatchData.matchScore >= 75
                             ? 'var(--semantic-green)'
                             : previewMatchData.matchScore >= 50
-                            ? 'var(--semantic-amber)'
-                            : 'var(--semantic-red)',
-                        border: `1px solid ${
-                          previewMatchData.matchScore >= 75
+                              ? 'var(--semantic-amber)'
+                              : 'var(--semantic-red)',
+                        border: `1px solid ${previewMatchData.matchScore >= 75
                             ? 'rgba(45, 122, 58, 0.3)'
                             : previewMatchData.matchScore >= 50
-                            ? 'rgba(180, 83, 9, 0.3)'
-                            : 'rgba(185, 28, 28, 0.3)'
-                        }`,
+                              ? 'rgba(180, 83, 9, 0.3)'
+                              : 'rgba(185, 28, 28, 0.3)'
+                          }`,
                       }}
                     >
                       {previewMatchData.matchTier}
@@ -589,13 +589,12 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
                         height: '116px',
                         borderRadius: '50%',
                         margin: '0 auto 0.75rem',
-                        border: `6px solid ${
-                          previewMatchData.matchScore >= 75
+                        border: `6px solid ${previewMatchData.matchScore >= 75
                             ? 'var(--semantic-green)'
                             : previewMatchData.matchScore >= 50
-                            ? 'var(--semantic-amber)'
-                            : 'var(--semantic-red)'
-                        }`,
+                              ? 'var(--semantic-amber)'
+                              : 'var(--semantic-red)'
+                          }`,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
@@ -613,8 +612,8 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
                             previewMatchData.matchScore >= 75
                               ? 'var(--semantic-green)'
                               : previewMatchData.matchScore >= 50
-                              ? 'var(--semantic-amber)'
-                              : 'var(--semantic-red)',
+                                ? 'var(--semantic-amber)'
+                                : 'var(--semantic-red)',
                           lineHeight: 1,
                         }}
                       >
@@ -799,7 +798,7 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
                     )}
                   </div>
 
-                                    {/* AI Skill Gap Roadmap & Score Factors */}
+                  {/* AI Skill Gap Roadmap & Score Factors */}
                   <SkillGapRoadmapCard
                     scoreBreakdown={previewMatchData.scoreBreakdown}
                     skillGapRoadmap={previewMatchData.skillGapRoadmap}
@@ -1113,16 +1112,15 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
                         evaluationResult.aiMatchScore >= 75
                           ? 'rgba(45, 122, 58, 0.1)'
                           : evaluationResult.aiMatchScore >= 45
-                          ? 'rgba(180, 83, 9, 0.1)'
-                          : 'rgba(185, 28, 28, 0.1)',
+                            ? 'rgba(180, 83, 9, 0.1)'
+                            : 'rgba(185, 28, 28, 0.1)',
                       color: scoreColor,
-                      border: `1px solid ${
-                        evaluationResult.aiMatchScore >= 75
+                      border: `1px solid ${evaluationResult.aiMatchScore >= 75
                           ? 'rgba(45, 122, 58, 0.25)'
                           : evaluationResult.aiMatchScore >= 45
-                          ? 'rgba(180, 83, 9, 0.25)'
-                          : 'rgba(185, 28, 28, 0.25)'
-                      }`,
+                            ? 'rgba(180, 83, 9, 0.25)'
+                            : 'rgba(185, 28, 28, 0.25)'
+                        }`,
                     }}
                   >
                     {evaluationResult.recommendation}
@@ -1370,13 +1368,13 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
                   evaluationResult.skillGapRoadmap && evaluationResult.skillGapRoadmap.length > 0
                     ? evaluationResult.skillGapRoadmap
                     : (evaluationResult.missingSkills || []).map((skill, idx) => ({
-                        skill,
-                        priority: idx === 0 ? 'High' : 'Medium',
-                        impact: '+15% Match Score',
-                        timeToBridge: '2-3 Days',
-                        actionPlan: 'Build a containerized module or hands-on project utilizing ' + skill + ' to bridge this requirement.',
-                        resource: 'Official ' + skill + ' documentation and crash courses.',
-                      }))
+                      skill,
+                      priority: idx === 0 ? 'High' : 'Medium',
+                      impact: '+15% Match Score',
+                      timeToBridge: '2-3 Days',
+                      actionPlan: 'Build a containerized module or hands-on project utilizing ' + skill + ' to bridge this requirement.',
+                      resource: 'Official ' + skill + ' documentation and crash courses.',
+                    }))
                 }
                 resumeImprovements={evaluationResult.resumeImprovements}
                 matchScore={evaluationResult.aiMatchScore ?? 83}

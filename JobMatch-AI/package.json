@@ -9,13 +9,15 @@
     "build": "npm --prefix client run build",
     "client": "npm --prefix client run dev",
     "seed": "node scripts/seedDatabase.js",
-    "test": "npm run test:security && npm run test:health && npm run test:quickmatch",
+    "reset:demo": "node scripts/resetDemoData.js",
+    "test": "npm run test:security && npm run test:health && npm run test:quickmatch && npm run test:analytics",
     "test:ai": "node scripts/verifyAIPipeline.js",
     "test:preview": "node scripts/testPreviewMatch.js",
     "test:emails": "node scripts/testEmailNotifications.js",
     "test:health": "node scripts/testHealth.js",
     "test:security": "node scripts/testSecurityPathTraversal.js",
-    "test:quickmatch": "node scripts/testQuickMatch.js"
+    "test:quickmatch": "node scripts/testQuickMatch.js",
+    "test:analytics": "node scripts/testRecruiterAnalyticsHonesty.js"
   },
   "keywords": [],
   "author": "",

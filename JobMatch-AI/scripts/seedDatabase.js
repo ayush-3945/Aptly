@@ -49,6 +49,14 @@ async function seedDatabase() {
     const demoUserDefinitions = [
       {
         name: 'Sarah Jenkins',
+        email: 'recruiter@aptly.ai',
+        password: hashedPassword,
+        role: 'recruiter',
+        bio: 'Head of Technical Talent & Engineering Recruitment at Acme Payments.',
+        location: 'Bengaluru, India',
+      },
+      {
+        name: 'Sarah Jenkins (JobMatch Alias)',
         email: 'recruiter@jobmatch.ai',
         password: hashedPassword,
         role: 'recruiter',
@@ -57,12 +65,22 @@ async function seedDatabase() {
       },
       {
         name: 'Alex Morgan',
+        email: 'candidate@aptly.ai',
+        password: hashedPassword,
+        role: 'candidate',
+        bio: 'Full-Stack MERN & AI Engineer passionate about scalable distributed systems and LLM integrations.',
+        targetRole: 'Senior Full-Stack Engineer',
+        skills: ['React', 'Node.js', 'Express', 'MongoDB', 'Docker', 'TypeScript'],
+        location: 'Remote',
+      },
+      {
+        name: 'Alex Morgan (JobMatch Alias)',
         email: 'candidate@jobmatch.ai',
         password: hashedPassword,
         role: 'candidate',
         bio: 'Full-Stack MERN & AI Engineer passionate about scalable distributed systems and LLM integrations.',
         targetRole: 'Senior Full-Stack Engineer',
-        skills: ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'Docker', 'TypeScript'],
+        skills: ['React', 'Node.js', 'Express', 'MongoDB', 'Docker', 'TypeScript'],
         location: 'Remote',
       },
       {

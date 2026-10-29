@@ -1,8 +1,33 @@
 const analyticsService = require('../services/analyticsService');
 
 /**
+ * Controller: GET /api/analytics/overview
+ * Recruiter-only single source of truth for all pipeline metrics,
+ * stage counts, consecutive drop percentages, match tiers, and skill demand.
+ */
+const getAnalyticsOverview = async (req, res) => {
+  try {
+    const userId = req.user?._id;
+    const userEmail = req.user?.email;
+    const overview = await analyticsService.getPipelineOverview({ userId, userEmail });
+    return res.status(200).json({
+      success: true,
+      data: overview,
+    });
+  } catch (error) {
+    console.error('[AnalyticsController] Error fetching pipeline overview:', error.message);
+    const sample = analyticsService.getVerifiedSampleOverview();
+    return res.status(200).json({
+      success: true,
+      data: sample,
+      warning: 'Verified sample data served due to processing error.',
+    });
+  }
+};
+
+/**
  * Controller: GET /api/analytics/insights
- * Returns pipeline metrics and Gemini 2.5 Flash talent insights
+ * Returns pipeline metrics and talent insights (backward compatibility)
  */
 const getPipelineInsights = async (req, res) => {
   try {
@@ -13,7 +38,6 @@ const getPipelineInsights = async (req, res) => {
     });
   } catch (error) {
     console.error('[AnalyticsController] Error fetching pipeline insights:', error.message);
-    // Graceful fallback with baseline data
     const fallback = {
       aggregatedData: analyticsService.DEFAULT_BASELINE_TELEMETRY,
       aiInsights: analyticsService.generateFallbackInsights(analyticsService.DEFAULT_BASELINE_TELEMETRY),
@@ -28,5 +52,6 @@ const getPipelineInsights = async (req, res) => {
 };
 
 module.exports = {
+  getAnalyticsOverview,
   getPipelineInsights,
 };

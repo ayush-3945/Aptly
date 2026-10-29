@@ -1,88 +1,181 @@
 import React from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import CandidateDashboard from './CandidateDashboard';
 import RecruiterJobs from '../components/RecruiterJobs';
 import RecruiterAnalytics from '../components/RecruiterAnalytics';
 import UpcomingInterviews from '../components/UpcomingInterviews';
-import { ShieldCheck } from 'lucide-react';
+import { Briefcase, Calendar, BarChart2 } from 'lucide-react';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // If the logged in user is a candidate (or default role), show the candidate dashboard
+  // If the logged in user is a candidate, show candidate dashboard
   if (user?.role === 'candidate') {
     return <CandidateDashboard />;
   }
 
-  // Recruiter Dashboard View
+  // Active tab synchronized with URL (?tab=jobs | interviews | analytics)
+  const tabParam = (searchParams.get('tab') || 'jobs').toLowerCase();
+  const activeTab = ['jobs', 'interviews', 'analytics'].includes(tabParam) ? tabParam : 'jobs';
+
+  const handleTabChange = (tab) => {
+    setSearchParams({ tab });
+  };
+
   return (
-    <div className="container" style={{ padding: '3.5rem 1.5rem', minHeight: '80vh' }}>
-      {/* Active Job Postings Management */}
-      <RecruiterJobs />
-
-      {/* Recruiter Native Upcoming Interviews Section */}
-      <UpcomingInterviews viewMode="recruiter" />
-
-      {/* Recruiter Talent Analytics */}
-      <RecruiterAnalytics />
-
-      {/* Recruiter Lifecycle Overview Section */}
-      <div
-        className="paper-card"
-        style={{
-          marginTop: '3rem',
-          padding: '2.5rem',
-          borderRadius: '8px',
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-default)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
-          <ShieldCheck size={24} color="var(--accent-teal)" />
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Newsreader', Georgia, serif" }}>
-            ATS Candidate Evaluation Lifecycle
-          </h2>
+    <div className="container" style={{ padding: '3rem 1.5rem 5rem', minHeight: '80vh' }}>
+      {/* Recruiter Header & Simplified Subtitle */}
+      <div style={{ marginBottom: '2rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.4rem' }}>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              letterSpacing: '0.02em',
+              padding: '0.2rem 0.6rem',
+              borderRadius: '4px',
+              background: 'var(--accent-teal-light)',
+              color: 'var(--accent-teal)',
+              border: '1px solid rgba(15, 107, 92, 0.25)',
+              textTransform: 'uppercase',
+            }}
+          >
+            Recruiter command center
+          </span>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            Logged in as <strong style={{ color: 'var(--text-primary)' }}>{user?.name || 'Recruiter'}</strong>
+          </span>
         </div>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2rem', maxWidth: '800px' }}>
-          Aptly uses a structured semantic evaluation engine to analyze incoming resumes against technical requirements, providing recruiters with instant multi-point scorecards, skill gap breakdowns, and streamlined status transitions.
-        </p>
 
-        {/* State Machine Stages */}
-        <div
+        <h1
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-            gap: '1rem',
+            fontFamily: "'Newsreader', Georgia, serif",
+            fontSize: '2.3rem',
+            fontWeight: 800,
+            letterSpacing: '-0.025em',
+            margin: '0 0 0.4rem 0',
+            color: 'var(--text-primary)',
           }}
         >
-          {[
-            { stage: 'Applied', count: 18, color: 'var(--accent-teal)', desc: 'Fresh submissions awaiting recruiter review' },
-            { stage: 'Shortlisted', count: 14, color: 'var(--accent-teal-mid)', desc: 'Passed automated match threshold criteria' },
-            { stage: 'Interview', count: 10, color: 'var(--semantic-amber)', desc: 'Technical & behavioral rounds in progress' },
-            { stage: 'Hired', count: 4, color: 'var(--semantic-green)', desc: 'Offer extended and accepted' },
-            { stage: 'Rejected', count: 2, color: 'var(--semantic-red)', desc: 'Candidate archived with constructive feedback' },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              style={{
-                padding: '1.25rem',
-                borderRadius: '6px',
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border-default)',
-                borderTop: `3px solid ${item.color}`,
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <span style={{ fontWeight: 700, fontSize: '0.95rem', color: item.color }}>{item.stage}</span>
-                <span style={{ fontWeight: 800, fontSize: '1.2rem', color: 'var(--text-primary)' }}>{item.count}</span>
-              </div>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.4, margin: 0 }}>
-                {item.desc}
-              </p>
-            </div>
-          ))}
-        </div>
+          Recruiter Workspace
+        </h1>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.98rem', margin: 0, maxWidth: '720px', lineHeight: 1.5 }}>
+          Hiring funnel, match quality and skill demand across your open roles.
+        </p>
       </div>
+
+      {/* 3 Recruiter Tabs (Jobs, Interviews, Analytics) */}
+      <div
+        role="tablist"
+        aria-label="Recruiter workspace sections"
+        style={{
+          display: 'flex',
+          gap: '0.5rem',
+          borderBottom: '1px solid var(--border-default)',
+          marginBottom: '2.5rem',
+        }}
+      >
+        <button
+          role="tab"
+          id="tab-jobs"
+          aria-selected={activeTab === 'jobs'}
+          aria-controls="panel-jobs"
+          onClick={() => handleTabChange('jobs')}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.55rem',
+            padding: '0.75rem 1.25rem',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'jobs' ? '3px solid var(--accent-teal)' : '3px solid transparent',
+            color: activeTab === 'jobs' ? 'var(--accent-teal)' : 'var(--text-secondary)',
+            fontWeight: activeTab === 'jobs' ? 700 : 500,
+            fontSize: '0.92rem',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            marginBottom: '-1px',
+          }}
+        >
+          <Briefcase size={16} />
+          <span>Jobs</span>
+        </button>
+
+        <button
+          role="tab"
+          id="tab-interviews"
+          aria-selected={activeTab === 'interviews'}
+          aria-controls="panel-interviews"
+          onClick={() => handleTabChange('interviews')}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.55rem',
+            padding: '0.75rem 1.25rem',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'interviews' ? '3px solid var(--accent-teal)' : '3px solid transparent',
+            color: activeTab === 'interviews' ? 'var(--accent-teal)' : 'var(--text-secondary)',
+            fontWeight: activeTab === 'interviews' ? 700 : 500,
+            fontSize: '0.92rem',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            marginBottom: '-1px',
+          }}
+        >
+          <Calendar size={16} />
+          <span>Interviews</span>
+        </button>
+
+        <button
+          role="tab"
+          id="tab-analytics"
+          aria-selected={activeTab === 'analytics'}
+          aria-controls="panel-analytics"
+          onClick={() => handleTabChange('analytics')}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.55rem',
+            padding: '0.75rem 1.25rem',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'analytics' ? '3px solid var(--accent-teal)' : '3px solid transparent',
+            color: activeTab === 'analytics' ? 'var(--accent-teal)' : 'var(--text-secondary)',
+            fontWeight: activeTab === 'analytics' ? 700 : 500,
+            fontSize: '0.92rem',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            marginBottom: '-1px',
+          }}
+        >
+          <BarChart2 size={16} />
+          <span>Analytics</span>
+        </button>
+      </div>
+
+      {/* Tab Panels */}
+      {activeTab === 'jobs' && (
+        <div role="tabpanel" id="panel-jobs" aria-labelledby="tab-jobs">
+          <RecruiterJobs />
+        </div>
+      )}
+
+      {activeTab === 'interviews' && (
+        <div role="tabpanel" id="panel-interviews" aria-labelledby="tab-interviews">
+          <UpcomingInterviews viewMode="recruiter" />
+        </div>
+      )}
+
+      {activeTab === 'analytics' && (
+        <div role="tabpanel" id="panel-analytics" aria-labelledby="tab-analytics">
+          <RecruiterAnalytics />
+        </div>
+      )}
     </div>
   );
 };

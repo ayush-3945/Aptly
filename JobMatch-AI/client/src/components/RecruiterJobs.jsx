@@ -25,18 +25,41 @@ const RecruiterJobs = () => {
   const { user } = useAuth();
 
   const [jobs, setJobs] = useState([]);
+  const [overview, setOverview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [jobToDelete, setJobToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [notification, setNotification] = useState(null);
 
-  // Fetch recruiter's jobs
+  // Check if current user is a demo account
+  const isDemoAccount =
+    user?.email === 'recruiter@aptly.ai' ||
+    user?.email === 'recruiter@jobmatch.ai' ||
+    user?.email === 'candidate@aptly.ai' ||
+    user?.email === 'candidate@jobmatch.ai';
+
+  // Fetch recruiter's jobs and single source of truth analytics overview
   const fetchRecruiterJobs = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/jobs');
-      const allJobs = Array.isArray(response.data) ? response.data : [];
+      const [jobsRes, overviewRes] = await Promise.allSettled([
+        api.get('/jobs'),
+        api.get('/analytics/overview'),
+      ]);
+
+      const allJobs = jobsRes.status === 'fulfilled' && Array.isArray(jobsRes.value.data) ? jobsRes.value.data : [];
+
+      if (overviewRes.status === 'fulfilled' && overviewRes.value.data?.data) {
+        setOverview(overviewRes.value.data.data);
+      } else {
+        setOverview({
+          isSampleData: true,
+          totalApplicants: 24,
+          funnelSteps: [{ count: 24 }, { count: 16 }],
+          scoreMetrics: { averageMatchScore: 82.5 },
+        });
+      }
 
       // Filter jobs where postedBy matches current user
       const userJobs = allJobs.filter((job) => {
@@ -49,9 +72,9 @@ const RecruiterJobs = () => {
       } else {
         const demoRecruiterPostings = FALLBACK_JOBS.slice(0, 3).map((job) => ({
           ...job,
-          applicantCount: Math.floor(Math.random() * 12) + 4,
-          shortlistedCount: Math.floor(Math.random() * 5) + 1,
-          avgAiScore: Math.floor(Math.random() * 16) + 78,
+          applicantCount: 8,
+          shortlistedCount: 5,
+          avgAiScore: 83,
           isDemo: true,
         }));
         setJobs(demoRecruiterPostings);
@@ -61,11 +84,17 @@ const RecruiterJobs = () => {
       const demoRecruiterPostings = FALLBACK_JOBS.slice(0, 3).map((job) => ({
         ...job,
         applicantCount: 8,
-        shortlistedCount: 3,
-        avgAiScore: 84,
+        shortlistedCount: 5,
+        avgAiScore: 83,
         isDemo: true,
       }));
       setJobs(demoRecruiterPostings);
+      setOverview({
+        isSampleData: true,
+        totalApplicants: 24,
+        funnelSteps: [{ count: 24 }, { count: 16 }],
+        scoreMetrics: { averageMatchScore: 82.5 },
+      });
     } finally {
       setLoading(false);
     }
@@ -88,18 +117,21 @@ const RecruiterJobs = () => {
     );
   }, [jobs, searchTerm]);
 
-  // Metrics summary
+  // Metrics summary (Single Source of Truth from Overview)
+  const isSampleData = overview?.isSampleData ?? (!jobs.some((j) => !j.isDemo));
+
   const metrics = useMemo(() => {
     const totalJobs = jobs.length;
-    const totalApplicants = jobs.reduce((acc, curr) => acc + (curr.applicantCount || 6), 0);
-    const totalShortlisted = jobs.reduce((acc, curr) => acc + (curr.shortlistedCount || 2), 0);
-    const avgScore =
-      totalJobs > 0
-        ? Math.round(jobs.reduce((acc, curr) => acc + (curr.avgAiScore || 81), 0) / totalJobs)
-        : 80;
+    const totalApplicants = overview?.totalApplicants ?? 24;
+    const totalShortlisted =
+      overview?.funnelSteps?.[1]?.count ??
+      overview?.stageCounts?.shortlisted ??
+      16;
+    const rawScore = overview?.scoreMetrics?.averageMatchScore ?? overview?.avgAiMatchScore ?? 83;
+    const avgScore = typeof rawScore === 'number' ? Math.round(rawScore) : 83;
 
-    return { totalJobs, totalApplicants, totalShortlisted, avgScore };
-  }, [jobs]);
+    return { totalJobs, totalApplicants, totalShortlisted, avgScore, isSampleData };
+  }, [jobs, overview, isSampleData]);
 
   // Handle delete confirmation
   const confirmDeleteJob = async () => {
@@ -171,58 +203,45 @@ const RecruiterJobs = () => {
         </div>
       )}
 
-      {/* Recruiter Workspace Header */}
+      {/* Actions & Sample Badge Row (Directly above stat cards) */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           flexWrap: 'wrap',
-          gap: '1.5rem',
-          marginBottom: '2.5rem',
+          gap: '1rem',
+          marginBottom: '1.5rem',
         }}
       >
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.5rem' }}>
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                fontSize: '0.72rem',
-                fontWeight: 700,
-                letterSpacing: '0.01em',
-                padding: '0.28rem 0.7rem',
-                borderRadius: '4px',
-                background: 'var(--accent-teal-light)',
-                color: 'var(--accent-teal)',
-                border: '1px solid rgba(15, 107, 92, 0.25)',
-              }}
-            >
-              Recruiter command center
-            </span>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Logged in as <strong style={{ color: 'var(--text-primary)' }}>{user?.name}</strong>
-            </span>
-          </div>
-          <h1
-            style={{
-              fontFamily: "'Newsreader', Georgia, serif",
-              fontSize: '2.2rem',
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              marginBottom: '0.4rem',
-              color: 'var(--text-primary)',
-            }}
-          >
-            Active Requisitions & ATS Pipeline
-          </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', maxWidth: '650px', lineHeight: 1.5 }}>
-            Publish new engineering roles, manage active listings, and review incoming candidate scorecards with transparent skill evaluations.
-          </p>
+          {metrics.isSampleData && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  fontSize: '0.74rem',
+                  fontWeight: 700,
+                  padding: '0.2rem 0.6rem',
+                  borderRadius: '4px',
+                  background: 'rgba(180, 83, 9, 0.1)',
+                  color: '#B45309',
+                  border: '1px solid rgba(180, 83, 9, 0.25)',
+                }}
+                title="Metrics powered by seeded sample portfolio"
+              >
+                Sample data
+              </span>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                Pipeline counts and scores synchronized with sample portfolio
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* Primary CTA */}
+        {/* Primary CTA Buttons */}
         <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap' }}>
           <Link
             to="/jobs"
@@ -231,11 +250,11 @@ const RecruiterJobs = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
-              padding: '0.75rem 1.25rem',
+              padding: '0.65rem 1.15rem',
             }}
           >
-            <Briefcase size={17} />
-            Public Board
+            <Briefcase size={16} />
+            <span>Public Board</span>
           </Link>
           <Link
             to="/jobs/post"
@@ -244,16 +263,15 @@ const RecruiterJobs = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.55rem',
-              padding: '0.75rem 1.4rem',
+              padding: '0.65rem 1.25rem',
             }}
           >
-            <Plus size={18} />
+            <Plus size={17} />
             <span>Post New Job</span>
           </Link>
         </div>
       </div>
 
-      {/* Metrics Row */}
       <div
         style={{
           display: 'grid',
@@ -282,7 +300,7 @@ const RecruiterJobs = () => {
             {metrics.totalApplicants}
           </div>
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-            Evaluated via ATS Parser
+            Across all open roles
           </div>
         </div>
 
@@ -294,7 +312,7 @@ const RecruiterJobs = () => {
             {metrics.totalShortlisted}
           </div>
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-            AI Match Score &ge; 75%
+            Moved past the Applied stage
           </div>
         </div>
 
@@ -306,7 +324,7 @@ const RecruiterJobs = () => {
             {metrics.avgScore}%
           </div>
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-            Cross-role alignment score
+            Based on AI evaluations only
           </div>
         </div>
       </div>
@@ -642,9 +660,14 @@ const RecruiterJobs = () => {
                       View Applicants in ATS Pipeline
                     </Link>
 
-                    {/* Delete Listing Button */}
+                    {/* Delete Listing Button (Disabled in demo mode) */}
                     <button
-                      onClick={() => setJobToDelete(job)}
+                      type="button"
+                      onClick={() => {
+                        if (isDemoAccount) return;
+                        setJobToDelete(job);
+                      }}
+                      disabled={isDemoAccount}
                       className="btn btn-ghost"
                       style={{
                         padding: '0.5rem 0.85rem',
@@ -654,11 +677,14 @@ const RecruiterJobs = () => {
                         gap: '0.35rem',
                         color: 'var(--semantic-red)',
                         borderRadius: '4px',
+                        opacity: isDemoAccount ? 0.45 : 1,
+                        cursor: isDemoAccount ? 'not-allowed' : 'pointer',
                       }}
-                      title="Delete this listing"
+                      title={isDemoAccount ? 'Disabled in demo mode' : 'Delete this listing'}
+                      aria-disabled={isDemoAccount}
                     >
                       <Trash2 size={15} />
-                      Delete Listing
+                      <span>Delete Listing</span>
                     </button>
                   </div>
                 </div>
