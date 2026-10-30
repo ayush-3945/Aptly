@@ -20,6 +20,7 @@ import {
   FileCheck,
 } from 'lucide-react';
 import ResumeDropzone from '../components/ResumeDropzone';
+import SkillAutocomplete from '../components/SkillAutocomplete';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../services/api';
@@ -246,10 +247,16 @@ const CandidateProfile = () => {
   };
 
   // Skill tag operations
-  const handleAddSkill = (e) => {
-    if (e) e.preventDefault();
-    const trimmed = newSkillInput.trim();
-    if (trimmed && !formData.skills.includes(trimmed)) {
+  const handleAddSkill = (skillToAdd) => {
+    const raw = typeof skillToAdd === 'string' ? skillToAdd : newSkillInput;
+    const trimmed = raw?.trim();
+    if (!trimmed) return;
+
+    // Prevent duplicates case-insensitively
+    const exists = formData.skills.some(
+      (s) => s.toLowerCase() === trimmed.toLowerCase()
+    );
+    if (!exists) {
       setFormData((prev) => ({ ...prev, skills: [...prev.skills, trimmed] }));
       setNewSkillInput('');
     }
@@ -670,31 +677,14 @@ const CandidateProfile = () => {
             {aiFilledFields.has('skills') && <span className="ai-tag-indicator">Auto-filled</span>}
           </div>
 
-          {/* Add Skill Input */}
-          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', maxWidth: '420px' }}>
-            <input
-              type="text"
-              className="form-control"
-              value={newSkillInput}
-              onChange={(e) => setNewSkillInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleAddSkill();
-                }
-              }}
+          {/* Add Skill Input with SkillAutocomplete */}
+          <div style={{ marginBottom: '1.25rem', maxWidth: '420px' }}>
+            <SkillAutocomplete
+              onAddSkill={handleAddSkill}
+              existingSkills={formData.skills}
               placeholder="Add a technology or skill (e.g. Next.js)..."
-              style={{ flex: 1, padding: '0.55rem 0.85rem', fontSize: '0.88rem' }}
+              buttonText="Add"
             />
-            <button
-              type="button"
-              onClick={handleAddSkill}
-              className="btn btn-secondary"
-              style={{ fontSize: '0.85rem', padding: '0.55rem 0.95rem' }}
-            >
-              <Plus size={15} />
-              <span>Add</span>
-            </button>
           </div>
 
           {/* Skills Chips */}

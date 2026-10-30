@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import JDQualityPanel from '../components/JDQualityPanel';
+import SkillAutocomplete from '../components/SkillAutocomplete';
 
 const POPULAR_SKILLS = [
   'React',
@@ -603,28 +604,15 @@ const PostJob = () => {
                 Required Skills & Tech Stack <span style={{ color: 'var(--semantic-red)' }}>*</span>
               </label>
 
-              <div style={{ display: 'flex', gap: '0.65rem' }}>
-                <input
-                  type="text"
-                  placeholder="Type a skill (e.g. React, Docker, Python) and press Enter or Comma..."
-                  value={skillInput}
-                  onChange={(e) => setSkillInput(e.target.value)}
-                  onKeyDown={handleSkillKeyDown}
-                  className="form-input"
-                  style={{ fontSize: '0.92rem', padding: '0.75rem 1rem', flex: 1 }}
-                  disabled={loading}
-                />
-                <button
-                  type="button"
-                  onClick={() => handleAddSkill()}
-                  className="btn btn-secondary"
-                  style={{ padding: '0.75rem 1.25rem', fontSize: '0.88rem', whiteSpace: 'nowrap' }}
-                  disabled={loading || !skillInput.trim()}
-                >
-                  <Plus size={16} />
-                  Add Skill
-                </button>
-              </div>
+              <SkillAutocomplete
+                onAddSkill={handleAddSkill}
+                existingSkills={skills}
+                placeholder="Type a skill (e.g. React, Docker, Python) and press Enter or Comma..."
+                buttonText="Add Skill"
+                disabled={loading}
+                className="form-input"
+                inputStyle={{ fontSize: '0.92rem', padding: '0.75rem 1rem' }}
+              />
 
               {/* Selected Skills Chips */}
               {skills.length > 0 && (

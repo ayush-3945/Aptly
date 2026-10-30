@@ -10,7 +10,7 @@
   --accent-teal-mid: #1D9E75;    /* mid teal for hover states */
   --text-primary: #141414;       /* near-black body text */
   --text-secondary: #4A4A47;     /* muted supporting text */
-  --text-muted: #8A8A86;         /* metadata, captions */
+  --text-muted: #5E5E5A;         /* metadata, captions — high contrast ≥ 4.5:1 on cream & white */
   --border-default: #E0DDD5;     /* warm gray hairline border */
   --border-subtle: var(--border-default);
   --border-medium: #CDC9BF;

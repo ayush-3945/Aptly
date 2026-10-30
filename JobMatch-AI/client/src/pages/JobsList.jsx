@@ -23,6 +23,7 @@ import api from '../services/api';
 import ApplyModal from '../components/ApplyModal';
 import { useSavedJobs } from '../utils/savedJobs';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
+import SkillAutocomplete from '../components/SkillAutocomplete';
 
 const POPULAR_SKILLS = ['All', 'React', 'Node.js', 'MongoDB', 'PostgreSQL', 'Docker', 'Python', 'TypeScript'];
 const LOCATIONS = ['All Locations', 'Remote', 'San Francisco, CA', 'Austin, TX', 'New York, NY'];
@@ -464,6 +465,52 @@ const JobsList = () => {
                 </button>
               );
             })}
+
+            {/* Custom selected skill pill when not in POPULAR_SKILLS */}
+            {selectedSkill !== 'All' &&
+              !POPULAR_SKILLS.some((s) => s.toLowerCase() === selectedSkill.toLowerCase()) && (
+                <button
+                  key={selectedSkill}
+                  type="button"
+                  onClick={() => setSelectedSkill('All')}
+                  style={{
+                    padding: '0.22rem 0.65rem',
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    borderRadius: '6px',
+                    border: '1px solid #0d9488',
+                    backgroundColor: '#0d9488',
+                    color: '#FFFFFF',
+                    boxShadow: '0 1px 3px rgba(13, 148, 136, 0.28)',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.3rem',
+                  }}
+                  title="Click to clear skill filter"
+                >
+                  <span>{selectedSkill}</span>
+                  <X size={12} />
+                </button>
+              )}
+
+            {/* Reusable SkillAutocomplete for search filter */}
+            <div style={{ minWidth: '170px', maxWidth: '230px', marginLeft: 'auto' }}>
+              <SkillAutocomplete
+                onAddSkill={(skill) => setSelectedSkill(skill)}
+                placeholder="Find skill..."
+                showButton={false}
+                existingSkills={selectedSkill !== 'All' ? [selectedSkill] : []}
+                className="form-input"
+                inputStyle={{
+                  padding: '0.24rem 0.65rem',
+                  fontSize: '0.78rem',
+                  height: '28px',
+                  backgroundColor: '#FFFFFF',
+                  borderColor: '#E2E8F0',
+                }}
+              />
+            </div>
           </div>
         </div>
 

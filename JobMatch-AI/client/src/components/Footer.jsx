@@ -41,7 +41,23 @@ const Footer = () => {
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
+            <a
+              href="https://github.com/ayush-3945/Aptly/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontSize: '0.82rem',
+                color: 'var(--text-secondary)',
+                textDecoration: 'underline',
+                textUnderlineOffset: '3px',
+                transition: 'var(--transition)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-teal)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+            >
+              Report an issue
+            </a>
             <a
               href="https://github.com/ayush-3945/Aptly"
               target="_blank"

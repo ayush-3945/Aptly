@@ -14,6 +14,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import CandidateProfile from './pages/CandidateProfile';
 import Onboarding from './pages/Onboarding';
+import NotFound from './pages/NotFound';
 import ErrorBoundary from './components/ErrorBoundary';
 import ChatBot from './components/ChatBot';
 
@@ -68,6 +69,7 @@ function App() {
                 />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </ErrorBoundary>
           </main>

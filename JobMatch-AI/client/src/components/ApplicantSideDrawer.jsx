@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   X,
   ChevronLeft,
@@ -48,15 +48,57 @@ export default function ApplicantSideDrawer({
     if (hasNext) onSelectCandidate(applicants[currentIndex + 1]);
   };
 
-  // Keyboard shortcut listener for Esc, Left and Right arrows
+  const drawerRef = useRef(null);
+  const previouslyFocusedElement = useRef(null);
+
+  // Capture previously focused element on mount and restore on unmount/close
+  useEffect(() => {
+    previouslyFocusedElement.current = document.activeElement;
+
+    // Auto-focus first focusable element inside drawer
+    const timer = setTimeout(() => {
+      const focusables = drawerRef.current?.querySelectorAll(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusables && focusables.length > 0) {
+        focusables[0].focus();
+      }
+    }, 50);
+
+    return () => {
+      clearTimeout(timer);
+      if (previouslyFocusedElement.current && typeof previouslyFocusedElement.current.focus === 'function') {
+        previouslyFocusedElement.current.focus();
+      }
+    };
+  }, []);
+
+  // Keyboard listener: Esc, Tab focus trap, Left/Right navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
+        e.preventDefault();
         onClose();
       } else if (e.key === 'ArrowLeft' && hasPrev) {
         handlePrev();
       } else if (e.key === 'ArrowRight' && hasNext) {
         handleNext();
+      } else if (e.key === 'Tab' && drawerRef.current) {
+        const focusables = drawerRef.current.querySelectorAll(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length > 0) {
+          const first = focusables[0];
+          const last = focusables[focusables.length - 1];
+
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
       }
     };
 
@@ -117,6 +159,7 @@ export default function ApplicantSideDrawer({
       onClick={onClose}
     >
       <div
+        ref={drawerRef}
         style={{
           width: 'min(560px, 92vw)',
           height: '100%',
