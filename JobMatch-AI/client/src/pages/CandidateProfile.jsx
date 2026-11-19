@@ -20,7 +20,7 @@ import {
   FileCheck,
 } from 'lucide-react';
 import ResumeDropzone from '../components/ResumeDropzone';
-import SkillAutocomplete from '../components/SkillAutocomplete';
+import SkillAutocomplete, { normalizeSkillName } from '../components/SkillAutocomplete';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../services/api';
@@ -252,14 +252,23 @@ const CandidateProfile = () => {
     const trimmed = raw?.trim();
     if (!trimmed) return;
 
-    // Prevent duplicates case-insensitively
-    const exists = formData.skills.some(
-      (s) => s.toLowerCase() === trimmed.toLowerCase()
-    );
-    if (!exists) {
-      setFormData((prev) => ({ ...prev, skills: [...prev.skills, trimmed] }));
-      setNewSkillInput('');
-    }
+    const parts = trimmed
+      .split(',')
+      .map((s) => normalizeSkillName(s.trim()))
+      .filter(Boolean);
+
+    const updatedSkills = [...formData.skills];
+    parts.forEach((canonical) => {
+      const exists = updatedSkills.some(
+        (s) => s.toLowerCase() === canonical.toLowerCase()
+      );
+      if (!exists && canonical.length > 0) {
+        updatedSkills.push(canonical);
+      }
+    });
+
+    setFormData((prev) => ({ ...prev, skills: updatedSkills }));
+    setNewSkillInput('');
   };
 
   const handleRemoveSkill = (skillToRemove) => {

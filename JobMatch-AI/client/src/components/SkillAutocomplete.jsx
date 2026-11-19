@@ -37,10 +37,16 @@ export function normalizeSkillName(raw) {
   const exact = SKILLS.find((s) => s.toLowerCase() === trimmed.toLowerCase());
   if (exact) return exact;
 
-  // 2. Ignore dots and spaces match (e.g. "nextjs" -> "Next.js")
+  // 2. Ignore dots and spaces match (e.g. "nextjs" -> "Next.js", "tailwindcss" -> "Tailwind CSS")
   const clean = normalizeForMatch(trimmed);
   const cleanMatch = SKILLS.find((s) => normalizeForMatch(s) === clean);
   if (cleanMatch) return cleanMatch;
+
+  // 3. Common aliases (e.g. "tailwind" -> "Tailwind CSS")
+  if (clean === 'tailwind') {
+    const tw = SKILLS.find((s) => s === 'Tailwind CSS');
+    if (tw) return tw;
+  }
 
   return trimmed;
 }
@@ -339,7 +345,7 @@ export default function SkillAutocomplete({
       } else if (totalItems > 0) {
         setSelectedIndex((prev) => (prev > 0 ? prev - 1 : totalItems - 1));
       }
-    } else if (e.key === 'Enter') {
+    } else if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       if (isOpen && selectedIndex >= 0) {
         if (selectedIndex < suggestions.length) {
@@ -367,7 +373,12 @@ export default function SkillAutocomplete({
   };
 
   const handleInputChange = (e) => {
-    setQuery(e.target.value);
+    const val = e.target.value;
+    if (val.includes(',')) {
+      handleSelectSkill(val);
+      return;
+    }
+    setQuery(val);
     setSelectedIndex(-1);
     if (!isOpen) {
       setIsOpen(true);

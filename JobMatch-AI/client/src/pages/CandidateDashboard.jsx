@@ -74,7 +74,7 @@ const SAMPLE_APPLICATIONS = [
     job: {
       _id: 'job_fallback_2',
       title: 'Frontend Interface Architect',
-      company: 'Zepto Tech',
+      company: 'Nova Logistics',
       location: 'Mumbai, India (Hybrid)',
     },
   },

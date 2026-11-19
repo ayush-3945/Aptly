@@ -3,6 +3,7 @@ import {
   DndContext,
   DragOverlay,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   closestCorners,
@@ -167,7 +168,16 @@ const DraggableCard = ({ application, onViewResume, onScheduleInterview, onGener
       ref={setNodeRef}
       style={style}
       className="kanban-card"
+      tabIndex={0}
+      role="button"
+      aria-label={`View applicant profile for ${application.candidateName}`}
       onClick={() => onViewResume && onViewResume(application)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onViewResume && onViewResume(application);
+        }
+      }}
     >
       {/* Drag handle + candidate name */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
@@ -573,7 +583,13 @@ const KanbanBoard = ({ applicants, setApplicants, onViewResume, onScheduleInterv
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 },
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
     })
   );
 

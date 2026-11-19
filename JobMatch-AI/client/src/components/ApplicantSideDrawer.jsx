@@ -116,15 +116,25 @@ export default function ApplicantSideDrawer({
     'Anonymous Candidate';
 
   const score = application.aiMatchScore ?? 0;
-  const isFallback = application.evaluationSource === 'fallback';
   const stage = application.status || 'applied';
   const stageCfg = STAGE_CONFIG[stage] || STAGE_CONFIG.applied;
 
   const scoreBreakdown = application.scoreBreakdown || {};
-  const skillsScore = scoreBreakdown.skillsScore ?? scoreBreakdown.skills ?? score;
-  const experienceScore = scoreBreakdown.experienceScore;
-  const domainScore = scoreBreakdown.domainScore;
-  const educationScore = scoreBreakdown.educationScore;
+  const skillsScore = typeof (scoreBreakdown.skillsScore ?? scoreBreakdown.skills ?? score) === 'number'
+    ? Math.round(scoreBreakdown.skillsScore ?? scoreBreakdown.skills ?? score)
+    : 0;
+  const experienceScore = typeof scoreBreakdown.experienceScore === 'number' && !isNaN(scoreBreakdown.experienceScore)
+    ? scoreBreakdown.experienceScore
+    : null;
+  const domainScore = typeof (scoreBreakdown.domainScore ?? scoreBreakdown.relevanceScore) === 'number' && !isNaN(scoreBreakdown.domainScore ?? scoreBreakdown.relevanceScore)
+    ? (scoreBreakdown.domainScore ?? scoreBreakdown.relevanceScore)
+    : null;
+  const educationScore = typeof scoreBreakdown.educationScore === 'number' && !isNaN(scoreBreakdown.educationScore)
+    ? scoreBreakdown.educationScore
+    : null;
+
+  const isFallback = application.evaluationSource === 'fallback' ||
+    (experienceScore === null && domainScore === null && educationScore === null);
 
   const initials = fullName
     .split(' ')
@@ -418,10 +428,10 @@ export default function ApplicantSideDrawer({
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.73rem', marginBottom: '0.2rem' }}>
                       <span style={{ color: 'var(--text-secondary)' }}>Experience (30%)</span>
-                      <span style={{ fontWeight: 700 }}>{experienceScore ?? score}%</span>
+                      <span style={{ fontWeight: 700 }}>{experienceScore !== null ? `${experienceScore}%` : 'n/a'}</span>
                     </div>
                     <div style={{ height: '5px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
-                      <div style={{ width: `${experienceScore ?? score}%`, height: '100%', background: 'var(--accent-teal)' }} />
+                      <div style={{ width: `${experienceScore !== null ? experienceScore : 0}%`, height: '100%', background: 'var(--accent-teal)' }} />
                     </div>
                   </div>
 
@@ -429,10 +439,10 @@ export default function ApplicantSideDrawer({
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.73rem', marginBottom: '0.2rem' }}>
                       <span style={{ color: 'var(--text-secondary)' }}>Domain (20%)</span>
-                      <span style={{ fontWeight: 700 }}>{domainScore ?? score}%</span>
+                      <span style={{ fontWeight: 700 }}>{domainScore !== null ? `${domainScore}%` : 'n/a'}</span>
                     </div>
                     <div style={{ height: '5px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
-                      <div style={{ width: `${domainScore ?? score}%`, height: '100%', background: 'var(--accent-teal)' }} />
+                      <div style={{ width: `${domainScore !== null ? domainScore : 0}%`, height: '100%', background: 'var(--accent-teal)' }} />
                     </div>
                   </div>
 
@@ -440,10 +450,10 @@ export default function ApplicantSideDrawer({
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.73rem', marginBottom: '0.2rem' }}>
                       <span style={{ color: 'var(--text-secondary)' }}>Education (10%)</span>
-                      <span style={{ fontWeight: 700 }}>{educationScore ?? 75}%</span>
+                      <span style={{ fontWeight: 700 }}>{educationScore !== null ? `${educationScore}%` : 'n/a'}</span>
                     </div>
                     <div style={{ height: '5px', background: 'var(--border-default)', borderRadius: '2px', overflow: 'hidden' }}>
-                      <div style={{ width: `${educationScore ?? 75}%`, height: '100%', background: 'var(--accent-teal)' }} />
+                      <div style={{ width: `${educationScore !== null ? educationScore : 0}%`, height: '100%', background: 'var(--accent-teal)' }} />
                     </div>
                   </div>
                 </div>

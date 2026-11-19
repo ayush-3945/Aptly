@@ -10,6 +10,7 @@
     "client": "npm --prefix client run dev",
     "seed": "node scripts/seedDatabase.js",
     "reset:demo": "node scripts/resetDemoData.js",
+    "migrate:eval-source": "node scripts/migrateEvaluationSource.js",
     "test": "npm run test:security && npm run test:health && npm run test:quickmatch && npm run test:analytics",
     "test:ai": "node scripts/verifyAIPipeline.js",
     "test:preview": "node scripts/testPreviewMatch.js",

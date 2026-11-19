@@ -370,6 +370,8 @@ Requirements:
         resumeUrl: 'uploads/resumes/jordan-taylor-resume.pdf',
         aiMatchScore: 40,
         recommendation: 'Low Match',
+        evaluationSource: 'fallback',
+        scoreBreakdown: { skillsScore: 40 },
         matchedSkills: ['React'],
         missingSkills: ['Node.js', 'Express', 'MongoDB', 'Docker', 'PostgreSQL'],
         experienceFit: 'Junior UI developer with HTML/CSS focus; lacks requisite backend microservices experience.',

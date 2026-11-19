@@ -278,6 +278,10 @@ const getVerifiedSampleOverview = () => ({
     aiEvaluationCount: 20,
     fallbackEvaluationCount: 4,
     totalScored: 24,
+    avgSkillsScore: 88.0,
+    avgExperienceScore: 84.5,
+    avgDomainScore: 81.2,
+    avgEducationScore: 80.0,
   },
   topRequiredSkills: [
     { skill: 'React', jobCount: 3, candidateMatches: 21, percentOfJobs: 100 },
@@ -468,6 +472,25 @@ const getPipelineOverview = async ({ userId, userEmail } = {}) => {
     const fallbackEvaluationCount = fallbackApps.length;
     const totalAiScore = aiApps.reduce((sum, a) => sum + a.aiMatchScore, 0);
     const averageMatchScore = aiEvaluationCount > 0 ? Number((totalAiScore / aiEvaluationCount).toFixed(1)) : null;
+
+    // Sub-score averages (Strictly non-null numbers only, null-safe)
+    const validSkills = aiApps
+      .map((a) => a.scoreBreakdown?.skillsScore ?? a.scoreBreakdown?.skills)
+      .filter((n) => typeof n === 'number' && !isNaN(n));
+    const validExp = aiApps
+      .map((a) => a.scoreBreakdown?.experienceScore)
+      .filter((n) => typeof n === 'number' && !isNaN(n));
+    const validDomain = aiApps
+      .map((a) => a.scoreBreakdown?.domainScore ?? a.scoreBreakdown?.relevanceScore)
+      .filter((n) => typeof n === 'number' && !isNaN(n));
+    const validEdu = aiApps
+      .map((a) => a.scoreBreakdown?.educationScore)
+      .filter((n) => typeof n === 'number' && !isNaN(n));
+
+    const avgSkillsScore = validSkills.length > 0 ? Number((validSkills.reduce((s, v) => s + v, 0) / validSkills.length).toFixed(1)) : null;
+    const avgExperienceScore = validExp.length > 0 ? Number((validExp.reduce((s, v) => s + v, 0) / validExp.length).toFixed(1)) : null;
+    const avgDomainScore = validDomain.length > 0 ? Number((validDomain.reduce((s, v) => s + v, 0) / validDomain.length).toFixed(1)) : null;
+    const avgEducationScore = validEdu.length > 0 ? Number((validEdu.reduce((s, v) => s + v, 0) / validEdu.length).toFixed(1)) : null;
 
     // 6. Match Tiers (Calculated across all scored applications)
     let strongCount = 0;
@@ -664,6 +687,10 @@ const getPipelineOverview = async ({ userId, userEmail } = {}) => {
         aiEvaluationCount,
         fallbackEvaluationCount,
         totalScored,
+        avgSkillsScore,
+        avgExperienceScore,
+        avgDomainScore,
+        avgEducationScore,
       },
       topRequiredSkills,
       applicationsPerWeek,

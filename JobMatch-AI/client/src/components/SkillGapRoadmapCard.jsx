@@ -27,11 +27,20 @@ export default function SkillGapRoadmapCard({
   const [activeTab, setActiveTab] = useState('roadmap'); // 'roadmap' | 'breakdown' | 'resume'
   const [expandedIndex, setExpandedIndex] = useState(0);
 
-  const isFallback = evaluationSource === 'fallback' || (!scoreBreakdown?.experienceScore && !scoreBreakdown?.domainScore && !scoreBreakdown?.educationScore);
-  const skillsScore = scoreBreakdown?.skillsScore ?? scoreBreakdown?.skills ?? matchScore ?? 0;
-  const experienceScore = scoreBreakdown?.experienceScore ?? 0;
-  const domainScore = scoreBreakdown?.domainScore ?? scoreBreakdown?.relevanceScore ?? 0;
-  const educationScore = scoreBreakdown?.educationScore ?? 0;
+  const isFallback = evaluationSource === 'fallback' || 
+    (scoreBreakdown?.experienceScore == null && scoreBreakdown?.domainScore == null && scoreBreakdown?.educationScore == null);
+  const skillsScore = typeof (scoreBreakdown?.skillsScore ?? scoreBreakdown?.skills ?? matchScore) === 'number'
+    ? Math.max(0, Math.min(100, Math.round(scoreBreakdown?.skillsScore ?? scoreBreakdown?.skills ?? matchScore)))
+    : 0;
+  const experienceScore = typeof scoreBreakdown?.experienceScore === 'number' && !isNaN(scoreBreakdown?.experienceScore)
+    ? scoreBreakdown.experienceScore
+    : null;
+  const domainScore = typeof (scoreBreakdown?.domainScore ?? scoreBreakdown?.relevanceScore) === 'number' && !isNaN(scoreBreakdown?.domainScore ?? scoreBreakdown?.relevanceScore)
+    ? (scoreBreakdown?.domainScore ?? scoreBreakdown?.relevanceScore)
+    : null;
+  const educationScore = typeof scoreBreakdown?.educationScore === 'number' && !isNaN(scoreBreakdown?.educationScore)
+    ? scoreBreakdown.educationScore
+    : null;
 
   const roadmapItems = Array.isArray(skillGapRoadmap) && skillGapRoadmap.length > 0
     ? skillGapRoadmap
@@ -422,12 +431,14 @@ export default function SkillGapRoadmapCard({
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.25rem' }}>
                   <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Seniority & Experience Match (30%)</span>
-                  <span style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>{experienceScore}%</span>
+                  <span style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>
+                    {experienceScore !== null ? `${experienceScore}%` : 'n/a'}
+                  </span>
                 </div>
                 <div style={{ width: '100%', height: '6px', background: 'var(--bg-secondary)', borderRadius: '3px', overflow: 'hidden' }}>
                   <div
                     style={{
-                      width: `${experienceScore}%`,
+                      width: `${experienceScore !== null ? experienceScore : 0}%`,
                       height: '100%',
                       background: 'var(--accent-teal-mid)',
                       borderRadius: '3px',
@@ -440,12 +451,14 @@ export default function SkillGapRoadmapCard({
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.25rem' }}>
                   <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Domain & Tech Stack Relevance (20%)</span>
-                  <span style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>{domainScore}%</span>
+                  <span style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>
+                    {domainScore !== null ? `${domainScore}%` : 'n/a'}
+                  </span>
                 </div>
                 <div style={{ width: '100%', height: '6px', background: 'var(--bg-secondary)', borderRadius: '3px', overflow: 'hidden' }}>
                   <div
                     style={{
-                      width: `${domainScore}%`,
+                      width: `${domainScore !== null ? domainScore : 0}%`,
                       height: '100%',
                       background: 'var(--semantic-green)',
                       borderRadius: '3px',
@@ -458,12 +471,14 @@ export default function SkillGapRoadmapCard({
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.25rem' }}>
                   <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Education & Credentials (10%)</span>
-                  <span style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>{educationScore}%</span>
+                  <span style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>
+                    {educationScore !== null ? `${educationScore}%` : 'n/a'}
+                  </span>
                 </div>
                 <div style={{ width: '100%', height: '6px', background: 'var(--bg-secondary)', borderRadius: '3px', overflow: 'hidden' }}>
                   <div
                     style={{
-                      width: `${educationScore}%`,
+                      width: `${educationScore !== null ? educationScore : 0}%`,
                       height: '100%',
                       background: 'var(--accent-teal)',
                       borderRadius: '3px',

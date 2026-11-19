@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import JDQualityPanel from '../components/JDQualityPanel';
-import SkillAutocomplete from '../components/SkillAutocomplete';
+import SkillAutocomplete, { normalizeSkillName } from '../components/SkillAutocomplete';
 
 const POPULAR_SKILLS = [
   'React',
@@ -184,17 +184,21 @@ const PostJob = () => {
     );
   };
 
-  // Skill Input Handler — supports comma-separated bulk input
+  // Skill Input Handler — supports comma-separated bulk input and canonical normalization
   const handleAddSkill = (skillToAdd) => {
     const raw = (skillToAdd || skillInput).trim();
     if (!raw) return;
 
-    const parts = raw.split(',').map((s) => s.trim()).filter(Boolean);
+    const parts = raw
+      .split(',')
+      .map((s) => normalizeSkillName(s.trim()))
+      .filter(Boolean);
+
     const newSkills = [...skills];
-    parts.forEach((part) => {
-      const exists = newSkills.some((s) => s.toLowerCase() === part.toLowerCase());
-      if (!exists && part.length > 0) {
-        newSkills.push(part);
+    parts.forEach((canonicalPart) => {
+      const exists = newSkills.some((s) => s.toLowerCase() === canonicalPart.toLowerCase());
+      if (!exists && canonicalPart.length > 0) {
+        newSkills.push(canonicalPart);
       }
     });
     setSkills(newSkills);
@@ -394,27 +398,6 @@ const PostJob = () => {
               Draft role responsibilities and qualifications. The real-time quality scorer will evaluate clarity, competitiveness, and screen for biased wording.
             </p>
           </div>
-
-          {/* Pre-fill Sample Button */}
-          <button
-            type="button"
-            onClick={handlePrefill}
-            disabled={loading}
-            className="btn btn-secondary"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.45rem',
-              fontSize: '0.84rem',
-              padding: '0.55rem 1.1rem',
-              borderColor: 'rgba(15, 107, 92, 0.3)',
-              color: 'var(--accent-teal)',
-            }}
-            title="Populate complete sample engineering role"
-          >
-            <FileCheck size={15} />
-            <span>Pre-fill Sample Job</span>
-          </button>
         </div>
       </div>
 
@@ -605,10 +588,12 @@ const PostJob = () => {
               </label>
 
               <SkillAutocomplete
+                id="post-job-skills"
                 onAddSkill={handleAddSkill}
                 existingSkills={skills}
                 placeholder="Type a skill (e.g. React, Docker, Python) and press Enter or Comma..."
                 buttonText="Add Skill"
+                showButton={true}
                 disabled={loading}
                 className="form-input"
                 inputStyle={{ fontSize: '0.92rem', padding: '0.75rem 1rem' }}
@@ -673,7 +658,8 @@ const PostJob = () => {
                 </span>
                 <div style={{ display: 'inline-flex', flexWrap: 'wrap', gap: '0.35rem', marginTop: '0.25rem' }}>
                   {POPULAR_SKILLS.map((popSkill) => {
-                    const isAdded = skills.some((s) => s.toLowerCase() === popSkill.toLowerCase());
+                    const canonical = normalizeSkillName(popSkill);
+                    const isAdded = skills.some((s) => s.toLowerCase() === canonical.toLowerCase());
                     return (
                       <button
                         key={popSkill}
@@ -691,7 +677,7 @@ const PostJob = () => {
                           transition: 'var(--transition)',
                         }}
                       >
-                        {isAdded ? popSkill : `+ ${popSkill}`}
+                        {isAdded ? canonical : `+ ${popSkill}`}
                       </button>
                     );
                   })}

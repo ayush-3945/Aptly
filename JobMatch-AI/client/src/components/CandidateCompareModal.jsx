@@ -212,6 +212,50 @@ export default function CandidateCompareModal({
                     </div>
                   </div>
 
+                  {/* Sub-Score Calibration (Null-Safe) */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(4, 1fr)',
+                      gap: '0.35rem',
+                      marginBottom: '1rem',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <div style={{ background: 'var(--bg-secondary)', padding: '0.35rem 0.2rem', borderRadius: '4px' }}>
+                      <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>Skills</div>
+                      <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                        {typeof (app.scoreBreakdown?.skillsScore ?? app.scoreBreakdown?.skills ?? score) === 'number'
+                          ? `${app.scoreBreakdown?.skillsScore ?? app.scoreBreakdown?.skills ?? score}%`
+                          : 'n/a'}
+                      </div>
+                    </div>
+                    <div style={{ background: 'var(--bg-secondary)', padding: '0.35rem 0.2rem', borderRadius: '4px' }}>
+                      <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>Exp</div>
+                      <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                        {typeof app.scoreBreakdown?.experienceScore === 'number' && !isNaN(app.scoreBreakdown.experienceScore)
+                          ? `${app.scoreBreakdown.experienceScore}%`
+                          : 'n/a'}
+                      </div>
+                    </div>
+                    <div style={{ background: 'var(--bg-secondary)', padding: '0.35rem 0.2rem', borderRadius: '4px' }}>
+                      <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>Domain</div>
+                      <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                        {typeof app.scoreBreakdown?.domainScore === 'number' && !isNaN(app.scoreBreakdown.domainScore)
+                          ? `${app.scoreBreakdown.domainScore}%`
+                          : 'n/a'}
+                      </div>
+                    </div>
+                    <div style={{ background: 'var(--bg-secondary)', padding: '0.35rem 0.2rem', borderRadius: '4px' }}>
+                      <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>Edu</div>
+                      <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                        {typeof app.scoreBreakdown?.educationScore === 'number' && !isNaN(app.scoreBreakdown.educationScore)
+                          ? `${app.scoreBreakdown.educationScore}%`
+                          : 'n/a'}
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Fit Summary */}
                   <div style={{ marginBottom: '1rem', flex: 1 }}>
                     <div style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.3rem' }}>

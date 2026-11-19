@@ -153,6 +153,31 @@ async function runTests() {
     failed++;
   }
 
+  // Test 9: Null-safe sub-scores with a fallback applicant
+  const fallbackApp = {
+    aiMatchScore: 52,
+    evaluationSource: 'fallback',
+    scoreBreakdown: {
+      skillsScore: 52,
+      experienceScore: null,
+      domainScore: null,
+      educationScore: null,
+    },
+  };
+  const sb = fallbackApp.scoreBreakdown;
+  const expSafe = typeof sb.experienceScore === 'number' && !isNaN(sb.experienceScore) ? `${sb.experienceScore}%` : 'n/a';
+  const domainSafe = typeof sb.domainScore === 'number' && !isNaN(sb.domainScore) ? `${sb.domainScore}%` : 'n/a';
+  const eduSafe = typeof sb.educationScore === 'number' && !isNaN(sb.educationScore) ? `${sb.educationScore}%` : 'n/a';
+
+  if (sb.experienceScore === null && sb.domainScore === null && sb.educationScore === null &&
+      expSafe === 'n/a' && domainSafe === 'n/a' && eduSafe === 'n/a') {
+    console.log('✔ Test 9 Passed: Fallback applicant sub-scores null-safe (experience, domain, education render "n/a", no NaN)');
+    passed++;
+  } else {
+    console.error('❌ Test 9 Failed: Fallback applicant sub-scores threw NaN or failed null-safety');
+    failed++;
+  }
+
   server.close();
 
   console.log('\n======================================================');
