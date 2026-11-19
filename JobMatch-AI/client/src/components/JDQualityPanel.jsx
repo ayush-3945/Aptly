@@ -28,7 +28,7 @@ const getScoreColor = (score) => {
   return { color: '#B91C1C', bg: 'rgba(185, 28, 28, 0.1)', border: 'rgba(185, 28, 28, 0.25)' };
 };
 
-const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }) => {
+const JDQualityPanel = ({ scoreData, loading, isServerWaking, onAnalyzeNow, onPrefill, hasText }) => {
   const [issuesOpen, setIssuesOpen] = useState(true);
   const [improvementsOpen, setImprovementsOpen] = useState(true);
   const [strengthsOpen, setStrengthsOpen] = useState(false);
@@ -64,6 +64,8 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
           marginBottom: '1.25rem',
           paddingBottom: '0.85rem',
           borderBottom: '1px solid var(--border-default)',
+          gap: '0.5rem',
+          flexWrap: 'wrap',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
@@ -81,7 +83,40 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
           </h3>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+          {scoreData?.source === 'fallback' && (
+            <span
+              style={{
+                fontSize: '0.72rem',
+                fontWeight: 600,
+                padding: '0.2rem 0.5rem',
+                borderRadius: '4px',
+                background: 'rgba(180, 83, 9, 0.08)',
+                border: '1px solid rgba(180, 83, 9, 0.25)',
+                color: '#B45309',
+              }}
+              title="Deterministic rule-based checks applied because AI was unavailable"
+            >
+              Basic check (AI was unavailable)
+            </span>
+          )}
+
+          {scoreData?.source === 'ai' && (
+            <span
+              style={{
+                fontSize: '0.72rem',
+                fontWeight: 600,
+                padding: '0.2rem 0.5rem',
+                borderRadius: '4px',
+                background: 'rgba(15, 118, 110, 0.08)',
+                border: '1px solid rgba(15, 118, 110, 0.25)',
+                color: 'var(--accent-teal)',
+              }}
+            >
+              AI Analysis
+            </span>
+          )}
+
           {loading && (
             <span
               style={{
@@ -99,6 +134,29 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
           )}
         </div>
       </div>
+
+      {/* Server Cold-Start / Waking Up Banner */}
+      {isServerWaking && (
+        <div
+          style={{
+            padding: '0.75rem 0.9rem',
+            borderRadius: '6px',
+            background: 'rgba(15, 118, 110, 0.08)',
+            border: '1px solid rgba(15, 118, 110, 0.25)',
+            color: 'var(--accent-teal)',
+            fontSize: '0.8rem',
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.55rem',
+            lineHeight: 1.45,
+            marginBottom: '1rem',
+          }}
+        >
+          <Loader2 className="spin" size={16} style={{ flexShrink: 0 }} />
+          <span>Waking up server... this can take up to a minute</span>
+        </div>
+      )}
 
       {/* Initial Loading State when scoring is in progress */}
       {!scoreData && loading && (
@@ -361,8 +419,91 @@ const JDQualityPanel = ({ scoreData, loading, onAnalyzeNow, onPrefill, hasText }
             </div>
           </div>
 
-          {/* 5 Category Scores with Progress Bars */}
-          {scoreData.categories && (
+          {/* Fallback Honest Checks (When source === 'fallback') */}
+          {scoreData.source === 'fallback' && scoreData.checks && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                }}
+              >
+                <span>Automated Quality Checks</span>
+                <span style={{ fontSize: '0.72rem', fontWeight: 500, color: 'var(--text-muted)' }}>
+                  Rule-based check
+                </span>
+              </div>
+
+              {Object.entries(scoreData.checks).map(([key, check]) => {
+                const isPassed = Boolean(check.passed);
+                const checkColor = isPassed ? '#2D7A3A' : '#B45309';
+                const checkBg = isPassed ? 'rgba(45, 122, 58, 0.05)' : 'rgba(180, 83, 9, 0.05)';
+                const checkBorder = isPassed ? 'rgba(45, 122, 58, 0.2)' : 'rgba(180, 83, 9, 0.2)';
+
+                return (
+                  <div
+                    key={key}
+                    style={{
+                      padding: '0.55rem 0.75rem',
+                      borderRadius: '6px',
+                      background: checkBg,
+                      border: `1px solid ${checkBorder}`,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.2rem',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        color: 'var(--text-primary)',
+                      }}
+                    >
+                      <span>{check.label}</span>
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.25rem',
+                          fontSize: '0.72rem',
+                          color: checkColor,
+                          fontWeight: 700,
+                        }}
+                      >
+                        {isPassed ? (
+                          <>
+                            <CheckCircle2 size={13} color="#2D7A3A" />
+                            Passed
+                          </>
+                        ) : (
+                          <>
+                            <AlertCircle size={13} color="#B45309" />
+                            Needs review
+                          </>
+                        )}
+                      </span>
+                    </div>
+                    {check.detail && (
+                      <div style={{ fontSize: '0.73rem', color: 'var(--text-secondary)', lineHeight: 1.35 }}>
+                        {check.detail}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* 5 Category Scores with Progress Bars (ONLY when AI analysis succeeded) */}
+          {scoreData.source === 'ai' && scoreData.categories && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
               <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                 Evaluation Dimensions

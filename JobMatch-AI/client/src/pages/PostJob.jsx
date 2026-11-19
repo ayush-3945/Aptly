@@ -89,6 +89,7 @@ const PostJob = () => {
   // Live JD Quality Scorer State
   const [scoreData, setScoreData] = useState(null);
   const [scoringLoading, setScoringLoading] = useState(false);
+  const [isServerWaking, setIsServerWaking] = useState(false);
   const descriptionInputRef = React.useRef(null);
 
   // Fetch JD Quality Analysis
@@ -97,12 +98,15 @@ const PostJob = () => {
     reqVal = requirements,
     titleVal = title,
     locVal = location,
-    expVal = experienceLevel
+    expVal = experienceLevel,
+    skillsVal = skills,
+    isRetry = false
   ) => {
     const combined = `${descVal} ${reqVal}`.trim();
     if (combined.length < 10) {
       setScoreData(null);
       setScoringLoading(false);
+      setIsServerWaking(false);
       return;
     }
 
@@ -110,6 +114,7 @@ const PostJob = () => {
     try {
       const res = await api.post('/jobs/score-jd', {
         jobTitle: titleVal.trim() || 'Engineering Role',
+        skills: Array.isArray(skillsVal) ? skillsVal : [],
         description: descVal.trim() || 'Software Engineer',
         requirements: reqVal.trim(),
         location: locVal.trim() || 'Remote',
@@ -119,9 +124,28 @@ const PostJob = () => {
       if (res.data) {
         setScoreData(res.data.data || res.data);
       }
+      setIsServerWaking(false);
     } catch (err) {
+      const isNetworkError =
+        !err.response ||
+        err.code === 'ECONNABORTED' ||
+        err.code === 'ERR_NETWORK' ||
+        err.message?.includes('Network Error');
+
+      if (isNetworkError && !isRetry) {
+        // Cold start or network connection blip: show waking up message and retry automatically once
+        setIsServerWaking(true);
+        setTimeout(() => {
+          fetchJdScore(descVal, reqVal, titleVal, locVal, expVal, skillsVal, true);
+        }, 3000);
+        return;
+      }
+
+      setIsServerWaking(false);
       console.warn('[PostJob] Failed to score JD:', err.message);
-      showToast('Could not score JD right now. Please verify server connection.', 'error');
+      if (!isNetworkError) {
+        showToast('Could not score JD right now. Please verify server connection.', 'error');
+      }
     } finally {
       setScoringLoading(false);
     }
@@ -136,11 +160,11 @@ const PostJob = () => {
     }
 
     const timer = setTimeout(() => {
-      fetchJdScore();
+      fetchJdScore(description, requirements, title, location, experienceLevel, skills);
     }, 1500);
 
     return () => clearTimeout(timer);
-  }, [description, requirements, title, location, experienceLevel]);
+  }, [description, requirements, title, location, experienceLevel, skills]);
 
   const handleAnalyzeNow = () => {
     const combined = `${description} ${requirements}`.trim();
@@ -849,6 +873,7 @@ const PostJob = () => {
           <JDQualityPanel
             scoreData={scoreData}
             loading={scoringLoading}
+            isServerWaking={isServerWaking}
             onAnalyzeNow={handleAnalyzeNow}
             onPrefill={handlePrefill}
             hasText={Boolean(description.trim() || requirements.trim())}

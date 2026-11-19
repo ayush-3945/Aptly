@@ -2,55 +2,121 @@ const { getGeminiClient, isGeminiConfigured, DEFAULT_MODEL } = require('../confi
 
 /**
  * Known exclusionary or biased terms dictionary with rationale and inclusive replacements
+ * Explicitly covers: young, energetic, rockstar, ninja, guru, work hard play hard, aggressive
  */
 const BIASED_TERMS_DICTIONARY = [
   {
-    regex: /\b(ninja|rockstar|guru|wizard|superhero|unicorn)\b/gi,
+    regex: /\b(rockstar)\b/gi,
+    term: 'rockstar',
     reason: 'Informal hype words and hyper-masculine tech jargon alienate qualified mid/senior candidates and underrepresented groups.',
     suggestion: 'skilled engineer, proficient developer, or technical specialist',
   },
   {
-    regex: /\b(young|youthful|digital native|recent graduate)\b/gi,
+    regex: /\b(ninja)\b/gi,
+    term: 'ninja',
+    reason: 'Informal tech buzzword that can obscure real role expectations.',
+    suggestion: 'skilled engineer, proficient developer, or technical specialist',
+  },
+  {
+    regex: /\b(guru)\b/gi,
+    term: 'guru',
+    reason: 'Vague hype term that discourages collaborative engineers from applying.',
+    suggestion: 'subject-matter expert or domain specialist',
+  },
+  {
+    regex: /\b(young|youthful)\b/gi,
+    term: 'young',
     reason: 'Exclusionary language referencing candidate age or generational markers creates ageist bias.',
     suggestion: 'early-career professional or candidates with foundational knowledge',
   },
   {
     regex: /\b(energetic|high energy)\b/gi,
+    term: 'energetic',
     reason: 'Subjective personality trait often interpreted as an ageist or ableist proxy.',
     suggestion: 'collaborative, proactive, or results-oriented',
   },
   {
     regex: /\b(work hard play hard|hustle culture|grind)\b/gi,
-    reason: 'Signals poor work-life balance and burnout culture, discouraging caregivers and seasoned professionals.',
+    term: 'work hard play hard',
+    reason: 'Signals burnout culture and poor work-life balance, discouraging seasoned professionals and caregivers.',
     suggestion: 'sustainable engineering velocity and healthy work-life balance',
   },
   {
     regex: /\b(aggressive|dominate|killer instinct|ruthless)\b/gi,
+    term: 'aggressive',
     reason: 'Hyper-aggressive language discourages collaborative engineers and fosters toxic team dynamics.',
     suggestion: 'driven, ambitious, or strategic execution',
   },
   {
     regex: /\b(native english speaker)\b/gi,
+    term: 'native english speaker',
     reason: 'Potentially discriminatory against fluent non-native English speakers.',
     suggestion: 'proficient verbal and written communication in English',
   },
 ];
 
 /**
- * Deterministic heuristic fallback analyzer
- * Provides instant real-time quality evaluation when Gemini API is unconfigured or unavailable.
+ * Deterministic rule-based fallback analyzer (0 AI calls, 0 cost, 100% reliable)
+ * Used when Gemini fails or times out (15s).
+ * Computes honest checks only:
+ * 1. Description length
+ * 2. Presence of sections (responsibilities, requirements, benefits)
+ * 3. Number of listed skills
+ * 4. Salary mentioned or not
+ * 5. Biased-term scan with inclusive alternatives
+ *
+ * Never fabricates category scores; sets source: 'fallback'.
  */
 const generateFallbackJdScore = ({
   jobTitle = '',
+  skills = [],
   description = '',
   requirements = '',
   location = '',
   experienceLevel = '',
 }) => {
   const combinedText = `${jobTitle} ${description} ${requirements} ${location} ${experienceLevel}`.trim();
-  const lowerText = combinedText.toLowerCase();
 
-  // 1. Detect Biased Language
+  // 1. Description Length Check
+  const descWords = (description || '').split(/\s+/).filter(Boolean).length;
+  const reqWords = (requirements || '').split(/\s+/).filter(Boolean).length;
+  const wordCount = descWords + reqWords;
+  const lengthPassed = wordCount >= 80;
+  let lengthScore = 5;
+  if (wordCount >= 100) lengthScore = 20;
+  else if (wordCount >= 60) lengthScore = 15;
+  else if (wordCount >= 30) lengthScore = 10;
+
+  // 2. Presence of Sections Check (Responsibilities, Requirements, Benefits)
+  const hasResponsibilities = /\b(responsibilit(ies|y)|duties|what you('ll| will) do|role overview|day[- ]to[- ]day|key initiatives|mission)\b/i.test(combinedText);
+  const hasRequirements = /\b(requirement(s)?|qualification(s)?|what you need|skills required|must have|prerequisite(s)?|what we('re| are) looking for)\b/i.test(combinedText);
+  const hasBenefits = /\b(benefit(s)?|perk(s)?|what we offer|why join( us)?|compensation|salary|\$|₹|equity|401\(?k\)?|vacation|pto|insurance)\b/i.test(combinedText);
+  const sectionsPassed = hasResponsibilities && hasRequirements && hasBenefits;
+  let sectionsScore = 0;
+  const sectionHits = (hasResponsibilities ? 1 : 0) + (hasRequirements ? 1 : 0) + (hasBenefits ? 1 : 0);
+  if (sectionHits === 3) sectionsScore = 20;
+  else if (sectionHits === 2) sectionsScore = 14;
+  else if (sectionHits === 1) sectionsScore = 8;
+
+  // 3. Number of Listed Skills Check
+  let skillsCount = 0;
+  if (Array.isArray(skills)) {
+    skillsCount = skills.filter((s) => typeof s === 'string' && s.trim().length > 0).length;
+  }
+  if (skillsCount === 0) {
+    const techMatches = combinedText.match(/\b(react|node|javascript|typescript|python|docker|aws|sql|mongodb|api|cloud|graphql|ci\/cd|express|vue|angular|java|c\+\+|golang|kubernetes|html|css|tailwind)\b/gi) || [];
+    skillsCount = new Set(techMatches.map((m) => m.toLowerCase())).size;
+  }
+  const skillsPassed = skillsCount >= 3 && skillsCount <= 12;
+  let skillsScore = 0;
+  if (skillsCount >= 3 && skillsCount <= 12) skillsScore = 20;
+  else if (skillsCount >= 1) skillsScore = 12;
+
+  // 4. Salary Mentioned Check
+  const salaryMentioned = /\b(salary|compensation|\$|₹|eur|usd|per (year|month|annum|hr|hour)|base pay|stipend|equity package|hourly rate)\b/i.test(combinedText);
+  const salaryScore = salaryMentioned ? 20 : 0;
+
+  // 5. Biased-term scan with inclusive alternatives
   const biasFlags = [];
   BIASED_TERMS_DICTIONARY.forEach((item) => {
     const matches = combinedText.match(item.regex);
@@ -67,129 +133,30 @@ const generateFallbackJdScore = ({
       });
     }
   });
+  const biasPassed = biasFlags.length === 0;
+  let inclusivityScore = 20;
+  if (biasFlags.length === 1) inclusivityScore = 10;
+  else if (biasFlags.length === 2) inclusivityScore = 5;
+  else if (biasFlags.length >= 3) inclusivityScore = 0;
 
-  // 2. Clarity Assessment
-  const wordCount = combinedText.split(/\s+/).filter(Boolean).length;
-  let clarityScore = 50;
-  let clarityFeedback = '';
-
-  if (wordCount < 60) {
-    clarityScore = 40;
-    clarityFeedback = 'Description is too brief. Expand on day-to-day responsibilities and mission.';
-  } else if (wordCount < 120) {
-    clarityScore = 65;
-    clarityFeedback = 'Fairly clear but lacks deeper operational and team context.';
-  } else if (wordCount < 400) {
-    clarityScore = 88;
-    clarityFeedback = 'Well-articulated scope with balanced overview and expectations.';
-  } else {
-    clarityScore = 78;
-    clarityFeedback = 'Very comprehensive, though slightly verbose. Ensure key duties remain easy to scan.';
-  }
-
-  // 3. Specificity Assessment
-  const hasBullets = /(?:•|-|\*|\d+\.)\s+/i.test(description) || /(?:•|-|\*|\d+\.)\s+/i.test(requirements);
-  const mentionsTech = /(react|node|javascript|typescript|python|docker|aws|sql|mongodb|api|cloud|graphql|ci\/cd)/i.test(combinedText);
-  const mentionsYears = /\b\d+\+?\s*(?:years?|yrs?)\b/i.test(combinedText);
-
-  let specificityScore = 50;
-  let specificityFeedback = '';
-
-  if (hasBullets && mentionsTech && mentionsYears) {
-    specificityScore = 90;
-    specificityFeedback = 'Concrete qualifications with clear experience milestones and tech stack details.';
-  } else if (hasBullets && mentionsTech) {
-    specificityScore = 80;
-    specificityFeedback = 'Good technical specificity; consider specifying preferred seniority or years of experience.';
-  } else if (mentionsTech) {
-    specificityScore = 65;
-    specificityFeedback = 'Lists technical tools, but needs structured bullet points for qualifications.';
-  } else {
-    specificityScore = 45;
-    specificityFeedback = 'Vague requirements. Add specific languages, frameworks, and tools used by the team.';
-  }
-
-  // 4. Inclusivity Assessment
-  let inclusivityScore = 85;
-  let inclusivityFeedback = '';
-
-  if (biasFlags.length > 0) {
-    inclusivityScore = Math.max(30, 85 - biasFlags.length * 18);
-    inclusivityFeedback = `Contains ${biasFlags.length} exclusionary phrase(s) that may discourage qualified candidates.`;
-  } else {
-    const hasEqualOpp = /(equal opportunity|diversity|inclusive|belonging|accommodations?)/i.test(combinedText);
-    if (hasEqualOpp) {
-      inclusivityScore = 95;
-      inclusivityFeedback = 'Exemplary inclusive tone with zero detected bias and an equal-opportunity stance.';
-    } else {
-      inclusivityScore = 85;
-      inclusivityFeedback = 'Neutral tone free of obvious biased buzzwords. Consider adding an EOE statement.';
-    }
-  }
-
-  // 5. Competitiveness Assessment
-  const mentionsComp = /(salary|\$|compensation|equity|benefits|health|401k|pto|vacation|bonus|stipend)/i.test(combinedText);
-  const mentionsFlex = /(remote|flexible|hybrid|work from anywhere)/i.test(combinedText);
-
-  let competitivenessScore = 50;
-  let competitivenessFeedback = '';
-
-  if (mentionsComp && mentionsFlex) {
-    competitivenessScore = 92;
-    competitivenessFeedback = 'High applicant appeal with transparent benefits, compensation context, and location flexibility.';
-  } else if (mentionsComp || mentionsFlex) {
-    competitivenessScore = 75;
-    competitivenessFeedback = mentionsFlex
-      ? 'Strong location flexibility; adding salary bands or key benefits will boost application volume.'
-      : 'Solid benefits mention; clarify remote/hybrid policy for maximum reach.';
-  } else {
-    competitivenessScore = 52;
-    competitivenessFeedback = 'Missing compensation range or perks. Top candidates prioritize transparent job postings.';
-  }
-
-  // 6. Structure Assessment
-  const hasParagraphs = (description.match(/\n\s*\n/) || []).length > 0;
-  let structureScore = 55;
-  let structureFeedback = '';
-
-  if (hasParagraphs && hasBullets) {
-    structureScore = 92;
-    structureFeedback = 'Excellent readability with distinct sections and skimmable bullet points.';
-  } else if (hasBullets || hasParagraphs) {
-    structureScore = 74;
-    structureFeedback = 'Decent readability. Use clear section headers like "Responsibilities" and "Requirements".';
-  } else {
-    structureScore = 48;
-    structureFeedback = 'Dense wall of text. Break into short paragraphs and bullet points for mobile readability.';
-  }
-
-  // Calculate Weighted Overall Score
-  const rawOverall = Math.round(
-    clarityScore * 0.25 +
-    specificityScore * 0.25 +
-    inclusivityScore * 0.2 +
-    competitivenessScore * 0.15 +
-    structureScore * 0.15
-  );
-  const overallScore = Math.min(100, Math.max(10, rawOverall));
+  // Calculate Honest Overall Score (0 - 100)
+  const overallScore = Math.min(100, Math.max(10, lengthScore + sectionsScore + skillsScore + salaryScore + inclusivityScore));
 
   // Determine Grade
   let grade = 'C';
   if (overallScore >= 85) grade = 'A';
   else if (overallScore >= 75) grade = 'B';
-  else if (overallScore >= 65) grade = 'C';
-  else if (overallScore >= 50) grade = 'D';
+  else if (overallScore >= 60) grade = 'C';
+  else if (overallScore >= 45) grade = 'D';
   else grade = 'F';
 
   // Determine Predicted Candidate Pool
   let predictedCandidatePool = 'Medium';
-  if (overallScore >= 82) predictedCandidatePool = 'Very Large';
-  else if (overallScore >= 72) predictedCandidatePool = 'Large';
+  if (overallScore >= 80) predictedCandidatePool = 'Large';
   else if (overallScore >= 60) predictedCandidatePool = 'Medium';
-  else if (overallScore >= 45) predictedCandidatePool = 'Small';
-  else predictedCandidatePool = 'Very Small';
+  else predictedCandidatePool = 'Small';
 
-  // Generate Issues
+  // Construct Concrete Issues
   const issues = [];
   if (biasFlags.length > 0) {
     issues.push({
@@ -197,16 +164,28 @@ const generateFallbackJdScore = ({
       text: `Biased language detected: Replace "${biasFlags.map((b) => b.term).join(', ')}" with inclusive professional terms.`,
     });
   }
-  if (!mentionsComp) {
+  if (!salaryMentioned) {
     issues.push({
       severity: 'warning',
       text: 'No compensation or benefits listed. Adding salary transparency increases qualified applicant response by up to 40%.',
     });
   }
-  if (!hasBullets) {
+  if (!hasResponsibilities) {
     issues.push({
       severity: 'warning',
-      text: 'Format qualifications into distinct bullet points so candidates can quickly gauge their fit.',
+      text: 'Missing clear "Key Responsibilities" or daily duties section.',
+    });
+  }
+  if (!hasRequirements) {
+    issues.push({
+      severity: 'warning',
+      text: 'Missing clear "Requirements" or qualification milestones section.',
+    });
+  }
+  if (skillsCount < 3) {
+    issues.push({
+      severity: 'suggestion',
+      text: 'Add at least 3-5 specific technical skills or frameworks required for this role.',
     });
   }
   if (wordCount < 80) {
@@ -214,14 +193,9 @@ const generateFallbackJdScore = ({
       severity: 'critical',
       text: 'Job description is too brief. Candidates need to know about engineering team culture and key initiatives.',
     });
-  } else if (!/(growth|mentorship|career|opportunity)/i.test(combinedText)) {
-    issues.push({
-      severity: 'suggestion',
-      text: 'Highlight career development and mentorship opportunities to attract ambitious candidates.',
-    });
   }
 
-  // Generate Improvements with Code-Style Examples
+  // Construct Actionable Improvements
   const improvements = [];
   if (biasFlags.length > 0) {
     const firstFlag = biasFlags[0];
@@ -231,58 +205,85 @@ const generateFallbackJdScore = ({
       example: `Instead of: "We need a ${firstFlag.term} to build..."\nUse: "We are seeking a ${firstFlag.suggestion} to lead..."`,
     });
   }
-  if (!mentionsComp) {
+  if (!salaryMentioned) {
     improvements.push({
       priority: 'medium',
       action: 'Include salary band and core benefits package',
       example: 'Compensation: $140,000 - $175,000 base + equity, 401(k) matching, and comprehensive healthcare.',
     });
   }
-  if (!hasBullets) {
+  if (!hasResponsibilities || !hasRequirements) {
     improvements.push({
       priority: 'high',
-      action: 'Structure role responsibilities with action verbs',
-      example: 'Key Responsibilities:\n• Architect scalable REST APIs and microservices\n• Optimize MongoDB database query performance\n• Partner with product teams to ship weekly releases',
-    });
-  } else {
-    improvements.push({
-      priority: 'low',
-      action: 'Distinguish essential requirements from "nice-to-have" skills',
-      example: 'Required:\n• 3+ years Node.js\nNice to Have:\n• Experience with Gemini AI or LangChain',
+      action: 'Structure role responsibilities and requirements clearly',
+      example: 'Key Responsibilities:\n• Architect scalable REST APIs and microservices\n• Partner with product teams to ship weekly releases',
     });
   }
 
-  // Generate Strengths
+  // Construct Strengths
   const strengths = [];
-  if (mentionsTech) strengths.push('Clear mention of core modern technology stack.');
-  if (mentionsFlex) strengths.push('Highlights workplace flexibility (Remote/Hybrid options).');
-  if (hasBullets) strengths.push('Well-organized bulleted list for qualifications.');
-  if (biasFlags.length === 0) strengths.push('Free of gendered and exclusionary tech jargon.');
-  if (wordCount >= 120) strengths.push('Sufficient detail for candidates to evaluate mutual fit.');
+  if (skillsCount >= 3) strengths.push(`${skillsCount} technical skills and competencies clearly listed.`);
+  if (salaryMentioned) strengths.push('Clear compensation or benefits transparency.');
+  if (hasResponsibilities && hasRequirements) strengths.push('Well-structured responsibilities and qualification sections.');
+  if (biasFlags.length === 0) strengths.push('Free of gendered and exclusionary buzzwords.');
+  if (wordCount >= 80) strengths.push('Sufficient detail for candidates to evaluate mutual fit.');
 
   return {
+    source: 'fallback',
     overallScore,
     grade,
     predictedCandidatePool,
-    categories: {
-      clarity: { score: clarityScore, feedback: clarityFeedback },
-      specificity: { score: specificityScore, feedback: specificityFeedback },
-      inclusivity: { score: inclusivityScore, feedback: inclusivityFeedback },
-      competitiveness: { score: competitivenessScore, feedback: competitivenessFeedback },
-      structure: { score: structureScore, feedback: structureFeedback },
+    checks: {
+      descriptionLength: {
+        passed: lengthPassed,
+        wordCount,
+        label: 'Description Length',
+        detail: `${wordCount} words (${lengthPassed ? 'optimal length' : 'recommend 80+ words'})`,
+      },
+      sections: {
+        passed: sectionsPassed,
+        hasResponsibilities,
+        hasRequirements,
+        hasBenefits,
+        label: 'Standard Sections',
+        detail: `${[
+          hasResponsibilities ? 'Responsibilities ✓' : 'Responsibilities ✗',
+          hasRequirements ? 'Requirements ✓' : 'Requirements ✗',
+          hasBenefits ? 'Benefits ✓' : 'Benefits ✗',
+        ].join(' | ')}`,
+      },
+      skillsCount: {
+        passed: skillsPassed,
+        count: skillsCount,
+        label: 'Listed Skills',
+        detail: `${skillsCount} skill(s) listed (${skillsPassed ? 'optimal range' : 'recommend 3-8 skills'})`,
+      },
+      salaryMentioned: {
+        passed: salaryMentioned,
+        mentioned: salaryMentioned,
+        label: 'Salary / Compensation',
+        detail: salaryMentioned ? 'Compensation / perks mentioned ✓' : 'No compensation mentioned ✗',
+      },
+      biasScan: {
+        passed: biasPassed,
+        flagsCount: biasFlags.length,
+        label: 'Inclusive Language Scan',
+        detail: biasFlags.length === 0 ? 'Zero biased buzzwords detected ✓' : `${biasFlags.length} exclusionary phrase(s) flagged ✗`,
+      },
     },
+    biasFlags,
     issues,
     improvements,
-    biasFlags,
     strengths,
   };
 };
 
 /**
- * Analyzes a job description using Gemini 2.5 Flash, with deterministic fallback resilience
+ * Analyzes a job description using Gemini with deterministic fallback resilience
  */
 const analyzeJobDescription = async ({
   jobTitle = '',
+  skills = [],
   description = '',
   requirements = '',
   location = '',
@@ -291,15 +292,43 @@ const analyzeJobDescription = async ({
   const combinedLength = (description || '').trim().length + (requirements || '').trim().length;
   if (combinedLength < 15) {
     return {
+      source: 'fallback',
       overallScore: 0,
       grade: 'F',
       predictedCandidatePool: 'Very Small',
-      categories: {
-        clarity: { score: 0, feedback: 'Description is too short to evaluate.' },
-        specificity: { score: 0, feedback: 'Provide key qualifications and tech stack.' },
-        inclusivity: { score: 0, feedback: 'Awaiting content.' },
-        competitiveness: { score: 0, feedback: 'Awaiting content.' },
-        structure: { score: 0, feedback: 'Awaiting content.' },
+      checks: {
+        descriptionLength: {
+          passed: false,
+          wordCount: 0,
+          label: 'Description Length',
+          detail: '0 words (minimum 15 characters required)',
+        },
+        sections: {
+          passed: false,
+          hasResponsibilities: false,
+          hasRequirements: false,
+          hasBenefits: false,
+          label: 'Standard Sections',
+          detail: 'Awaiting content',
+        },
+        skillsCount: {
+          passed: false,
+          count: Array.isArray(skills) ? skills.length : 0,
+          label: 'Listed Skills',
+          detail: `${Array.isArray(skills) ? skills.length : 0} skills listed`,
+        },
+        salaryMentioned: {
+          passed: false,
+          mentioned: false,
+          label: 'Salary / Compensation',
+          detail: 'Awaiting content',
+        },
+        biasScan: {
+          passed: true,
+          flagsCount: 0,
+          label: 'Inclusive Language Scan',
+          detail: 'Awaiting content',
+        },
       },
       issues: [{ severity: 'critical', text: 'Please write a job overview to begin quality analysis.' }],
       improvements: [],
@@ -309,9 +338,10 @@ const analyzeJobDescription = async ({
   }
 
   if (!isGeminiConfigured()) {
-    console.log('[JDScorer] Gemini API not configured, using heuristic fallback scorer');
+    console.log('[JDScorer] Gemini API not configured, using rule-based fallback scorer');
     return generateFallbackJdScore({
       jobTitle,
+      skills,
       description,
       requirements,
       location,
@@ -321,9 +351,10 @@ const analyzeJobDescription = async ({
 
   const aiClient = getGeminiClient();
   if (!aiClient) {
-    console.warn('[JDScorer] Gemini client unavailable, using fallback scorer');
+    console.warn('[JDScorer] Gemini client unavailable, using rule-based fallback scorer');
     return generateFallbackJdScore({
       jobTitle,
+      skills,
       description,
       requirements,
       location,
@@ -359,12 +390,13 @@ Analyze this job description and return ONLY valid JSON, no markdown code fences
 Analyze for:
 - Clarity of role and day-to-day duties
 - Specific vs vague requirements
-- Gendered, informal, or exclusionary language (e.g. ninja, rockstar, guru, young, energetic, work hard play hard)
+- Gendered, informal, or exclusionary language (e.g. ninja, rockstar, guru, young, energetic, work hard play hard, aggressive)
 - Predicted applicant pool size (Very Large, Large, Medium, Small, Very Small)
 - Missing salary, compensation bands, or benefits information
 - Structure, readability, and scannability
 
 Job Title: ${jobTitle || 'Engineering Role'}
+Skills: ${Array.isArray(skills) ? skills.join(', ') : 'Not specified'}
 Location: ${location || 'Not specified'}
 Experience Level: ${experienceLevel || 'Not specified'}
 Description:
@@ -383,11 +415,19 @@ ${requirements || ''}`;
       },
     });
 
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Gemini API call timed out after 18 seconds')), 18000)
-    );
+    // 15-second timeout for Gemini API call
+    let timeoutId;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => reject(new Error('Gemini API call timed out after 15 seconds')), 15000);
+      if (timeoutId && timeoutId.unref) timeoutId.unref();
+    });
 
-    const response = await Promise.race([apiCall, timeoutPromise]);
+    let response;
+    try {
+      response = await Promise.race([apiCall, timeoutPromise]);
+    } finally {
+      clearTimeout(timeoutId);
+    }
     let rawText = response.text || '';
     rawText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
 
@@ -400,25 +440,28 @@ ${requirements || ''}`;
       Array.isArray(parsed.issues) &&
       Array.isArray(parsed.improvements)
     ) {
-      // Normalize boundaries
+      // Normalize boundaries and tag source as AI
       parsed.overallScore = Math.max(0, Math.min(100, Math.round(parsed.overallScore)));
+      parsed.source = 'ai';
       if (!Array.isArray(parsed.biasFlags)) parsed.biasFlags = [];
       if (!Array.isArray(parsed.strengths)) parsed.strengths = [];
       return parsed;
     }
 
-    console.warn('[JDScorer] Incomplete response structure, using fallback scorer');
+    console.warn('[JDScorer] Incomplete response structure, using rule-based fallback scorer');
     return generateFallbackJdScore({
       jobTitle,
+      skills,
       description,
       requirements,
       location,
       experienceLevel,
     });
   } catch (error) {
-    console.warn('[JDScorer] Gemini analysis failed, using fallback:', error.message);
+    console.warn('[JDScorer] Gemini analysis failed or timed out, using rule-based fallback:', error.message);
     return generateFallbackJdScore({
       jobTitle,
+      skills,
       description,
       requirements,
       location,
@@ -430,4 +473,5 @@ ${requirements || ''}`;
 module.exports = {
   analyzeJobDescription,
   generateFallbackJdScore,
+  BIASED_TERMS_DICTIONARY,
 };

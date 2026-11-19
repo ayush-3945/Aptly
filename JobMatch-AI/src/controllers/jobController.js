@@ -223,6 +223,7 @@ const scoreJobDescription = async (req, res) => {
   try {
     const {
       jobTitle = '',
+      skills = [],
       description = '',
       requirements = '',
       location = '',
@@ -231,6 +232,7 @@ const scoreJobDescription = async (req, res) => {
 
     const analysis = await analyzeJobDescription({
       jobTitle,
+      skills,
       description,
       requirements,
       location,
