@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import ResumeDropzone from '../components/ResumeDropzone';
 import SkillAutocomplete, { normalizeSkillName } from '../components/SkillAutocomplete';
+import TitleAutocomplete from '../components/TitleAutocomplete';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../services/api';
@@ -627,13 +628,14 @@ const CandidateProfile = () => {
                 </label>
                 {aiFilledFields.has('currentRole') && <span className="ai-tag-indicator">Auto-filled</span>}
               </div>
-              <input
-                type="text"
-                className={`form-control ${aiFilledFields.has('currentRole') ? 'field-ai-filled' : ''}`}
+              <TitleAutocomplete
+                id="profile-current-role"
+                name="currentRole"
                 value={formData.currentRole}
                 onChange={(e) => handleChange('currentRole', e.target.value)}
                 placeholder="e.g. Senior Full-Stack Engineer"
-                style={{ width: '100%', padding: '0.65rem 0.85rem', fontSize: '0.9rem' }}
+                className={`form-control ${aiFilledFields.has('currentRole') ? 'field-ai-filled' : ''}`}
+                inputStyle={{ width: '100%', padding: '0.65rem 0.85rem', fontSize: '0.9rem' }}
               />
             </div>
 

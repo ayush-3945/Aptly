@@ -21,6 +21,7 @@ import {
 import api from '../services/api';
 import JDQualityPanel from '../components/JDQualityPanel';
 import SkillAutocomplete, { normalizeSkillName } from '../components/SkillAutocomplete';
+import TitleAutocomplete from '../components/TitleAutocomplete';
 
 const POPULAR_SKILLS = [
   'React',
@@ -463,15 +464,16 @@ const PostJob = () => {
                 <Briefcase size={16} color="var(--accent-teal)" />
                 Job Title / Requisition Role <span style={{ color: 'var(--semantic-red)' }}>*</span>
               </label>
-              <input
-                type="text"
-                placeholder="e.g. Senior Full-Stack Engineer"
+              <TitleAutocomplete
+                id="post-job-title"
+                name="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="form-input"
-                style={{ fontSize: '0.95rem', padding: '0.8rem 1.1rem' }}
+                placeholder="e.g. Senior Full-Stack Engineer"
                 disabled={loading}
                 required
+                className="form-input"
+                inputStyle={{ fontSize: '0.95rem', padding: '0.8rem 1.1rem' }}
               />
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                 Use industry standard titles (e.g. "Senior Backend Engineer") for optimal candidate matching.
