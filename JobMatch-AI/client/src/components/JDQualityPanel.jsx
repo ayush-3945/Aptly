@@ -154,7 +154,11 @@ const JDQualityPanel = ({ scoreData, loading, isServerWaking, onAnalyzeNow, onPr
           }}
         >
           <Loader2 className="spin" size={16} style={{ flexShrink: 0 }} />
-          <span>Waking up server... this can take up to a minute</span>
+          <span>
+            {scoreData
+              ? 'Connecting to AI server... Showing instant rule-based analysis'
+              : 'Waking up server... this can take up to a minute'}
+          </span>
         </div>
       )}
 

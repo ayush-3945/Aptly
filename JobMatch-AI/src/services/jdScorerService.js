@@ -291,50 +291,14 @@ const analyzeJobDescription = async ({
 }) => {
   const combinedLength = (description || '').trim().length + (requirements || '').trim().length;
   if (combinedLength < 15) {
-    return {
-      source: 'fallback',
-      overallScore: 0,
-      grade: 'F',
-      predictedCandidatePool: 'Very Small',
-      checks: {
-        descriptionLength: {
-          passed: false,
-          wordCount: 0,
-          label: 'Description Length',
-          detail: '0 words (minimum 15 characters required)',
-        },
-        sections: {
-          passed: false,
-          hasResponsibilities: false,
-          hasRequirements: false,
-          hasBenefits: false,
-          label: 'Standard Sections',
-          detail: 'Awaiting content',
-        },
-        skillsCount: {
-          passed: false,
-          count: Array.isArray(skills) ? skills.length : 0,
-          label: 'Listed Skills',
-          detail: `${Array.isArray(skills) ? skills.length : 0} skills listed`,
-        },
-        salaryMentioned: {
-          passed: false,
-          mentioned: false,
-          label: 'Salary / Compensation',
-          detail: 'Awaiting content',
-        },
-        biasScan: {
-          passed: true,
-          flagsCount: 0,
-          label: 'Inclusive Language Scan',
-          detail: 'Awaiting content',
-        },
-      },
-      issues: [{ severity: 'critical', text: 'Please write a job overview to begin quality analysis.' }],
-      improvements: [],
-      biasFlags: [],
-      strengths: [],
-    };
+    return generateFallbackJdScore({
+      jobTitle,
+      skills,
+      description,
+      requirements,
+      location,
+      experienceLevel,
+    });
   }
 
   if (!isGeminiConfigured()) {

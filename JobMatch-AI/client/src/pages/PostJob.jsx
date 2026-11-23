@@ -22,6 +22,7 @@ import api from '../services/api';
 import JDQualityPanel from '../components/JDQualityPanel';
 import SkillAutocomplete, { normalizeSkillName } from '../components/SkillAutocomplete';
 import TitleAutocomplete from '../components/TitleAutocomplete';
+import { generateFallbackJdScore } from '../utils/jdScorer';
 
 const POPULAR_SKILLS = [
   'React',
@@ -102,8 +103,14 @@ const PostJob = () => {
     skillsVal = skills,
     isRetry = false
   ) => {
-    const combined = `${descVal} ${reqVal}`.trim();
-    if (combined.length < 10) {
+    const hasAnyInput = Boolean(
+      (titleVal && titleVal.trim().length > 0) ||
+      (Array.isArray(skillsVal) && skillsVal.length > 0) ||
+      (descVal && descVal.trim().length > 0) ||
+      (reqVal && reqVal.trim().length > 0)
+    );
+
+    if (!hasAnyInput) {
       setScoreData(null);
       setScoringLoading(false);
       setIsServerWaking(false);
@@ -115,8 +122,8 @@ const PostJob = () => {
       const res = await api.post('/jobs/score-jd', {
         jobTitle: titleVal.trim() || 'Engineering Role',
         skills: Array.isArray(skillsVal) ? skillsVal : [],
-        description: descVal.trim() || 'Software Engineer',
-        requirements: reqVal.trim(),
+        description: descVal.trim() || '',
+        requirements: reqVal.trim() || '',
         location: locVal.trim() || 'Remote',
         experienceLevel: expVal,
       });
@@ -132,6 +139,17 @@ const PostJob = () => {
         err.code === 'ERR_NETWORK' ||
         err.message?.includes('Network Error');
 
+      // Instant local deterministic fallback — ensure the user gets immediate scoring feedback!
+      const fallbackResult = generateFallbackJdScore({
+        jobTitle: titleVal.trim() || 'Engineering Role',
+        skills: Array.isArray(skillsVal) ? skillsVal : [],
+        description: descVal.trim(),
+        requirements: reqVal.trim(),
+        location: locVal.trim() || 'Remote',
+        experienceLevel: expVal,
+      });
+      setScoreData(fallbackResult);
+
       if (isNetworkError && !isRetry) {
         // Cold start or network connection blip: show waking up message and retry automatically once
         setIsServerWaking(true);
@@ -142,49 +160,49 @@ const PostJob = () => {
       }
 
       setIsServerWaking(false);
-      console.warn('[PostJob] Failed to score JD:', err.message);
-      if (!isNetworkError) {
-        showToast('Could not score JD right now. Please verify server connection.', 'error');
-      }
+      console.warn('[PostJob] Backend score API unavailable, using instant client fallback:', err.message);
     } finally {
       setScoringLoading(false);
     }
   };
 
-  // Debounced trigger: 1.5s after user stops typing
+  // Debounced trigger: 1.2s after user stops typing
   useEffect(() => {
-    const combined = `${description} ${requirements}`.trim();
-    if (combined.length < 10) {
+    const hasAnyInput = Boolean(
+      (title && title.trim().length > 0) ||
+      (Array.isArray(skills) && skills.length > 0) ||
+      (description && description.trim().length > 0) ||
+      (requirements && requirements.trim().length > 0)
+    );
+    if (!hasAnyInput) {
       setScoreData(null);
       return;
     }
 
     const timer = setTimeout(() => {
       fetchJdScore(description, requirements, title, location, experienceLevel, skills);
-    }, 1500);
+    }, 1200);
 
     return () => clearTimeout(timer);
   }, [description, requirements, title, location, experienceLevel, skills]);
 
   const handleAnalyzeNow = () => {
-    const combined = `${description} ${requirements}`.trim();
-    if (combined.length === 0) {
+    const hasAnyInput = Boolean(
+      (title && title.trim().length > 0) ||
+      (Array.isArray(skills) && skills.length > 0) ||
+      (description && description.trim().length > 0) ||
+      (requirements && requirements.trim().length > 0)
+    );
+
+    if (!hasAnyInput) {
       showToast(
-        'Please enter text in Job Overview or Requirements before analyzing, or click "Pre-fill Sample Job".',
+        'Please enter a Job Title, Skills, or Job Overview before analyzing, or click "Pre-fill Sample Job".',
         'warning'
       );
       descriptionInputRef.current?.focus();
       return;
     }
-    if (combined.length < 10) {
-      showToast(
-        `Please write at least 10 characters for JD analysis (currently ${combined.length} chars).`,
-        'info'
-      );
-      descriptionInputRef.current?.focus();
-      return;
-    }
-    fetchJdScore();
+    fetchJdScore(description, requirements, title, location, experienceLevel, skills);
   };
 
   // 1-Click Pre-fill Sample Job
@@ -205,7 +223,8 @@ const PostJob = () => {
       SAMPLE_JOB.requirements,
       SAMPLE_JOB.title,
       SAMPLE_JOB.location,
-      SAMPLE_JOB.experienceLevel || 'Senior'
+      SAMPLE_JOB.experienceLevel || 'Senior',
+      SAMPLE_JOB.skills
     );
   };
 

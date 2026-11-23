@@ -561,10 +561,10 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
                               ? 'var(--semantic-amber)'
                               : 'var(--semantic-red)',
                         border: `1px solid ${previewMatchData.matchScore >= 75
-                            ? 'rgba(45, 122, 58, 0.3)'
-                            : previewMatchData.matchScore >= 50
-                              ? 'rgba(180, 83, 9, 0.3)'
-                              : 'rgba(185, 28, 28, 0.3)'
+                          ? 'rgba(45, 122, 58, 0.3)'
+                          : previewMatchData.matchScore >= 50
+                            ? 'rgba(180, 83, 9, 0.3)'
+                            : 'rgba(185, 28, 28, 0.3)'
                           }`,
                       }}
                     >
@@ -590,10 +590,10 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
                         borderRadius: '50%',
                         margin: '0 auto 0.75rem',
                         border: `6px solid ${previewMatchData.matchScore >= 75
-                            ? 'var(--semantic-green)'
-                            : previewMatchData.matchScore >= 50
-                              ? 'var(--semantic-amber)'
-                              : 'var(--semantic-red)'
+                          ? 'var(--semantic-green)'
+                          : previewMatchData.matchScore >= 50
+                            ? 'var(--semantic-amber)'
+                            : 'var(--semantic-red)'
                           }`,
                         display: 'flex',
                         flexDirection: 'column',
@@ -1116,10 +1116,10 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
                             : 'rgba(185, 28, 28, 0.1)',
                       color: scoreColor,
                       border: `1px solid ${evaluationResult.aiMatchScore >= 75
-                          ? 'rgba(45, 122, 58, 0.25)'
-                          : evaluationResult.aiMatchScore >= 45
-                            ? 'rgba(180, 83, 9, 0.25)'
-                            : 'rgba(185, 28, 28, 0.25)'
+                        ? 'rgba(45, 122, 58, 0.25)'
+                        : evaluationResult.aiMatchScore >= 45
+                          ? 'rgba(180, 83, 9, 0.25)'
+                          : 'rgba(185, 28, 28, 0.25)'
                         }`,
                     }}
                   >
