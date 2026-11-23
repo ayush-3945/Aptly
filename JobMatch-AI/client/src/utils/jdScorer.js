@@ -75,9 +75,14 @@ export const generateFallbackJdScore = ({
   else if (wordCount >= 30) lengthScore = 10;
 
   // 2. Presence of Sections Check
-  const hasResponsibilities = /\b(responsibilit(ies|y)|duties|what you('ll| will) do|role overview|day[- ]to[- ]day|key initiatives|mission)\b/i.test(combinedText);
-  const hasRequirements = /\b(requirement(s)?|qualification(s)?|what you need|skills required|must have|prerequisite(s)?|what we('re| are) looking for)\b/i.test(combinedText);
-  const hasBenefits = /\b(benefit(s)?|perk(s)?|what we offer|why join( us)?|compensation|salary|\$|₹|equity|401\(?k\)?|vacation|pto|insurance)\b/i.test(combinedText);
+  // Look in the COMBINED text of "Job Overview" and "Key Requirements & Qualifications"
+  const combinedSectionsText = `${description} ${requirements}`.trim();
+  const hasResponsibilities = /\b(responsibilit(ies|y)|duties|what you('ll| will) do|role overview|day[- ]to[- ]day|key initiatives|mission)\b/i.test(combinedSectionsText);
+  // If Key Requirements field has content, mark Requirements as present
+  const hasRequirementsContent = Boolean(requirements && requirements.trim().length > 0);
+  const hasRequirementsKeyword = /\b(requirement(s)?|qualification(s)?|what you need|skills required|must have|prerequisite(s)?|what we('re| are) looking for)\b/i.test(combinedSectionsText);
+  const hasRequirements = hasRequirementsContent || hasRequirementsKeyword;
+  const hasBenefits = /\b(benefit(s)?|perk(s)?|what we offer|why join( us)?|compensation|salary|\$|₹|equity|401\(?k\)?|vacation|pto|insurance)\b/i.test(combinedSectionsText);
   const sectionsPassed = hasResponsibilities && hasRequirements && hasBenefits;
   let sectionsScore = 0;
   const sectionHits = (hasResponsibilities ? 1 : 0) + (hasRequirements ? 1 : 0) + (hasBenefits ? 1 : 0);
@@ -135,11 +140,6 @@ export const generateFallbackJdScore = ({
   else if (overallScore >= 60) grade = 'C';
   else if (overallScore >= 45) grade = 'D';
   else grade = 'F';
-
-  let predictedCandidatePool = 'Medium';
-  if (overallScore >= 80) predictedCandidatePool = 'Large';
-  else if (overallScore >= 60) predictedCandidatePool = 'Medium';
-  else predictedCandidatePool = 'Small';
 
   const issues = [];
   if (biasFlags.length > 0) {
@@ -214,12 +214,20 @@ export const generateFallbackJdScore = ({
     source: 'fallback',
     overallScore,
     grade,
-    predictedCandidatePool,
+    formula: `Score: ${overallScore}/100 from 5 weighted checks`,
+    weights: {
+      descriptionLength: 20,
+      sections: 20,
+      skillsCount: 20,
+      salaryMentioned: 20,
+      biasScan: 20,
+    },
     checks: {
       descriptionLength: {
         passed: lengthPassed,
         wordCount,
         label: 'Description Length',
+        weight: '20 pts',
         detail: `${wordCount} words (${lengthPassed ? 'optimal length' : 'recommend 80+ words'})`,
       },
       sections: {
@@ -228,6 +236,7 @@ export const generateFallbackJdScore = ({
         hasRequirements,
         hasBenefits,
         label: 'Standard Sections',
+        weight: '20 pts',
         detail: `${[
           hasResponsibilities ? 'Responsibilities ✓' : 'Responsibilities ✗',
           hasRequirements ? 'Requirements ✓' : 'Requirements ✗',
@@ -238,18 +247,21 @@ export const generateFallbackJdScore = ({
         passed: skillsPassed,
         count: skillsCount,
         label: 'Listed Skills',
+        weight: '20 pts',
         detail: `${skillsCount} skill(s) listed (${skillsPassed ? 'optimal range' : 'recommend 3-8 skills'})`,
       },
       salaryMentioned: {
         passed: salaryMentioned,
         mentioned: salaryMentioned,
         label: 'Salary / Compensation',
+        weight: '20 pts',
         detail: salaryMentioned ? 'Compensation / perks mentioned ✓' : 'No compensation mentioned ✗',
       },
       biasScan: {
         passed: biasPassed,
         flagsCount: biasFlags.length,
         label: 'Inclusive Language Scan',
+        weight: '20 pts',
         detail: biasFlags.length === 0 ? 'Zero biased buzzwords detected ✓' : `${biasFlags.length} exclusionary phrase(s) flagged ✗`,
       },
     },

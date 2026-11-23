@@ -385,42 +385,105 @@ const JDQualityPanel = ({ scoreData, loading, isServerWaking, onAnalyzeNow, onPr
                 >
                   {overallScore}
                 </span>
-                <span
-                  style={{
-                    fontSize: '0.72rem',
-                    fontWeight: 700,
-                    padding: '0.1rem 0.4rem',
-                    borderRadius: '3px',
-                    background: scoreTheme.bg,
-                    color: scoreTheme.color,
-                    marginTop: '0.2rem',
-                    border: `1px solid ${scoreTheme.border}`,
-                  }}
-                >
-                  Grade {scoreData.grade || 'B'}
-                </span>
+                {scoreData.source === 'ai' ? (
+                  <span
+                    style={{
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      padding: '0.1rem 0.4rem',
+                      borderRadius: '3px',
+                      background: scoreTheme.bg,
+                      color: scoreTheme.color,
+                      marginTop: '0.2rem',
+                      border: `1px solid ${scoreTheme.border}`,
+                    }}
+                  >
+                    Grade {scoreData.grade || 'B'}
+                  </span>
+                ) : (
+                  <span
+                    style={{
+                      fontSize: '0.68rem',
+                      fontWeight: 600,
+                      color: 'var(--text-muted)',
+                      marginTop: '0.2rem',
+                    }}
+                  >
+                    out of 100
+                  </span>
+                )}
               </div>
             </div>
 
-            {/* Candidate Pool Indicator */}
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                fontSize: '0.8rem',
-                color: 'var(--text-secondary)',
-                fontWeight: 500,
-              }}
-            >
-              <Users size={14} color="var(--accent-teal)" />
-              <span>
-                Predicted candidate pool:{' '}
-                <strong style={{ color: 'var(--text-primary)' }}>
-                  {scoreData.predictedCandidatePool || 'Medium'}
-                </strong>
-              </span>
-            </div>
+            {/* Candidate Pool Indicator (AI Mode Only) */}
+            {scoreData.source === 'ai' && scoreData.predictedCandidatePool && (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  fontSize: '0.8rem',
+                  color: 'var(--text-secondary)',
+                  fontWeight: 500,
+                }}
+              >
+                <Users size={14} color="var(--accent-teal)" />
+                <span>
+                  Predicted candidate pool:{' '}
+                  <strong style={{ color: 'var(--text-primary)' }}>
+                    {scoreData.predictedCandidatePool}
+                  </strong>
+                </span>
+              </div>
+            )}
+
+            {/* In Fallback Mode: Show formula & weights, with letter grade presented alongside formula */}
+            {scoreData.source === 'fallback' && (
+              <div
+                style={{
+                  marginTop: '0.4rem',
+                  padding: '0.65rem 0.85rem',
+                  borderRadius: '6px',
+                  background: 'rgba(15, 118, 110, 0.05)',
+                  border: '1px solid rgba(15, 118, 110, 0.2)',
+                  textAlign: 'center',
+                  width: '100%',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.45rem',
+                    marginBottom: '0.25rem',
+                  }}
+                >
+                  <span>Score: {overallScore}/100 from 5 weighted checks</span>
+                  {scoreData.grade && (
+                    <span
+                      style={{
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        padding: '0.1rem 0.4rem',
+                        borderRadius: '3px',
+                        background: scoreTheme.bg,
+                        color: scoreTheme.color,
+                        border: `1px solid ${scoreTheme.border}`,
+                      }}
+                    >
+                      Grade {scoreData.grade}
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: '0.71rem', color: 'var(--text-muted)', lineHeight: 1.45 }}>
+                  Weights: Length (20 pts) • Sections (20 pts) • Skills (20 pts) • Salary (20 pts) • Inclusivity (20 pts)
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Fallback Honest Checks (When source === 'fallback') */}
@@ -471,7 +534,14 @@ const JDQualityPanel = ({ scoreData, loading, isServerWaking, onAnalyzeNow, onPr
                         color: 'var(--text-primary)',
                       }}
                     >
-                      <span>{check.label}</span>
+                      <span>
+                        {check.label}{' '}
+                        {check.weight && (
+                          <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+                            ({check.weight})
+                          </span>
+                        )}
+                      </span>
                       <span
                         style={{
                           display: 'inline-flex',

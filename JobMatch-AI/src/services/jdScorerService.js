@@ -58,14 +58,19 @@ const BIASED_TERMS_DICTIONARY = [
 /**
  * Deterministic rule-based fallback analyzer (0 AI calls, 0 cost, 100% reliable)
  * Used when Gemini fails or times out (15s).
- * Computes honest checks only:
- * 1. Description length
- * 2. Presence of sections (responsibilities, requirements, benefits)
- * 3. Number of listed skills
- * 4. Salary mentioned or not
- * 5. Biased-term scan with inclusive alternatives
  *
- * Never fabricates category scores; sets source: 'fallback'.
+ * Scoring Formula & 5 Weighted Checks (Total: 100 pts):
+ * 1. Description Length (Weight: 20 pts): >=100 words = 20 pts, >=60 words = 15 pts, >=30 words = 10 pts, <30 words = 5 pts.
+ * 2. Standard Sections (Weight: 20 pts): Checked over combined Job Overview & Key Requirements.
+ *    Responsibilities (hit), Requirements (marked present if Key Requirements field has content OR keywords found),
+ *    Benefits/Compensation (hit). 3 hits = 20 pts, 2 hits = 14 pts, 1 hit = 8 pts.
+ * 3. Listed Skills (Weight: 20 pts): 3-12 skills = 20 pts, 1-2 skills = 12 pts, 0 skills = 0 pts.
+ * 4. Salary Transparency (Weight: 20 pts): Compensation/perks mentioned = 20 pts, omitted = 0 pts.
+ * 5. Inclusive Language Scan (Weight: 20 pts): 0 biased buzzwords = 20 pts, 1 = 10 pts, 2 = 5 pts, 3+ = 0 pts.
+ *
+ * Formula: Score: {overallScore}/100 from 5 weighted checks
+ * Letter grade is only displayed alongside this transparent formula.
+ * "Predicted candidate pool" is omitted in fallback mode to maintain strict honesty.
  */
 const generateFallbackJdScore = ({
   jobTitle = '',
@@ -74,10 +79,11 @@ const generateFallbackJdScore = ({
   requirements = '',
   location = '',
   experienceLevel = '',
+  geminiUnavailableReason = null,
 }) => {
   const combinedText = `${jobTitle} ${description} ${requirements} ${location} ${experienceLevel}`.trim();
 
-  // 1. Description Length Check
+  // 1. Description Length Check (Weight: 20 pts)
   const descWords = (description || '').split(/\s+/).filter(Boolean).length;
   const reqWords = (requirements || '').split(/\s+/).filter(Boolean).length;
   const wordCount = descWords + reqWords;
@@ -87,10 +93,15 @@ const generateFallbackJdScore = ({
   else if (wordCount >= 60) lengthScore = 15;
   else if (wordCount >= 30) lengthScore = 10;
 
-  // 2. Presence of Sections Check (Responsibilities, Requirements, Benefits)
-  const hasResponsibilities = /\b(responsibilit(ies|y)|duties|what you('ll| will) do|role overview|day[- ]to[- ]day|key initiatives|mission)\b/i.test(combinedText);
-  const hasRequirements = /\b(requirement(s)?|qualification(s)?|what you need|skills required|must have|prerequisite(s)?|what we('re| are) looking for)\b/i.test(combinedText);
-  const hasBenefits = /\b(benefit(s)?|perk(s)?|what we offer|why join( us)?|compensation|salary|\$|₹|equity|401\(?k\)?|vacation|pto|insurance)\b/i.test(combinedText);
+  // 2. Presence of Sections Check (Weight: 20 pts)
+  // Look in the COMBINED text of "Job Overview" and "Key Requirements & Qualifications"
+  const combinedSectionsText = `${description} ${requirements}`.trim();
+  const hasResponsibilities = /\b(responsibilit(ies|y)|duties|what you('ll| will) do|role overview|day[- ]to[- ]day|key initiatives|mission)\b/i.test(combinedSectionsText);
+  // If Key Requirements field has content, mark Requirements as present
+  const hasRequirementsContent = Boolean(requirements && requirements.trim().length > 0);
+  const hasRequirementsKeyword = /\b(requirement(s)?|qualification(s)?|what you need|skills required|must have|prerequisite(s)?|what we('re| are) looking for)\b/i.test(combinedSectionsText);
+  const hasRequirements = hasRequirementsContent || hasRequirementsKeyword;
+  const hasBenefits = /\b(benefit(s)?|perk(s)?|what we offer|why join( us)?|compensation|salary|\$|₹|equity|401\(?k\)?|vacation|pto|insurance)\b/i.test(combinedSectionsText);
   const sectionsPassed = hasResponsibilities && hasRequirements && hasBenefits;
   let sectionsScore = 0;
   const sectionHits = (hasResponsibilities ? 1 : 0) + (hasRequirements ? 1 : 0) + (hasBenefits ? 1 : 0);
@@ -98,7 +109,7 @@ const generateFallbackJdScore = ({
   else if (sectionHits === 2) sectionsScore = 14;
   else if (sectionHits === 1) sectionsScore = 8;
 
-  // 3. Number of Listed Skills Check
+  // 3. Number of Listed Skills Check (Weight: 20 pts)
   let skillsCount = 0;
   if (Array.isArray(skills)) {
     skillsCount = skills.filter((s) => typeof s === 'string' && s.trim().length > 0).length;
@@ -112,11 +123,11 @@ const generateFallbackJdScore = ({
   if (skillsCount >= 3 && skillsCount <= 12) skillsScore = 20;
   else if (skillsCount >= 1) skillsScore = 12;
 
-  // 4. Salary Mentioned Check
+  // 4. Salary Mentioned Check (Weight: 20 pts)
   const salaryMentioned = /\b(salary|compensation|\$|₹|eur|usd|per (year|month|annum|hr|hour)|base pay|stipend|equity package|hourly rate)\b/i.test(combinedText);
   const salaryScore = salaryMentioned ? 20 : 0;
 
-  // 5. Biased-term scan with inclusive alternatives
+  // 5. Biased-term scan with inclusive alternatives (Weight: 20 pts)
   const biasFlags = [];
   BIASED_TERMS_DICTIONARY.forEach((item) => {
     const matches = combinedText.match(item.regex);
@@ -149,12 +160,6 @@ const generateFallbackJdScore = ({
   else if (overallScore >= 60) grade = 'C';
   else if (overallScore >= 45) grade = 'D';
   else grade = 'F';
-
-  // Determine Predicted Candidate Pool
-  let predictedCandidatePool = 'Medium';
-  if (overallScore >= 80) predictedCandidatePool = 'Large';
-  else if (overallScore >= 60) predictedCandidatePool = 'Medium';
-  else predictedCandidatePool = 'Small';
 
   // Construct Concrete Issues
   const issues = [];
@@ -232,12 +237,20 @@ const generateFallbackJdScore = ({
     source: 'fallback',
     overallScore,
     grade,
-    predictedCandidatePool,
+    formula: `Score: ${overallScore}/100 from 5 weighted checks`,
+    weights: {
+      descriptionLength: 20,
+      sections: 20,
+      skillsCount: 20,
+      salaryMentioned: 20,
+      biasScan: 20,
+    },
     checks: {
       descriptionLength: {
         passed: lengthPassed,
         wordCount,
         label: 'Description Length',
+        weight: '20 pts',
         detail: `${wordCount} words (${lengthPassed ? 'optimal length' : 'recommend 80+ words'})`,
       },
       sections: {
@@ -246,6 +259,7 @@ const generateFallbackJdScore = ({
         hasRequirements,
         hasBenefits,
         label: 'Standard Sections',
+        weight: '20 pts',
         detail: `${[
           hasResponsibilities ? 'Responsibilities ✓' : 'Responsibilities ✗',
           hasRequirements ? 'Requirements ✓' : 'Requirements ✗',
@@ -256,18 +270,21 @@ const generateFallbackJdScore = ({
         passed: skillsPassed,
         count: skillsCount,
         label: 'Listed Skills',
+        weight: '20 pts',
         detail: `${skillsCount} skill(s) listed (${skillsPassed ? 'optimal range' : 'recommend 3-8 skills'})`,
       },
       salaryMentioned: {
         passed: salaryMentioned,
         mentioned: salaryMentioned,
         label: 'Salary / Compensation',
+        weight: '20 pts',
         detail: salaryMentioned ? 'Compensation / perks mentioned ✓' : 'No compensation mentioned ✗',
       },
       biasScan: {
         passed: biasPassed,
         flagsCount: biasFlags.length,
         label: 'Inclusive Language Scan',
+        weight: '20 pts',
         detail: biasFlags.length === 0 ? 'Zero biased buzzwords detected ✓' : `${biasFlags.length} exclusionary phrase(s) flagged ✗`,
       },
     },
@@ -275,6 +292,7 @@ const generateFallbackJdScore = ({
     issues,
     improvements,
     strengths,
+    ...(geminiUnavailableReason ? { geminiUnavailableReason } : {}),
   };
 };
 
@@ -302,7 +320,7 @@ const analyzeJobDescription = async ({
   }
 
   if (!isGeminiConfigured()) {
-    console.log('[JDScorer] Gemini API not configured, using rule-based fallback scorer');
+    console.warn('[JDScorer] Gemini API unavailable for JD scorer. Reason: GEMINI_API_KEY is not configured or empty. Using rule-based fallback.');
     return generateFallbackJdScore({
       jobTitle,
       skills,
@@ -310,12 +328,13 @@ const analyzeJobDescription = async ({
       requirements,
       location,
       experienceLevel,
+      geminiUnavailableReason: 'GEMINI_API_KEY is not configured or empty',
     });
   }
 
   const aiClient = getGeminiClient();
   if (!aiClient) {
-    console.warn('[JDScorer] Gemini client unavailable, using rule-based fallback scorer');
+    console.warn('[JDScorer] Gemini API unavailable for JD scorer. Reason: Gemini client initialization failed. Using rule-based fallback.');
     return generateFallbackJdScore({
       jobTitle,
       skills,
@@ -323,6 +342,7 @@ const analyzeJobDescription = async ({
       requirements,
       location,
       experienceLevel,
+      geminiUnavailableReason: 'Gemini client initialization failed',
     });
   }
 
@@ -412,7 +432,7 @@ ${requirements || ''}`;
       return parsed;
     }
 
-    console.warn('[JDScorer] Incomplete response structure, using rule-based fallback scorer');
+    console.warn('[JDScorer] Incomplete response structure from Gemini API, using rule-based fallback scorer');
     return generateFallbackJdScore({
       jobTitle,
       skills,
@@ -420,9 +440,13 @@ ${requirements || ''}`;
       requirements,
       location,
       experienceLevel,
+      geminiUnavailableReason: 'Incomplete response structure from Gemini API',
     });
   } catch (error) {
-    console.warn('[JDScorer] Gemini analysis failed or timed out, using rule-based fallback:', error.message);
+    const errorStatus = error.status || error.statusCode || error.code || 'UNKNOWN';
+    console.warn(
+      `[JDScorer] Gemini API unavailable for JD scorer. Exact status: ${errorStatus}, message: "${error.message}". Using rule-based fallback.`
+    );
     return generateFallbackJdScore({
       jobTitle,
       skills,
@@ -430,6 +454,7 @@ ${requirements || ''}`;
       requirements,
       location,
       experienceLevel,
+      geminiUnavailableReason: `Status: ${errorStatus} - ${error.message}`,
     });
   }
 };

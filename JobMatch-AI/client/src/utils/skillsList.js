@@ -27,3 +27,35 @@ export const SKILLS = [
   "Computer Networks","TCP/IP","HTTP/HTTPS","DNS","Operating Systems","DBMS","Embedded Systems","IoT","Arduino","Raspberry Pi","Blockchain","Web3","Ethereum","Smart Contracts","Game Development","Unity","Unreal Engine","AR/VR","Robotics","ROS","CMS","WordPress","Shopify","Strapi","Contentful","Stripe","Razorpay","Twilio","Resend","Nodemailer","Multer","pdf-parse","Axios","Fetch API","JSON","XML","YAML","Regex","Web Scraping","Cheerio","BeautifulSoup","Scrapy"
 ];
 
+export function normalizeForMatch(str) {
+  if (!str) return '';
+  return str.toLowerCase().replace(/[\s\.]+/g, '');
+}
+
+/**
+ * Normalizes a raw skill name to its canonical spelling from SKILLS if found.
+ * Example: "react" -> "React", "nextjs" -> "Next.js", "TailwindCSS" -> "Tailwind CSS".
+ */
+export function normalizeSkillName(raw) {
+  if (!raw || typeof raw !== 'string') return '';
+  const trimmed = raw.trim();
+  if (!trimmed) return '';
+
+  // 1. Direct case-insensitive match
+  const exact = SKILLS.find((s) => s.toLowerCase() === trimmed.toLowerCase());
+  if (exact) return exact;
+
+  // 2. Ignore dots and spaces match (e.g. "nextjs" -> "Next.js", "tailwindcss" -> "Tailwind CSS")
+  const clean = normalizeForMatch(trimmed);
+  const cleanMatch = SKILLS.find((s) => normalizeForMatch(s) === clean);
+  if (cleanMatch) return cleanMatch;
+
+  // 3. Common aliases (e.g. "tailwind" -> "Tailwind CSS", "tailwindcss" -> "Tailwind CSS")
+  if (clean === 'tailwind' || clean === 'tailwindcss') {
+    return 'Tailwind CSS';
+  }
+
+  return trimmed;
+}
+
+

@@ -130,11 +130,17 @@ Aptly replaces rigid regex filters with **deep semantic LLM vector comprehension
   * Non-blocking automated email triggers on stage transitions.
 * **AI Job Description Quality Scorer**:
   * Responsive 60/40 split layout on the **Post a Job** page.
-  * Real-time 1.5s debounced scoring + manual *"Analyze Current Text"* trigger.
-  * Animated SVG circular score ring (0–100) with color-coded performance tiers (Green ≥80, Teal 65–79, Amber 50–64, Red <50).
+  * Real-time 1.2s debounced scoring + manual *"Analyze Current Text"* trigger.
+  * Animated SVG circular score ring (0–100) with color-coded performance tiers (Green ≥80, Amber 60–79, Red <60).
   * **Exclusionary Bias Language Scanner**: Detects and flags terms like *ninja*, *rockstar*, *guru*, *young*, *energetic*, *work hard play hard*, and *aggressive*, explaining why they hurt diversity and providing inclusive alternatives.
-  * Category progress bars for **Clarity**, **Specificity**, **Inclusivity**, **Competitiveness**, and **Structure**.
-  * Actionable code rewrite suggestions with before/after comparisons.
+  * Actionable rewrite suggestions with before/after comparisons.
+  * **Deterministic Fallback Formula (5 Weighted Checks)**: When Gemini is offline or unavailable, computes an honest score from 5 checks (20 pts each):
+    1. *Description Length (20 pts)*: Word count depth.
+    2. *Standard Sections (20 pts)*: Responsibilities, Requirements (present if Key Requirements has content), Benefits.
+    3. *Listed Skills (20 pts)*: 3–12 technical skills specified.
+    4. *Salary Transparency (20 pts)*: Explicit salary/compensation mentioned.
+    5. *Inclusive Language Scan (20 pts)*: Zero exclusionary buzzwords.
+    * *Fallback Transparency*: Omits "Predicted candidate pool" in fallback mode, renders formula as `Score: X/100 from 5 weighted checks`, and only displays letter grades alongside the formula.
   * Non-blocking warning banner: never disables job posting if the recruiter wishes to proceed.
 * **AI Interview Question Generator**:
   * Generates 12 personalized interview questions based on each candidate's exact skill gaps and the job requisition.

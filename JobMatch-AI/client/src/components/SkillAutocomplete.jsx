@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect, useMemo, useId } from 'react';
 import { Plus, Sparkles, Check } from 'lucide-react';
-import { SKILLS } from '../utils/skillsList';
+import { SKILLS, normalizeSkillName, normalizeForMatch } from '../utils/skillsList';
+
+export { normalizeSkillName, normalizeForMatch };
 
 export const POPULAR_SKILLS = [
   'JavaScript',
@@ -15,41 +17,7 @@ export const POPULAR_SKILLS = [
   'MongoDB',
 ];
 
-/**
- * Normalizes a string by lowercasing and stripping whitespace and periods.
- * Enables matching "nextjs" with "Next.js", "nodejs" with "Node.js", etc.
- */
-function normalizeForMatch(str) {
-  if (!str) return '';
-  return str.toLowerCase().replace(/[\s\.]+/g, '');
-}
 
-/**
- * Normalizes a raw skill name to its canonical spelling from SKILLS if found.
- * Example: "react" -> "React", "nextjs" -> "Next.js", "docker" -> "Docker".
- */
-export function normalizeSkillName(raw) {
-  if (!raw || typeof raw !== 'string') return '';
-  const trimmed = raw.trim();
-  if (!trimmed) return '';
-
-  // 1. Direct case-insensitive match
-  const exact = SKILLS.find((s) => s.toLowerCase() === trimmed.toLowerCase());
-  if (exact) return exact;
-
-  // 2. Ignore dots and spaces match (e.g. "nextjs" -> "Next.js", "tailwindcss" -> "Tailwind CSS")
-  const clean = normalizeForMatch(trimmed);
-  const cleanMatch = SKILLS.find((s) => normalizeForMatch(s) === clean);
-  if (cleanMatch) return cleanMatch;
-
-  // 3. Common aliases (e.g. "tailwind" -> "Tailwind CSS")
-  if (clean === 'tailwind') {
-    const tw = SKILLS.find((s) => s === 'Tailwind CSS');
-    if (tw) return tw;
-  }
-
-  return trimmed;
-}
 
 /**
  * Renders text with the matched query substring highlighted in bold.

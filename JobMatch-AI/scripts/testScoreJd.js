@@ -98,9 +98,46 @@ We have a work hard play hard hustle culture and require young, energetic candid
   assert(biasedResult.overallScore < 50, `Overall score penalized for biased terms and missing sections (${biasedResult.overallScore}/100)`);
 
   // -----------------------------------------------------------------
-  // Test 3: HTTP POST /api/jobs/score-jd Integration
+  // Test 3: Requirements text present ONLY in Key Requirements field
   // -----------------------------------------------------------------
-  console.log('\n--- Test Group 3: HTTP Endpoint POST /api/jobs/score-jd ---');
+  console.log('\n--- Test Group 3: Requirements Present Only in Key Requirements Field ---');
+  const reqOnlyJd = {
+    jobTitle: 'Backend Developer',
+    skills: ['Node.js', 'Express', 'MongoDB'],
+    location: 'San Francisco, CA',
+    experienceLevel: 'Mid-Level',
+    description: `CloudPulse is hiring a backend engineer.
+Key Responsibilities:
+• Build high throughput RESTful services and APIs.
+• Monitor production databases and ensure high availability.
+Compensation & Benefits:
+• Competitive base salary and equity options with health insurance.`,
+    requirements: '3+ years of production experience with Node.js and MongoDB clusters.',
+  };
+
+  const reqOnlyResult = generateFallbackJdScore(reqOnlyJd);
+
+  assert(reqOnlyResult.checks.sections.hasRequirements === true, 'Requirements marked as present when content exists only in Key Requirements field');
+  assert(reqOnlyResult.checks.sections.detail.includes('Requirements ✓'), 'Requirements section marked passed (✓) in detail string');
+  assert(reqOnlyResult.checks.sections.passed === true, 'Standard Sections check passed with responsibilities in description and requirements in separate field');
+  assert(reqOnlyResult.predictedCandidatePool === undefined, 'Predicted candidate pool is removed in fallback mode');
+  assert(typeof reqOnlyResult.formula === 'string' && reqOnlyResult.formula.includes('5 weighted checks'), 'Fallback score formula string is present with weighted checks');
+  assert(Boolean(reqOnlyResult.weights), 'Weights mapping is present on fallback result');
+
+  // -----------------------------------------------------------------
+  // Test 4: TailwindCSS Quick Suggestion Chip Canonical Normalization
+  // -----------------------------------------------------------------
+  console.log('\n--- Test Group 4: TailwindCSS Skill Normalization ---');
+  const { normalizeSkillName } = await import('../client/src/utils/skillsList.js');
+  assert(normalizeSkillName('TailwindCSS') === 'Tailwind CSS', 'normalizeSkillName("TailwindCSS") resolves to "Tailwind CSS"');
+  assert(normalizeSkillName('tailwindcss') === 'Tailwind CSS', 'normalizeSkillName("tailwindcss") resolves to "Tailwind CSS"');
+  assert(normalizeSkillName('tailwind') === 'Tailwind CSS', 'normalizeSkillName("tailwind") resolves to "Tailwind CSS"');
+  assert(normalizeSkillName('Tailwind CSS') === 'Tailwind CSS', 'normalizeSkillName("Tailwind CSS") preserves canonical "Tailwind CSS"');
+
+  // -----------------------------------------------------------------
+  // Test 5: HTTP POST /api/jobs/score-jd Integration
+  // -----------------------------------------------------------------
+  console.log('\n--- Test Group 5: HTTP Endpoint POST /api/jobs/score-jd ---');
   const server = http.createServer(app);
 
   await new Promise((resolve) => {

@@ -704,12 +704,14 @@ const PostJob = () => {
                 <div style={{ display: 'inline-flex', flexWrap: 'wrap', gap: '0.35rem', marginTop: '0.25rem' }}>
                   {POPULAR_SKILLS.map((popSkill) => {
                     const canonical = normalizeSkillName(popSkill);
-                    const isAdded = skills.some((s) => s.toLowerCase() === canonical.toLowerCase());
+                    const isAdded = skills.some(
+                      (s) => s.toLowerCase() === canonical.toLowerCase() || s.toLowerCase() === popSkill.toLowerCase()
+                    );
                     return (
                       <button
                         key={popSkill}
                         type="button"
-                        onClick={() => handleAddSkill(popSkill)}
+                        onClick={() => handleAddSkill(canonical)}
                         disabled={isAdded || loading}
                         style={{
                           fontSize: '0.74rem',
