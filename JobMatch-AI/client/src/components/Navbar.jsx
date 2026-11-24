@@ -280,9 +280,6 @@ const Navbar = () => {
             color: 'var(--text-primary)',
             minHeight: '44px',
             minWidth: '44px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
           }}
         >
           {mobileOpen ? <X size={20} /> : <Menu size={20} />}

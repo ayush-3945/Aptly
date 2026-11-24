@@ -1091,7 +1091,7 @@ const Hero = () => {
             How Aptly.AI Works
           </h2>
           <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', marginBottom: '2rem' }}>
-            Auto-advances every 3s • Hover or focus to pause • Click any step to inspect
+            Click a step to explore
           </p>
 
           <div
@@ -1174,7 +1174,7 @@ const Hero = () => {
                 1. Upload & Parse
               </h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem', lineHeight: 1.55, margin: 0 }}>
-                Upload your PDF resume. Aptly extracts machine text from your PDF and parses your experience.
+                Upload your PDF resume. Aptly extracts the text and reads your experience.
               </p>
             </div>
 

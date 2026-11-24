@@ -665,11 +665,22 @@ a {
    Mobile Navigation & Responsive Breakpoints (<= 768px)
    ========================================================================= */
 .mobile-toggle-btn {
-  display: none;
+  display: none !important;
+}
+
+@media (min-width: 769px) {
+  .mobile-toggle-btn {
+    display: none !important;
+  }
+
+  .desktop-nav,
+  .desktop-auth {
+    display: flex !important;
+  }
 }
 
 @media (max-width: 768px) {
-  /* Navbar adjustments */
+  /* Navbar adjustments: strictly hide desktop links and show mobile hamburger */
   .desktop-nav,
   .desktop-auth {
     display: none !important;
