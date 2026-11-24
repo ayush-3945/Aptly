@@ -62,6 +62,17 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
     }
   }, [isOpen, isAuthenticated, user]);
 
+  // Keyboard navigation: Close modal on Escape key
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        handleClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   if (!isOpen || !job) return null;
 
   const candidateSkills =
@@ -339,6 +350,7 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
           <button
             onClick={handleClose}
             className="btn-ghost"
+            aria-label="Close application dialog"
             style={{
               padding: '0.4rem',
               borderRadius: 'var(--radius-xs)',
@@ -346,6 +358,11 @@ Skills: React, Node.js, Express, MongoDB, PostgreSQL, Docker, JavaScript, REST A
               border: 'none',
               color: 'var(--text-muted)',
               background: 'transparent',
+              minWidth: '36px',
+              minHeight: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             <X size={20} />

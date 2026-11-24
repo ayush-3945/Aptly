@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, ArrowLeft } from 'lucide-react';
-import usePageMeta from '../hooks/usePageMeta';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 export default function NotFound() {
-  usePageMeta('Page Not Found', 'The requested page could not be found on Aptly.AI.');
+  useDocumentTitle('Page Not Found', 'The requested page could not be found on Aptly.AI.');
 
   return (
     <div

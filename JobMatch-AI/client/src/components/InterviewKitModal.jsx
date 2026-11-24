@@ -55,6 +55,17 @@ const InterviewKitModal = ({ application, job, onClose }) => {
   // Individual question expandable tips (collapsed by default)
   const [expandedAnswers, setExpandedAnswers] = useState({});
 
+  // Keyboard navigation: Close modal on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   const candidate = application?.candidate || {};
   const candidateName =
     application?.candidateName ||
@@ -365,6 +376,7 @@ const InterviewKitModal = ({ application, job, onClose }) => {
             <button
               type="button"
               onClick={onClose}
+              aria-label="Close interview kit dialog"
               style={{
                 background: 'transparent',
                 border: 'none',

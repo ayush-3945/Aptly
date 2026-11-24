@@ -4,8 +4,14 @@ import { User, Briefcase, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../services/api';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Onboarding = () => {
+  useDocumentTitle(
+    'Welcome to Aptly.AI',
+    'Select your role to start discovering matching technical jobs or screening candidate pipelines.'
+  );
+
   const navigate = useNavigate();
   const { user, updateUser, isAuthenticated } = useAuth();
   const { showToast } = useToast();

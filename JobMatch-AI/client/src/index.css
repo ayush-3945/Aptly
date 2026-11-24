@@ -710,9 +710,34 @@ a {
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
   outline: 2px solid var(--accent-teal);
   outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(15, 107, 92, 0.18);
+}
+
+/* Touch tap targets on mobile (min 44px) */
+@media (max-width: 768px) {
+  .btn,
+  .mobile-toggle-btn,
+  .chip-suggestion,
+  .nav-link,
+  button:not(.inline-icon-btn) {
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  body, html, #root {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
 }
 
 .btn {

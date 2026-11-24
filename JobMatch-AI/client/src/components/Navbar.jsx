@@ -24,6 +24,17 @@ const Navbar = () => {
     setMobileOpen(false);
   }, [location.pathname]);
 
+  // Close mobile drawer on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && mobileOpen) {
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileOpen]);
+
   const isActive = (path) => location.pathname === path;
 
   return (
@@ -267,6 +278,11 @@ const Navbar = () => {
             border: 'none',
             cursor: 'pointer',
             color: 'var(--text-primary)',
+            minHeight: '44px',
+            minWidth: '44px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           {mobileOpen ? <X size={20} /> : <Menu size={20} />}

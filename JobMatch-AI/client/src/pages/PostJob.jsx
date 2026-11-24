@@ -23,6 +23,7 @@ import JDQualityPanel from '../components/JDQualityPanel';
 import SkillAutocomplete, { normalizeSkillName } from '../components/SkillAutocomplete';
 import TitleAutocomplete from '../components/TitleAutocomplete';
 import { generateFallbackJdScore } from '../utils/jdScorer';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const POPULAR_SKILLS = [
   'React',
@@ -70,6 +71,11 @@ Compensation & Benefits:
 };
 
 const PostJob = () => {
+  useDocumentTitle(
+    'Post a Job & JD Quality Scorer',
+    'Create verified technical job postings with instant AI quality scoring and inclusive language scans.'
+  );
+
   const navigate = useNavigate();
   const { showToast } = useToast();
 

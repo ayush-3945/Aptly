@@ -56,6 +56,17 @@ const ScheduleInterviewModal = ({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
+  // Keyboard navigation: Close modal on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {

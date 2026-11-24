@@ -3,8 +3,14 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LogIn, Mail, Lock, Eye, EyeOff, AlertCircle, Loader2, ArrowRight, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Login = () => {
+  useDocumentTitle(
+    'Sign In',
+    'Sign in to your Aptly.AI account to access job listings and applicant pipelines.'
+  );
+
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();

@@ -3,8 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { UserPlus, User, Mail, Lock, Eye, EyeOff, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Signup = () => {
+  useDocumentTitle(
+    'Create Account',
+    'Create your candidate or recruiter account on Aptly.AI for AI-powered skill matching.'
+  );
+
   const navigate = useNavigate();
   const { register } = useAuth();
   const { showToast } = useToast();

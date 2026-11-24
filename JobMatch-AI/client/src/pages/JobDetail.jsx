@@ -22,6 +22,7 @@ import api from '../services/api';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
 import ApplyModal from '../components/ApplyModal';
 import { useSavedJobs } from '../utils/savedJobs';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const JobDetail = () => {
   const { id } = useParams();
@@ -34,6 +35,11 @@ const JobDetail = () => {
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const { isSaved, toggleSave } = useSavedJobs();
+
+  useDocumentTitle(
+    job?.title ? `${job.title} at ${job.company}` : 'Job Details',
+    job?.description ? job.description.slice(0, 150) : 'View job responsibilities, tech stack requirements, and salary compensation.'
+  );
 
   useEffect(() => {
     const fetchJob = async () => {

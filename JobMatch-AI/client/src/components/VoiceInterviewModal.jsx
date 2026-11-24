@@ -60,6 +60,17 @@ export default function VoiceInterviewModal({ isOpen, onClose, jobTitle = 'Softw
 
   const recognitionRef = useRef(null);
 
+  // Keyboard navigation: Close modal on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   const currentQ = questions[currentIndex] || questions[0];
 
   // Initialize Speech Recognition if supported
@@ -271,6 +282,7 @@ export default function VoiceInterviewModal({ isOpen, onClose, jobTitle = 'Softw
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close voice interview dialog"
             style={{
               background: 'transparent',
               border: 'none',

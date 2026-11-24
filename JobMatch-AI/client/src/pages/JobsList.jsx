@@ -24,11 +24,17 @@ import ApplyModal from '../components/ApplyModal';
 import { useSavedJobs } from '../utils/savedJobs';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
 import SkillAutocomplete from '../components/SkillAutocomplete';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const POPULAR_SKILLS = ['All', 'React', 'Node.js', 'MongoDB', 'PostgreSQL', 'Docker', 'Python', 'TypeScript'];
 const LOCATIONS = ['All Locations', 'Remote', 'San Francisco, CA', 'Austin, TX', 'New York, NY'];
 
 const JobsList = () => {
+  useDocumentTitle(
+    'Explore Tech Jobs',
+    'Browse verified technical requisitions with real-time skill matching and compensation transparency.'
+  );
+
   const navigate = useNavigate();
   const { user } = useAuth();
   const { showToast } = useToast();

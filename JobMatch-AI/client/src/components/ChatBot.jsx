@@ -119,6 +119,17 @@ export default function ChatBot() {
     }
   }, [messages, isOpen, isMinimized, showSettings]);
 
+  // Keyboard navigation: Close chatbot on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   const handleSaveKey = (e) => {
     e.preventDefault();
     const cleanKey = tempKeyInput.trim();
@@ -516,6 +527,7 @@ export default function ChatBot() {
                   setShowSettings(!showSettings);
                 }}
                 title="Connect Gemini API Key"
+                aria-label="Connect Gemini API Key"
                 style={{
                   background: showSettings ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
                   border: 'none',
@@ -543,6 +555,7 @@ export default function ChatBot() {
                   ]);
                 }}
                 title="Reset conversation"
+                aria-label="Reset conversation"
                 style={{
                   background: 'transparent',
                   border: 'none',
@@ -562,6 +575,7 @@ export default function ChatBot() {
                   setIsMinimized(!isMinimized);
                 }}
                 title={isMinimized ? 'Expand' : 'Minimize'}
+                aria-label={isMinimized ? 'Expand chat' : 'Minimize chat'}
                 style={{
                   background: 'transparent',
                   border: 'none',
@@ -581,6 +595,7 @@ export default function ChatBot() {
                   setIsOpen(false);
                 }}
                 title="Close chat"
+                aria-label="Close chat"
                 style={{
                   background: 'transparent',
                   border: 'none',

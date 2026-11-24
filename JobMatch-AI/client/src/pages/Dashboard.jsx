@@ -6,8 +6,14 @@ import RecruiterJobs from '../components/RecruiterJobs';
 import RecruiterAnalytics from '../components/RecruiterAnalytics';
 import UpcomingInterviews from '../components/UpcomingInterviews';
 import { Briefcase, Calendar, BarChart2 } from 'lucide-react';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Dashboard = () => {
+  useDocumentTitle(
+    'ATS Dashboard',
+    'Manage active job postings, track applicant pipelines, and review recruitment analytics.'
+  );
+
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 

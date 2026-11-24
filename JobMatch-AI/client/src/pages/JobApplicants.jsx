@@ -28,11 +28,14 @@ import { FALLBACK_JOBS } from '../data/fallbackJobs';
 import { getDemoApplicantsForJob } from '../utils/demoApplicants';
 import { useToast } from '../context/ToastContext';
 import ScheduleInterviewModal from '../components/ScheduleInterviewModal';
-import KanbanBoard from '../components/KanbanBoard';
+import KanbanSkeleton from '../components/KanbanSkeleton';
 import InterviewKitModal from '../components/InterviewKitModal';
 import CandidateCompareModal from '../components/CandidateCompareModal';
 import ApplicantSideDrawer from '../components/ApplicantSideDrawer';
 import { Scale } from 'lucide-react';
+import useDocumentTitle from '../hooks/useDocumentTitle';
+
+const KanbanBoard = React.lazy(() => import('../components/KanbanBoard'));
 
 const PIPELINE_COLUMNS = [
   {
@@ -83,6 +86,11 @@ const PIPELINE_COLUMNS = [
 ];
 
 const JobApplicants = () => {
+  useDocumentTitle(
+    'Candidate Pipeline',
+    'Review applicants, candidate match scores, and interview kits in your recruitment pipeline.'
+  );
+
   const { jobId } = useParams();
   const navigate = useNavigate();
 
@@ -914,14 +922,16 @@ const JobApplicants = () => {
         <>
           {/* Kanban Drag-and-Drop View */}
           {viewMode === 'kanban' && (
-            <KanbanBoard
-              applicants={processedApplicants}
-              setApplicants={setApplicants}
-              onViewResume={(app) => setSelectedCandidate(app)}
-              onScheduleInterview={(app) => setSchedulingApplicant(app)}
-              onGenerateKit={(app) => setSelectedKitCandidate(app)}
-              job={job}
-            />
+            <React.Suspense fallback={<KanbanSkeleton />}>
+              <KanbanBoard
+                applicants={processedApplicants}
+                setApplicants={setApplicants}
+                onViewResume={(app) => setSelectedCandidate(app)}
+                onScheduleInterview={(app) => setSchedulingApplicant(app)}
+                onGenerateKit={(app) => setSelectedKitCandidate(app)}
+                job={job}
+              />
+            </React.Suspense>
           )}
 
           {/* List / Column Grid View */}

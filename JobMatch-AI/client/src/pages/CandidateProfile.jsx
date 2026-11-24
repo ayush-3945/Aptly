@@ -25,6 +25,7 @@ import TitleAutocomplete from '../components/TitleAutocomplete';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../services/api';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const SAMPLE_DEMO_DATA = {
   fullName: 'Alex Morgan',
@@ -71,6 +72,11 @@ const SAMPLE_DEMO_DATA = {
 };
 
 const CandidateProfile = () => {
+  useDocumentTitle(
+    'My Candidate Profile',
+    'Manage your technical skills, experience history, and resume for AI-powered job matching.'
+  );
+
   const { user, updateUser } = useAuth();
   const { showToast } = useToast();
 

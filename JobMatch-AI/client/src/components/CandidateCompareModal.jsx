@@ -20,6 +20,16 @@ export default function CandidateCompareModal({
   job,
   onScheduleInterview,
 }) {
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen || !candidates || candidates.length === 0) return null;
 
   // Find candidate with highest score
@@ -91,6 +101,7 @@ export default function CandidateCompareModal({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close candidate comparison dialog"
             style={{
               background: 'transparent',
               border: 'none',
