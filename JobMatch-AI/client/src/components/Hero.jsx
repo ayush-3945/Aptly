@@ -1043,21 +1043,39 @@ const Hero = () => {
               </div>
 
               <div>
-                <a
-                  href="#playground"
-                  className="btn btn-primary"
-                  style={{
-                    fontSize: '0.84rem',
-                    padding: '0.5rem 1.25rem',
-                    fontWeight: 600,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.45rem',
-                  }}
-                >
-                  <span>Try it with your own resume</span>
-                  <ArrowRight size={14} />
-                </a>
+                {user?.role === 'recruiter' ? (
+                  <Link
+                    to="/dashboard"
+                    className="btn btn-primary"
+                    style={{
+                      fontSize: '0.84rem',
+                      padding: '0.5rem 1.25rem',
+                      fontWeight: 600,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.45rem',
+                    }}
+                  >
+                    <span>Open ATS Pipeline</span>
+                    <ArrowRight size={14} />
+                  </Link>
+                ) : (
+                  <a
+                    href="#playground"
+                    className="btn btn-primary"
+                    style={{
+                      fontSize: '0.84rem',
+                      padding: '0.5rem 1.25rem',
+                      fontWeight: 600,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.45rem',
+                    }}
+                  >
+                    <span>Try it with your own resume</span>
+                    <ArrowRight size={14} />
+                  </a>
+                )}
               </div>
             </div>
           </div>
