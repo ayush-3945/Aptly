@@ -1,6 +1,7 @@
 const Job = require('../models/Job');
 const mongoose = require('mongoose');
 const { FALLBACK_JOBS } = require('../data/fallbackData');
+const { normalizeSkillsArray } = require('../utils/normalizeSkillName');
 
 // Create a new job
 const createJob = async (req, res) => {
@@ -11,7 +12,7 @@ const createJob = async (req, res) => {
       title,
       description,
       company,
-      requiredSkills,
+      requiredSkills: normalizeSkillsArray(requiredSkills),
       location,
       postedBy: req.user._id,
     });
@@ -99,7 +100,7 @@ const updateJob = async (req, res) => {
     job.title = title || job.title;
     job.description = description || job.description;
     job.company = company || job.company;
-    job.requiredSkills = requiredSkills || job.requiredSkills;
+    job.requiredSkills = requiredSkills ? normalizeSkillsArray(requiredSkills) : job.requiredSkills;
     job.location = location || job.location;
 
     const updatedJob = await job.save();

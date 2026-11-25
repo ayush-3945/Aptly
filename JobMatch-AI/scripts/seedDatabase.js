@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * JobMatch AI - Automated Idempotent Database Seeder
- * Populates MongoDB with verified demo users, production job postings,
- * and multi-stage candidate applications with Gemini AI ATS match scorecards.
+ * Populates MongoDB with verified demo users, 18 production job postings across diverse roles & cities,
+ * and multi-stage candidate applications with ATS match scorecards.
  */
 
 require('dotenv').config();
@@ -18,6 +18,7 @@ const User = require('../src/models/User');
 const Job = require('../src/models/Job');
 const Application = require('../src/models/Application');
 const Interview = require('../src/models/Interview');
+const { normalizeSkillsArray } = require('../src/utils/normalizeSkillName');
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/jobmatch-ai';
 
@@ -45,7 +46,7 @@ async function seedDatabase() {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(defaultPassword, salt);
 
-    // 2. Demo User Definitions
+    // 2. Demo User Definitions with Normalized Skills
     const demoUserDefinitions = [
       {
         name: 'Sarah Jenkins',
@@ -70,7 +71,7 @@ async function seedDatabase() {
         role: 'candidate',
         bio: 'Full-Stack MERN & AI Engineer passionate about scalable distributed systems and LLM integrations.',
         targetRole: 'Senior Full-Stack Engineer',
-        skills: ['React', 'Node.js', 'Express', 'MongoDB', 'Docker', 'TypeScript'],
+        skills: normalizeSkillsArray(['React', 'Node.js', 'Express', 'MongoDB', 'Docker', 'TypeScript', 'Tailwind CSS']),
         location: 'Remote',
       },
       {
@@ -80,7 +81,7 @@ async function seedDatabase() {
         role: 'candidate',
         bio: 'Full-Stack MERN & AI Engineer passionate about scalable distributed systems and LLM integrations.',
         targetRole: 'Senior Full-Stack Engineer',
-        skills: ['React', 'Node.js', 'Express', 'MongoDB', 'Docker', 'TypeScript'],
+        skills: normalizeSkillsArray(['React', 'Node.js', 'Express', 'MongoDB', 'Docker', 'TypeScript', 'Tailwind CSS']),
         location: 'Remote',
       },
       {
@@ -90,7 +91,7 @@ async function seedDatabase() {
         role: 'candidate',
         bio: 'Principal full-stack engineer with 6+ years designing high-throughput Node microservices.',
         targetRole: 'Staff Software Engineer',
-        skills: ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'Docker', 'Kubernetes'],
+        skills: normalizeSkillsArray(['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'Docker', 'Kubernetes']),
         location: 'Seattle, WA',
       },
       {
@@ -100,7 +101,7 @@ async function seedDatabase() {
         role: 'candidate',
         bio: 'Frontend-leaning full-stack developer specializing in React 19, state management, and modern CSS.',
         targetRole: 'Senior Frontend / Full-Stack Engineer',
-        skills: ['React', 'Node.js', 'Express', 'MongoDB', 'TypeScript', 'TailwindCSS'],
+        skills: normalizeSkillsArray(['React', 'Node.js', 'Express', 'MongoDB', 'TypeScript', 'Tailwind CSS']),
         location: 'Austin, TX',
       },
       {
@@ -110,7 +111,7 @@ async function seedDatabase() {
         role: 'candidate',
         bio: 'Engineering Leader with proven track record scaling AI products from 0 to 1M+ active users.',
         targetRole: 'Lead Full-Stack & AI Architect',
-        skills: ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'Docker', 'AWS'],
+        skills: normalizeSkillsArray(['React', 'Node.js', 'Express', 'MongoDB', 'Gemini AI', 'Docker', 'AWS']),
         location: 'San Francisco, CA',
       },
       {
@@ -120,7 +121,7 @@ async function seedDatabase() {
         role: 'candidate',
         bio: 'Full-stack software engineer with strong fundamentals in JavaScript, Node.js, and API design.',
         targetRole: 'Full-Stack Developer',
-        skills: ['React', 'Node.js', 'Express', 'JavaScript', 'REST API', 'PostgreSQL'],
+        skills: normalizeSkillsArray(['React', 'Node.js', 'Express', 'JavaScript', 'REST API', 'PostgreSQL']),
         location: 'New York, NY',
       },
       {
@@ -130,7 +131,7 @@ async function seedDatabase() {
         role: 'candidate',
         bio: 'Backend systems specialist focused on Node.js performance, MongoDB indexing, and Redis caching.',
         targetRole: 'Senior Backend Engineer',
-        skills: ['Node.js', 'Express', 'MongoDB', 'Docker', 'Gemini AI', 'Redis'],
+        skills: normalizeSkillsArray(['Node.js', 'Express', 'MongoDB', 'Docker', 'Gemini AI', 'Redis']),
         location: 'Denver, CO',
       },
       {
@@ -140,7 +141,7 @@ async function seedDatabase() {
         role: 'candidate',
         bio: 'MERN stack developer building accessible and responsive consumer web applications.',
         targetRole: 'Full-Stack Software Engineer',
-        skills: ['React', 'Node.js', 'MongoDB', 'Docker', 'Next.js', 'TailwindCSS'],
+        skills: normalizeSkillsArray(['React', 'Node.js', 'MongoDB', 'Docker', 'Next.js', 'Tailwind CSS']),
         location: 'Chicago, IL',
       },
       {
@@ -150,39 +151,53 @@ async function seedDatabase() {
         role: 'candidate',
         bio: 'Junior web developer focused on responsive HTML/CSS design and React component libraries.',
         targetRole: 'Junior Frontend Developer',
-        skills: ['React', 'JavaScript', 'HTML5', 'CSS3', 'Git'],
+        skills: normalizeSkillsArray(['React', 'JavaScript', 'HTML5', 'CSS3', 'Git']),
         location: 'Atlanta, GA',
       },
     ];
 
-    // 3. Idempotent Cleanup of Previous Demo Records
-    console.log('🧹 Purging any existing demo seed records...');
+    // 3. Safe, Idempotent Cleanup of Previous Demo Records Only (Preserves real registered users)
+    console.log('🧹 Purging only demo seed accounts & demo-posted records...');
     const demoEmails = demoUserDefinitions.map((u) => u.email);
-    const existingUsers = await User.find({ email: { $in: demoEmails } });
-    const existingUserIds = existingUsers.map((u) => u._id);
+    const existingDemoUsers = await User.find({ email: { $in: demoEmails } });
+    const existingDemoUserIds = existingDemoUsers.map((u) => u._id);
 
-    if (existingUserIds.length > 0) {
+    if (existingDemoUserIds.length > 0) {
       await Interview.deleteMany({
         $or: [
-          { recruiterId: { $in: existingUserIds } },
-          { candidateId: { $in: existingUserIds } },
+          { recruiterId: { $in: existingDemoUserIds } },
+          { candidateId: { $in: existingDemoUserIds } },
         ],
       });
-      await Application.deleteMany({ candidate: { $in: existingUserIds } });
-      const existingJobs = await Job.find({ postedBy: { $in: existingUserIds } });
-      const existingJobIds = existingJobs.map((j) => j._id);
-      if (existingJobIds.length > 0) {
-        await Interview.deleteMany({ jobId: { $in: existingJobIds } });
-        await Application.deleteMany({ job: { $in: existingJobIds } });
-        await Job.deleteMany({ _id: { $in: existingJobIds } });
+      await Application.deleteMany({ candidate: { $in: existingDemoUserIds } });
+      const existingDemoJobs = await Job.find({ postedBy: { $in: existingDemoUserIds } });
+      const existingDemoJobIds = existingDemoJobs.map((j) => j._id);
+      if (existingDemoJobIds.length > 0) {
+        await Interview.deleteMany({ jobId: { $in: existingDemoJobIds } });
+        await Application.deleteMany({ job: { $in: existingDemoJobIds } });
+        await Job.deleteMany({ _id: { $in: existingDemoJobIds } });
       }
-      await User.deleteMany({ _id: { $in: existingUserIds } });
+      await User.deleteMany({ _id: { $in: existingDemoUserIds } });
     }
-    console.log('✔ Stale demo data cleared.\n');
+    console.log('✔ Stale demo data cleared safely. Real user accounts remain untouched.\n');
 
-    // 4. Seed Users
+    // 4. Normalize Skills on any Existing Non-Demo Jobs in the Database
+    const existingNonDemoJobs = await Job.find({});
+    let normalizedExistingCount = 0;
+    for (const job of existingNonDemoJobs) {
+      const normalized = normalizeSkillsArray(job.requiredSkills || []);
+      if (JSON.stringify(normalized) !== JSON.stringify(job.requiredSkills)) {
+        job.requiredSkills = normalized;
+        await job.save();
+        normalizedExistingCount++;
+      }
+    }
+    if (normalizedExistingCount > 0) {
+      console.log(`✔ Normalized skills across ${normalizedExistingCount} existing non-demo jobs.\n`);
+    }
+
+    // 5. Seed Users
     console.log('👤 Inserting demo user accounts...');
-    // We use insertMany with already hashed passwords to bypass re-hashing
     const createdUsers = await User.insertMany(demoUserDefinitions);
     const recruiterUser = createdUsers.find((u) => u.role === 'recruiter');
     const userMap = {};
@@ -191,9 +206,9 @@ async function seedDatabase() {
     });
     console.log(`✔ Seeded ${createdUsers.length} users (1 Recruiter, ${createdUsers.length - 1} Candidates).\n`);
 
-    // 5. Seed 6 Production Job Openings
-    console.log('💼 Publishing production job openings...');
-    const jobDefinitions = [
+    // 6. Seed 18 Production Job Openings Across Diverse Roles & Cities
+    console.log('💼 Publishing 18 production job openings with normalized skills...');
+    const rawJobDefinitions = [
       {
         title: 'Full-Stack MERN Systems Engineer',
         company: 'Acme Payments',
@@ -217,54 +232,158 @@ Requirements:
         postedBy: recruiterUser._id,
       },
       {
-        title: 'Senior Backend Architect - Node.js & Microservices',
-        company: 'Helix Core',
-        location: 'Bengaluru, India (Hybrid)',
-        requiredSkills: ['Node.js', 'Express', 'MongoDB', 'Redis', 'Docker', 'Microservices', 'Kubernetes'],
-        description: `Lead our backend infrastructure initiatives designing resilient, high-throughput microservices handling millions of daily payment transactions. You will optimize database throughput, implement distributed Redis caching, and maintain robust API gateways.`,
+        title: 'Frontend Interface Architect',
+        company: 'Nova Logistics',
+        location: 'Mumbai, India (Hybrid)',
+        requiredSkills: ['React', 'TypeScript', 'TailwindCSS', 'PostgreSQL', 'Next.js'],
+        description: `Lead our frontend engineering initiatives building high-frequency logistics and consumer interfaces. Strong mastery of React component trees, responsive CSS, and high-performance streaming APIs required.`,
         postedBy: recruiterUser._id,
       },
       {
-        title: 'Frontend React 19 Engineer',
+        title: 'Backend Systems & API Engineer',
+        company: 'Helix Core',
+        location: 'Bengaluru, India (Remote)',
+        requiredSkills: ['Node.js', 'Express', 'MongoDB', 'Docker', 'Redis', 'Microservices'],
+        description: `Architect robust backend services, secure authentication, and high-performance MongoDB aggregation pipelines. You will optimize database throughput and scale services handling millions of daily events.`,
+        postedBy: recruiterUser._id,
+      },
+      {
+        title: 'Full-Stack Software Engineer',
         company: 'Apex Analytics',
         location: 'Bengaluru, India',
-        requiredSkills: ['React', 'TypeScript', 'TailwindCSS', 'Next.js', 'CSS Modules', 'Web Vitals'],
-        description: `Join Apex Analytics to craft high-fidelity, component-driven user interfaces. You will build responsive investment applications with React 19, accessible design systems, and optimized Core Web Vitals.`,
+        requiredSkills: ['React', 'Node.js', 'MongoDB', 'Python', 'REST API'],
+        description: `Join our product engineering team delivering modern investment and analytics dashboards. Build full-stack features from MERN interfaces to data pipelines and secure customer access controls.`,
         postedBy: recruiterUser._id,
       },
       {
-        title: 'Cloud Infrastructure & DevOps Lead',
+        title: 'Cloud Infrastructure & DevOps Engineer',
         company: 'CloudScale Systems',
         location: 'Mumbai, India (Remote)',
-        requiredSkills: ['Docker', 'Kubernetes', 'AWS', 'Terraform', 'CI/CD', 'GitHub Actions', 'Linux'],
-        description: `Architect automated CI/CD pipelines, containerize backend microservices with Docker/Kubernetes, and manage multi-region AWS cloud infrastructure with Terraform.`,
+        requiredSkills: ['Docker', 'AWS', 'Kubernetes', 'CI/CD', 'Node.js'],
+        description: `Manage cloud infrastructure, automated deployment pipelines, and Docker container clusters for our distributed testing cloud. Experience with continuous delivery and zero-downtime rollouts is essential.`,
         postedBy: recruiterUser._id,
       },
       {
-        title: 'Platform API & Developer Tools Engineer',
-        company: 'DevFlow Systems',
-        location: 'Bengaluru, India (Remote)',
-        requiredSkills: ['Node.js', 'Express', 'REST API', 'GraphQL', 'Docker', 'PostgreSQL'],
-        description: `Build high-throughput developer tooling, API governance systems, and developer workspace features used by millions of engineers globally.`,
+        title: 'Junior Full-Stack Web Developer',
+        company: 'QuickServe Technologies',
+        location: 'Bengaluru, India (Hybrid)',
+        requiredSkills: ['React', 'JavaScript', 'Express', 'MongoDB', 'Git'],
+        description: `Great opportunity for a rising full-stack developer to contribute to our consumer engineering platform. You will build user-facing components, write API endpoints, and learn automated production workflows.`,
+        postedBy: recruiterUser._id,
+      },
+      // 12 New Roles across different specializations and cities
+      {
+        title: 'Senior Frontend Engineer - Design Systems & Web Performance',
+        company: 'Prism Labs',
+        location: 'Austin, TX (Hybrid)',
+        requiredSkills: ['React', 'TypeScript', 'TailwindCSS', 'Next.js', 'GraphQL', 'Web Performance'],
+        description: `Prism Labs develops high-performance visualization platforms and design tooling for modern product teams. We are seeking a Senior Frontend Engineer to champion our component libraries, design token systems, and web performance standards.`,
         postedBy: recruiterUser._id,
       },
       {
-        title: 'Junior Full-Stack Developer',
-        company: 'Nova Logistics',
-        location: 'Mumbai, India (Remote)',
-        requiredSkills: ['JavaScript', 'HTML5', 'CSS3', 'React', 'Git', 'REST API'],
-        description: `Entry-level engineering position for ambitious web developers. Build reusable UI components, write unit tests, and collaborate with senior mentors on modern full-stack logistics products.`,
+        title: 'Backend Systems Engineer - Distributed Services',
+        company: 'Vortex Data',
+        location: 'Seattle, WA (Remote)',
+        requiredSkills: ['Go', 'PostgreSQL', 'gRPC', 'Docker', 'Kafka', 'Redis', 'Microservices'],
+        description: `Vortex Data powers real-time event streaming and data synchronization for distributed enterprise infrastructure. We are hiring a Backend Systems Engineer to build high-throughput data processing pipelines and resilient microservices.`,
+        postedBy: recruiterUser._id,
+      },
+      {
+        title: 'Senior Data Analyst - Growth & Business Intelligence',
+        company: 'Aura Metrics',
+        location: 'New York, NY (Hybrid)',
+        requiredSkills: ['SQL', 'Python', 'Tableau', 'Power BI', 'dbt', 'Snowflake', 'Statistics'],
+        description: `Aura Metrics builds analytics software that empowers marketing and growth teams to make data-driven decisions. We are looking for a Senior Data Analyst to lead our product performance analytics and growth experiments.`,
+        postedBy: recruiterUser._id,
+      },
+      {
+        title: 'Machine Learning Engineer - NLP & Applied AI',
+        company: 'Cortex AI',
+        location: 'San Francisco, CA (Hybrid)',
+        requiredSkills: ['Python', 'PyTorch', 'TensorFlow', 'LLMs', 'Docker', 'MLOps', 'FastAPI'],
+        description: `Cortex AI delivers specialized machine learning models and semantic search solutions for knowledge discovery. We are seeking an Applied Machine Learning Engineer to design, evaluate, and deploy fine-tuned transformer architectures and LLM pipelines.`,
+        postedBy: recruiterUser._id,
+      },
+      {
+        title: 'DevOps & Site Reliability Engineer',
+        company: 'Kite Infrastructure',
+        location: 'Denver, CO (Remote)',
+        requiredSkills: ['Kubernetes', 'Docker', 'Terraform', 'AWS', 'CI/CD', 'Prometheus', 'Linux'],
+        description: `Kite Infrastructure provides continuous reliability and automated developer platforms. We are seeking a DevOps & Site Reliability Engineer to manage our multi-region Kubernetes clusters and streamline automated cloud deployments.`,
+        postedBy: recruiterUser._id,
+      },
+      {
+        title: 'Senior QA Automation Engineer',
+        company: 'QualiPulse Technologies',
+        location: 'Chicago, IL (Hybrid)',
+        requiredSkills: ['Playwright', 'Cypress', 'JavaScript', 'Jest', 'CI/CD', 'Selenium', 'Postman'],
+        description: `QualiPulse Technologies builds quality assurance testing platforms that accelerate software delivery. We are looking for a Senior QA Automation Engineer to lead our end-to-end testing strategy across web and API applications.`,
+        postedBy: recruiterUser._id,
+      },
+      {
+        title: 'Senior Mobile Engineer - React Native',
+        company: 'PocketWave Apps',
+        location: 'San Francisco, CA (Remote)',
+        requiredSkills: ['React Native', 'TypeScript', 'Redux', 'iOS', 'Android', 'GraphQL', 'Jest'],
+        description: `PocketWave Apps creates fluid, cross-platform mobile experiences for millions of consumers. We are looking for an experienced Senior Mobile Engineer to build performant iOS and Android apps using React Native.`,
+        postedBy: recruiterUser._id,
+      },
+      {
+        title: 'Lead UI/UX Product Designer',
+        company: 'PixelCraft Studios',
+        location: 'Austin, TX (Onsite)',
+        requiredSkills: ['Figma', 'UI/UX Design', 'Wireframing', 'Design Systems', 'User Research', 'Prototyping'],
+        description: `PixelCraft Studios is a digital product agency designing intuitive web and mobile platforms for tech innovators. We are seeking a Lead UI/UX Product Designer to guide product design from discovery research through high-fidelity prototypes.`,
+        postedBy: recruiterUser._id,
+      },
+      {
+        title: 'Product Analyst - User Behavior & Retention',
+        company: 'Stratum Analytics',
+        location: 'Boston, MA (Hybrid)',
+        requiredSkills: ['SQL', 'Mixpanel', 'Amplitude', 'Python', 'A/B Testing', 'Product Analytics', 'Tableau'],
+        description: `Stratum Analytics builds enterprise intelligence platforms. We are seeking a Product Analyst to dig into product usage telemetry, analyze user conversion funnels, and define key product engagement metrics.`,
+        postedBy: recruiterUser._id,
+      },
+      {
+        title: 'Principal Cloud Solutions Architect',
+        company: 'SkyGrid Cloud Solutions',
+        location: 'Dallas, TX (Remote)',
+        requiredSkills: ['AWS', 'Azure', 'Terraform', 'Kubernetes', 'Cloud Security', 'Architecture', 'Python'],
+        description: `SkyGrid Cloud Solutions guides enterprise digital transformation through modern cloud-native architectures. We are hiring a Principal Cloud Solutions Architect to design secure, highly resilient multi-cloud infrastructures.`,
+        postedBy: recruiterUser._id,
+      },
+      {
+        title: 'Cybersecurity Analyst & Threat Specialist',
+        company: 'Sentinel Gate Security',
+        location: 'Washington, DC (Onsite)',
+        requiredSkills: ['Network Security', 'SIEM', 'Penetration Testing', 'Incident Response', 'Python', 'Linux', 'SOC'],
+        description: `Sentinel Gate Security provides mission-critical threat detection and cyber defense operations. We are seeking a Cybersecurity Analyst to monitor security events, conduct vulnerability assessments, and respond to incidents.`,
+        postedBy: recruiterUser._id,
+      },
+      {
+        title: 'Senior Enterprise Java Developer - Spring Boot',
+        company: 'Novus Financial Systems',
+        location: 'Charlotte, NC (Hybrid)',
+        requiredSkills: ['Java', 'Spring Boot', 'Microservices', 'PostgreSQL', 'Docker', 'Kafka', 'REST APIs', 'JUnit'],
+        description: `Novus Financial Systems engineers high-volume core banking and ledger transaction platforms. We are seeking a Senior Enterprise Java Developer to build distributed, fault-tolerant microservices using Spring Boot.`,
         postedBy: recruiterUser._id,
       },
     ];
 
+    // Normalize requiredSkills across all job definitions
+    const jobDefinitions = rawJobDefinitions.map((job) => ({
+      ...job,
+      requiredSkills: normalizeSkillsArray(job.requiredSkills),
+    }));
+
     const createdJobs = await Job.insertMany(jobDefinitions);
     const flagshipJob = createdJobs[0]; // Full-Stack MERN & AI Engineer
-    console.log(`✔ Seeded ${createdJobs.length} production job requisitions.\n`);
+    console.log(`✔ Seeded ${createdJobs.length} production job requisitions with normalized skills.\n`);
 
-    // 6. Seed 8 Multi-Stage Candidate Applications with Realistic Bell-Curve Score Distribution
-    console.log('📋 Creating candidate applications with realistic ATS match scorecards...');
-    const applicationDefinitions = [
+    // 7. Seed 8 Multi-Stage Candidate Applications for the Flagship Job Only
+    // (Notice: other 17 jobs stay without match scores, displaying 'Not evaluated yet' until real evaluation occurs)
+    console.log('📋 Creating candidate applications for flagship role with ATS match scorecards...');
+    const rawApplicationDefinitions = [
       {
         job: flagshipJob._id,
         candidate: userMap['david.chen@example.com']._id,
@@ -379,10 +498,16 @@ Requirements:
       },
     ];
 
+    const applicationDefinitions = rawApplicationDefinitions.map((app) => ({
+      ...app,
+      matchedSkills: normalizeSkillsArray(app.matchedSkills),
+      missingSkills: normalizeSkillsArray(app.missingSkills),
+    }));
+
     const createdApplications = await Application.insertMany(applicationDefinitions);
     console.log(`✔ Seeded ${createdApplications.length} applications across all 6 Kanban stages.\n`);
 
-    // 7. Seed Production Interviews for Pipeline Candidates
+    // 8. Seed Production Interviews for Pipeline Candidates
     console.log('📅 Scheduling upcoming interview sessions for pipeline candidates...');
     const elenaUser = userMap['elena.rostova@example.com'];
     const liamUser = userMap['liam.walker@example.com'];
@@ -415,22 +540,34 @@ Requirements:
     const createdInterviews = await Interview.insertMany(interviewDefinitions);
     console.log(`✔ Seeded ${createdInterviews.length} upcoming interview appointments in calendar.\n`);
 
-    // 8. Render Formatted Summary Table
+    // 9. Render Formatted Summary Table
     console.log('================================================================================');
     console.log('                    DATABASE SEEDING VERIFICATION SUMMARY                       ');
     console.log('================================================================================');
     console.log(`👥 Demo Accounts     : ${createdUsers.length} (1 Recruiter, ${createdUsers.length - 1} Candidates)`);
-    console.log(`💼 Active Jobs       : ${createdJobs.length} Production Requisitions`);
+    console.log(`💼 Active Jobs       : ${createdJobs.length} Production Requisitions Across 18 Roles & Cities`);
     console.log(`📋 ATS Applications  : ${createdApplications.length} Applications Distributed Across 6 Stages`);
     console.log(`📅 Active Interviews : ${createdInterviews.length} Scheduled Sessions Linked to Flagship Opening`);
     console.log('--------------------------------------------------------------------------------');
-    console.log('Kanban Stage Distribution for Flagship Role ("Full-Stack MERN & AI Engineer"):');
-    console.log('  📥 Applied        : 2 candidates (David Chen [95%], Priya Sharma [76%])');
-    console.log('  ⭐ Shortlisted    : 1 candidate  (Alex Morgan [92%])');
-    console.log('  💬 Interview      : 2 candidates (Elena Rostova [88%], Liam Walker [84%])');
-    console.log('  🎁 Offer Extended : 1 candidate  (Sophie Martin [89%])');
-    console.log('  🎉 Hired          : 1 candidate  (Marcus Vance [96%])');
-    console.log('  ❌ Rejected       : 1 candidate  (Jordan Taylor [40%])');
+    console.log('Roles Included:');
+    console.log('  1. Full-Stack MERN Systems Engineer (Bengaluru - Remote)');
+    console.log('  2. Frontend Interface Architect (Mumbai - Hybrid)');
+    console.log('  3. Backend Systems & API Engineer (Bengaluru - Remote)');
+    console.log('  4. Full-Stack Software Engineer (Bengaluru)');
+    console.log('  5. Cloud Infrastructure & DevOps Engineer (Mumbai - Remote)');
+    console.log('  6. Junior Full-Stack Web Developer (Bengaluru - Hybrid)');
+    console.log('  7. Senior Frontend Engineer (Austin, TX - Hybrid)');
+    console.log('  8. Backend Systems Engineer - Distributed Services (Seattle, WA - Remote)');
+    console.log('  9. Senior Data Analyst (New York, NY - Hybrid)');
+    console.log('  10. Machine Learning Engineer (San Francisco, CA - Hybrid)');
+    console.log('  11. DevOps & SRE (Denver, CO - Remote)');
+    console.log('  12. Senior QA Automation Engineer (Chicago, IL - Hybrid)');
+    console.log('  13. Senior Mobile Engineer - React Native (San Francisco, CA - Remote)');
+    console.log('  14. Lead UI/UX Product Designer (Austin, TX - Onsite)');
+    console.log('  15. Product Analyst - User Behavior & Retention (Boston, MA - Hybrid)');
+    console.log('  16. Principal Cloud Solutions Architect (Dallas, TX - Remote)');
+    console.log('  17. Cybersecurity Analyst & Threat Specialist (Washington, DC - Onsite)');
+    console.log('  18. Senior Enterprise Java Developer - Spring Boot (Charlotte, NC - Hybrid)');
     console.log('================================================================================');
     console.log('✨ Seeder executed successfully! Default logins:');
     console.log('   Recruiter : recruiter@jobmatch.ai / password123');

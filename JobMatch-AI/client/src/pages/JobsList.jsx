@@ -26,8 +26,31 @@ import { FALLBACK_JOBS } from '../data/fallbackJobs';
 import SkillAutocomplete from '../components/SkillAutocomplete';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 
-const POPULAR_SKILLS = ['All', 'React', 'Node.js', 'MongoDB', 'PostgreSQL', 'Docker', 'Python', 'TypeScript'];
-const LOCATIONS = ['All Locations', 'Remote', 'San Francisco, CA', 'Austin, TX', 'New York, NY'];
+const POPULAR_SKILLS = [
+  'All',
+  'React',
+  'Node.js',
+  'Python',
+  'Java',
+  'Docker',
+  'AWS',
+  'Kubernetes',
+  'PostgreSQL',
+  'TypeScript',
+  'Tailwind CSS',
+];
+const LOCATIONS = [
+  'All Locations',
+  'Remote',
+  'Hybrid',
+  'San Francisco, CA',
+  'Austin, TX',
+  'New York, NY',
+  'Seattle, WA',
+  'Chicago, IL',
+  'Boston, MA',
+  'Denver, CO',
+];
 
 const JobsList = () => {
   useDocumentTitle(
@@ -53,6 +76,7 @@ const JobsList = () => {
 
   // Bookmark State
   const { isSaved, toggleSave } = useSavedJobs();
+  const [candidateApplications, setCandidateApplications] = useState([]);
 
   const handleToggleSave = (job) => {
     const isNowSaved = toggleSave(job._id);
@@ -61,6 +85,24 @@ const JobsList = () => {
       isNowSaved ? 'success' : 'info'
     );
   };
+
+  // Fetch candidate evaluated applications if logged in
+  useEffect(() => {
+    if (user && user.role === 'candidate') {
+      api
+        .get('/applications/my')
+        .then((res) => {
+          if (Array.isArray(res.data)) {
+            setCandidateApplications(res.data);
+          }
+        })
+        .catch(() => {
+          setCandidateApplications([]);
+        });
+    } else {
+      setCandidateApplications([]);
+    }
+  }, [user]);
 
   // Fetch jobs from backend with resilient fallback
   useEffect(() => {
@@ -84,37 +126,57 @@ const JobsList = () => {
     fetchJobs();
   }, []);
 
-  // Candidate reference skills baseline for real-time diagnostic gap calculation
+  // Candidate reference skills if present in profile
   const candidateSkills = useMemo(() => {
     if (user?.skills && Array.isArray(user.skills) && user.skills.length > 0) {
       return user.skills;
     }
-    // Default engineering baseline for prospective candidates
-    return ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'TypeScript'];
+    return [];
   }, [user]);
 
-  // Enrich each job with real-time diagnostic match calculations
+  // Enrich each job: Only real matcher scores from candidate applications are shown.
+  // Unevaluated jobs receive matchScore = null (rendered as "Not evaluated yet").
   const enrichedJobs = useMemo(() => {
     return jobs.map((job) => {
+      const jobIdStr = String(job._id || job.id || '');
       const reqSkills = Array.isArray(job.requiredSkills) ? job.requiredSkills : [];
+
+      // Check if logged-in candidate already has an evaluated application
+      const candidateApp = candidateApplications.find((app) => {
+        const appJobId = String(app.job?._id || app.job?.id || app.job || '');
+        return appJobId === jobIdStr;
+      });
+
+      if (candidateApp && typeof candidateApp.aiMatchScore === 'number') {
+        return {
+          ...job,
+          matchScore: candidateApp.aiMatchScore,
+          matchedSkills: Array.isArray(candidateApp.matchedSkills) ? candidateApp.matchedSkills : [],
+          missingSkills: Array.isArray(candidateApp.missingSkills) ? candidateApp.missingSkills : [],
+          isStrongMatch: candidateApp.aiMatchScore >= 75,
+          isEvaluated: true,
+        };
+      }
+
+      // If candidate has profile skills, calculate skill overlap for breakdown
       const matched = reqSkills.filter((s) =>
         candidateSkills.some((cs) => cs.toLowerCase() === s.toLowerCase())
       );
       const missing = reqSkills.filter(
         (s) => !candidateSkills.some((cs) => cs.toLowerCase() === s.toLowerCase())
       );
-      const ratio = reqSkills.length > 0 ? matched.length / reqSkills.length : 0.75;
-      // Clinical compatibility score with realistic curve
-      const matchScore = Math.min(96, Math.max(52, Math.round(ratio * 78 + (matched.length > 0 ? 18 : 0))));
+
+      // Do NOT invent match scores. Stays null until evaluated by the real matcher.
       return {
         ...job,
-        matchScore,
+        matchScore: null,
         matchedSkills: matched,
         missingSkills: missing,
-        isStrongMatch: matchScore >= 75,
+        isStrongMatch: false,
+        isEvaluated: false,
       };
     });
-  }, [jobs, candidateSkills]);
+  }, [jobs, candidateApplications, candidateSkills]);
 
   // Filter & sort jobs based on search inputs and sort dropdown
   const filteredJobs = useMemo(() => {
@@ -153,7 +215,14 @@ const JobsList = () => {
 
     // Sort order
     if (sortBy === 'best-match') {
-      result.sort((a, b) => b.matchScore - a.matchScore);
+      result.sort((a, b) => {
+        const scoreA = typeof a.matchScore === 'number' ? a.matchScore : -1;
+        const scoreB = typeof b.matchScore === 'number' ? b.matchScore : -1;
+        if (scoreA !== scoreB) {
+          return scoreB - scoreA;
+        }
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      });
     } else if (sortBy === 'newest') {
       result.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
     } else if (sortBy === 'title') {
@@ -167,9 +236,10 @@ const JobsList = () => {
 
   // Determine top matching job to break visual monotony
   const topMatchJobId = useMemo(() => {
-    if (filteredJobs.length === 0) return null;
-    let highest = filteredJobs[0];
-    for (const j of filteredJobs) {
+    const evaluated = filteredJobs.filter((j) => typeof j.matchScore === 'number');
+    if (evaluated.length === 0) return null;
+    let highest = evaluated[0];
+    for (const j of evaluated) {
       if (j.matchScore > highest.matchScore) {
         highest = j;
       }
@@ -189,7 +259,7 @@ const JobsList = () => {
   // Distinct handler for Evaluate (diagnostic scorecard) vs Apply (direct submission)
   const handleOpenApplyModal = (job, isDiagnosticEvaluation = false) => {
     setSelectedJob(job);
-    if (isDiagnosticEvaluation) {
+    if (isDiagnosticEvaluation && typeof job.matchScore === 'number') {
       setInitialEvaluationForModal({
         aiMatchScore: job.matchScore,
         recommendation: job.isStrongMatch ? 'Strong Match' : 'Moderate Match',
@@ -532,9 +602,9 @@ const JobsList = () => {
             padding: '0 0.25rem',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.88rem', color: '#64748B' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.88rem', color: 'var(--text-secondary)' }}>
             <span>
-              Showing <strong style={{ color: '#0F172A', fontWeight: 700 }}>{filteredJobs.length}</strong> evaluated roles
+              Showing <strong style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{filteredJobs.length}</strong> roles
             </span>
             {hasActiveFilters && (
               <span
@@ -833,40 +903,65 @@ const JobsList = () => {
                       {/* Right Header Actions: Match Score Preview Badge + Interactive Bookmark */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexShrink: 0 }}>
                         {/* 1. Diagnostic Match Preview Badge */}
-                        <div
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'baseline',
-                            gap: '0.2rem',
-                            padding: '0.22rem 0.55rem',
-                            borderRadius: '9999px',
-                            backgroundColor: job.isStrongMatch ? '#F0FDFA' : '#FFFBEB',
-                            border: `1px solid ${job.isStrongMatch ? '#99F6E4' : '#FDE68A'}`,
-                          }}
-                          title={`Estimated ${job.matchScore}% candidate compatibility based on skills profile`}
-                        >
-                          <span
+                        {typeof job.matchScore === 'number' ? (
+                          <div
                             style={{
-                              fontFamily: "'JetBrains Mono', monospace",
-                              fontSize: '0.84rem',
-                              fontWeight: 700,
-                              color: job.isStrongMatch ? '#0F6B5C' : '#B45309',
-                              lineHeight: 1,
+                              display: 'inline-flex',
+                              alignItems: 'baseline',
+                              gap: '0.2rem',
+                              padding: '0.22rem 0.55rem',
+                              borderRadius: '9999px',
+                              backgroundColor: job.isStrongMatch ? '#F0FDFA' : '#FFFBEB',
+                              border: `1px solid ${job.isStrongMatch ? '#99F6E4' : '#FDE68A'}`,
                             }}
+                            title={`Evaluated fit: ${job.matchScore}% candidate compatibility`}
                           >
-                            {job.matchScore}%
-                          </span>
-                          <span
+                            <span
+                              style={{
+                                fontFamily: "'JetBrains Mono', monospace",
+                                fontSize: '0.84rem',
+                                fontWeight: 700,
+                                color: job.isStrongMatch ? 'var(--accent-teal)' : 'var(--semantic-amber)',
+                                lineHeight: 1,
+                              }}
+                            >
+                              {job.matchScore}%
+                            </span>
+                            <span
+                              style={{
+                                fontSize: '0.72rem',
+                                fontWeight: 600,
+                                color: job.isStrongMatch ? 'var(--accent-teal)' : 'var(--semantic-amber)',
+                                lineHeight: 1,
+                              }}
+                            >
+                              fit
+                            </span>
+                          </div>
+                        ) : (
+                          <div
                             style={{
-                              fontSize: '0.72rem',
-                              fontWeight: 600,
-                              color: job.isStrongMatch ? '#0d9488' : '#D97706',
-                              lineHeight: 1,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              padding: '0.2rem 0.55rem',
+                              borderRadius: '9999px',
+                              backgroundColor: 'var(--bg-secondary)',
+                              border: '1px solid var(--border-default)',
                             }}
+                            title="Not evaluated yet for your profile"
                           >
-                            fit
-                          </span>
-                        </div>
+                            <span
+                              style={{
+                                fontSize: '0.72rem',
+                                fontWeight: 600,
+                                color: 'var(--text-muted)',
+                                lineHeight: 1,
+                              }}
+                            >
+                              Not evaluated yet
+                            </span>
+                          </div>
+                        )}
 
                         {/* 8. Interactive Bookmark Button */}
                         <button
