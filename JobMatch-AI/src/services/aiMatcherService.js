@@ -154,7 +154,7 @@ Analyze the match and provide the evaluation in the requested JSON structure.`;
     });
 
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Gemini API call timed out after 15 seconds')), 15000)
+      setTimeout(() => reject(new Error('Gemini API call timed out after 35 seconds')), 35000)
     );
 
     const response = await Promise.race([apiCall, timeoutPromise]);
@@ -322,7 +322,7 @@ Candidate Profile: ${candidateDetails}`;
     });
 
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Gemini API call timed out after 15 seconds')), 15000)
+      setTimeout(() => reject(new Error('Gemini API call timed out after 35 seconds')), 35000)
     );
 
     const response = await Promise.race([apiCall, timeoutPromise]);

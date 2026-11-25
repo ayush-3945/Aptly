@@ -402,7 +402,7 @@ ${requirements || ''}`;
     // 15-second timeout for Gemini API call
     let timeoutId;
     const timeoutPromise = new Promise((_, reject) => {
-      timeoutId = setTimeout(() => reject(new Error('Gemini API call timed out after 15 seconds')), 15000);
+      timeoutId = setTimeout(() => reject(new Error('Gemini API call timed out after 35 seconds')), 35000);
       if (timeoutId && timeoutId.unref) timeoutId.unref();
     });
 
