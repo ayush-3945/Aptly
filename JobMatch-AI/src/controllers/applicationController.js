@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const mongoose = require('mongoose');
 const Application = require('../models/Application');
 const { SAMPLE_APPLICATIONS } = require('../data/fallbackData');
 const Job = require('../models/Job');
