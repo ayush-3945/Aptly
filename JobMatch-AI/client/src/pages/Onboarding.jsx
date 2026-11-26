@@ -20,7 +20,7 @@ const Onboarding = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const handleContinue = async () => {
-    if (!selectedRole) return;
+    if (!selectedRole || submitting) return;
 
     setSubmitting(true);
     try {
@@ -38,7 +38,10 @@ const Onboarding = () => {
         updateUser({ ...user, role: selectedRole });
       }
 
-      showToast(`Welcome! Setting up your ${selectedRole === 'recruiter' ? 'recruiter studio' : 'job seeker workspace'}.`, 'success');
+      showToast(
+        `Welcome! Setting up your ${selectedRole === 'recruiter' ? 'recruiter studio' : 'job seeker workspace'}.`,
+        'success'
+      );
 
       // 3. Role-based intentional redirection
       if (selectedRole === 'recruiter') {
@@ -54,6 +57,30 @@ const Onboarding = () => {
     }
   };
 
+  const handleKeyDown = (e, role) => {
+    if (e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      setSelectedRole(role);
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      const nextRole = role === 'candidate' ? 'recruiter' : 'candidate';
+      setSelectedRole(nextRole);
+      document.getElementById(nextRole === 'candidate' ? 'role-card-candidate' : 'role-card-recruiter')?.focus();
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const prevRole = role === 'candidate' ? 'recruiter' : 'candidate';
+      setSelectedRole(prevRole);
+      document.getElementById(prevRole === 'candidate' ? 'role-card-candidate' : 'role-card-recruiter')?.focus();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedRole) {
+        handleContinue();
+      } else {
+        setSelectedRole(role);
+      }
+    }
+  };
+
   return (
     <div
       className="animate-fade-in"
@@ -62,7 +89,7 @@ const Onboarding = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '2.5rem 1.5rem',
+        padding: '2.5rem 1.25rem',
         backgroundColor: 'var(--bg-primary, #F8F7F4)',
       }}
     >
@@ -71,7 +98,7 @@ const Onboarding = () => {
         style={{
           width: '100%',
           maxWidth: '680px',
-          padding: '3rem 2.5rem',
+          padding: '2.75rem 2.25rem',
           borderRadius: '12px',
           backgroundColor: '#FFFFFF',
           border: '1px solid var(--border-default, #E2E8F0)',
@@ -116,30 +143,38 @@ const Onboarding = () => {
 
           <p
             style={{
-              fontSize: '0.96rem',
+              fontSize: '0.98rem',
               color: 'var(--text-secondary, #64748B)',
               maxWidth: '460px',
               margin: '0 auto',
               lineHeight: 1.5,
             }}
           >
-            Select your primary objective so we can tailor your workspace, matches, and navigation.
+            Pick the option that fits you best.
           </p>
         </div>
 
-        {/* Two Large Side-by-Side Clickable Option Cards */}
+        {/* Accessible Radiogroup Options */}
         <div
+          role="radiogroup"
+          aria-label="Role selection: how will you use Aptly?"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
             gap: '1.25rem',
-            marginBottom: '2.5rem',
+            marginBottom: '2.25rem',
             textAlign: 'left',
           }}
         >
           {/* Card 1: Candidate Option */}
           <div
+            id="role-card-candidate"
+            role="radio"
+            aria-checked={selectedRole === 'candidate'}
+            aria-label="Looking for a job: Get an AI match score for every role and track your applications"
+            tabIndex={0}
             onClick={() => setSelectedRole('candidate')}
+            onKeyDown={(e) => handleKeyDown(e, 'candidate')}
             style={{
               padding: '1.75rem 1.5rem',
               borderRadius: '10px',
@@ -155,13 +190,21 @@ const Onboarding = () => {
                   : '#FFFFFF',
               boxShadow:
                 selectedRole === 'candidate'
-                  ? '0 6px 18px -3px rgba(15, 118, 110, 0.15)'
+                  ? '0 6px 18px -3px rgba(15, 118, 110, 0.18)'
                   : '0 1px 3px rgba(0, 0, 0, 0.02)',
+              outline: 'none',
               position: 'relative',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              minHeight: '170px',
+              minHeight: '220px',
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.outline = '2px solid var(--accent-teal, #0F766E)';
+              e.currentTarget.style.outlineOffset = '2px';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.outline = 'none';
             }}
             onMouseEnter={(e) => {
               if (selectedRole !== 'candidate') {
@@ -202,8 +245,17 @@ const Onboarding = () => {
                   <User size={22} />
                 </div>
 
-                {selectedRole === 'candidate' && (
-                  <CheckCircle2 size={20} color="var(--accent-teal, #0F766E)" />
+                {selectedRole === 'candidate' ? (
+                  <CheckCircle2 size={22} color="var(--accent-teal, #0F766E)" />
+                ) : (
+                  <div
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      borderRadius: '50%',
+                      border: '1.5px solid var(--border-default, #CBD5E1)',
+                    }}
+                  />
                 )}
               </div>
 
@@ -222,17 +274,80 @@ const Onboarding = () => {
                   fontSize: '0.85rem',
                   color: 'var(--text-secondary, #64748B)',
                   lineHeight: 1.45,
-                  margin: 0,
+                  margin: '0 0 0.85rem 0',
                 }}
               >
                 Browse roles and get matched
               </p>
+
+              {/* Feature Bullets */}
+              <ul
+                style={{
+                  listStyle: 'none',
+                  padding: 0,
+                  margin: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.45rem',
+                }}
+              >
+                <li
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.45rem',
+                    fontSize: '0.82rem',
+                    color: 'var(--text-secondary, #475569)',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  <span
+                    style={{
+                      color: 'var(--accent-teal, #0F766E)',
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      marginTop: '0.15rem',
+                    }}
+                  >
+                    ✓
+                  </span>
+                  <span>Get an AI match score for every role</span>
+                </li>
+                <li
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.45rem',
+                    fontSize: '0.82rem',
+                    color: 'var(--text-secondary, #475569)',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  <span
+                    style={{
+                      color: 'var(--accent-teal, #0F766E)',
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      marginTop: '0.15rem',
+                    }}
+                  >
+                    ✓
+                  </span>
+                  <span>Track your applications</span>
+                </li>
+              </ul>
             </div>
           </div>
 
           {/* Card 2: Recruiter Option */}
           <div
+            id="role-card-recruiter"
+            role="radio"
+            aria-checked={selectedRole === 'recruiter'}
+            aria-label="Hiring talent: Post jobs and check JD quality, and rank candidates on a Kanban board"
+            tabIndex={0}
             onClick={() => setSelectedRole('recruiter')}
+            onKeyDown={(e) => handleKeyDown(e, 'recruiter')}
             style={{
               padding: '1.75rem 1.5rem',
               borderRadius: '10px',
@@ -248,13 +363,21 @@ const Onboarding = () => {
                   : '#FFFFFF',
               boxShadow:
                 selectedRole === 'recruiter'
-                  ? '0 6px 18px -3px rgba(15, 118, 110, 0.15)'
+                  ? '0 6px 18px -3px rgba(15, 118, 110, 0.18)'
                   : '0 1px 3px rgba(0, 0, 0, 0.02)',
+              outline: 'none',
               position: 'relative',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              minHeight: '170px',
+              minHeight: '220px',
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.outline = '2px solid var(--accent-teal, #0F766E)';
+              e.currentTarget.style.outlineOffset = '2px';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.outline = 'none';
             }}
             onMouseEnter={(e) => {
               if (selectedRole !== 'recruiter') {
@@ -295,8 +418,17 @@ const Onboarding = () => {
                   <Briefcase size={22} />
                 </div>
 
-                {selectedRole === 'recruiter' && (
-                  <CheckCircle2 size={20} color="var(--accent-teal, #0F766E)" />
+                {selectedRole === 'recruiter' ? (
+                  <CheckCircle2 size={22} color="var(--accent-teal, #0F766E)" />
+                ) : (
+                  <div
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      borderRadius: '50%',
+                      border: '1.5px solid var(--border-default, #CBD5E1)',
+                    }}
+                  />
                 )}
               </div>
 
@@ -315,16 +447,73 @@ const Onboarding = () => {
                   fontSize: '0.85rem',
                   color: 'var(--text-secondary, #64748B)',
                   lineHeight: 1.45,
-                  margin: 0,
+                  margin: '0 0 0.85rem 0',
                 }}
               >
                 Post jobs and evaluate candidates
               </p>
+
+              {/* Feature Bullets */}
+              <ul
+                style={{
+                  listStyle: 'none',
+                  padding: 0,
+                  margin: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.45rem',
+                }}
+              >
+                <li
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.45rem',
+                    fontSize: '0.82rem',
+                    color: 'var(--text-secondary, #475569)',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  <span
+                    style={{
+                      color: 'var(--accent-teal, #0F766E)',
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      marginTop: '0.15rem',
+                    }}
+                  >
+                    ✓
+                  </span>
+                  <span>Post jobs and check JD quality</span>
+                </li>
+                <li
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.45rem',
+                    fontSize: '0.82rem',
+                    color: 'var(--text-secondary, #475569)',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  <span
+                    style={{
+                      color: 'var(--accent-teal, #0F766E)',
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      marginTop: '0.15rem',
+                    }}
+                  >
+                    ✓
+                  </span>
+                  <span>Rank candidates on a Kanban board</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
 
-        {/* Single Required Continue Button (No skip option) */}
+        {/* Continue Button & Informative Footer */}
         <div>
           <button
             type="button"
@@ -342,9 +531,13 @@ const Onboarding = () => {
               justifyContent: 'center',
               gap: '0.5rem',
               cursor: !selectedRole || submitting ? 'not-allowed' : 'pointer',
-              opacity: !selectedRole || submitting ? 0.6 : 1,
-              boxShadow: selectedRole ? '0 4px 14px rgba(15, 118, 110, 0.25)' : 'none',
-              transition: 'all 0.15s ease',
+              backgroundColor: !selectedRole
+                ? 'var(--bg-muted, #E2E8F0)'
+                : 'var(--accent-teal, #0F766E)',
+              color: !selectedRole ? 'var(--text-muted, #94A3B8)' : '#FFFFFF',
+              border: !selectedRole ? '1px solid #CBD5E1' : '1px solid transparent',
+              boxShadow: selectedRole && !submitting ? '0 4px 14px rgba(15, 118, 110, 0.25)' : 'none',
+              transition: 'all 0.18s ease',
             }}
           >
             {submitting ? (
@@ -362,13 +555,13 @@ const Onboarding = () => {
 
           <p
             style={{
-              fontSize: '0.78rem',
-              color: 'var(--text-muted, #94A3B8)',
-              marginTop: '1rem',
+              fontSize: '0.82rem',
+              color: 'var(--text-muted, #64748B)',
+              marginTop: '1.15rem',
               marginBottom: 0,
             }}
           >
-            Role selection is required to configure your applicant workflows and permissions.
+            Your choice decides what you see in Aptly.
           </p>
         </div>
       </div>
