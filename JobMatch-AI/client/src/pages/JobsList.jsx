@@ -24,6 +24,7 @@ import ApplyModal from '../components/ApplyModal';
 import { useSavedJobs } from '../utils/savedJobs';
 import { FALLBACK_JOBS } from '../data/fallbackJobs';
 import SkillAutocomplete from '../components/SkillAutocomplete';
+import { normalizeSkillName } from '../utils/skillsList';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const POPULAR_SKILLS = [
@@ -67,7 +68,8 @@ const JobsList = () => {
   const [keyword, setKeyword] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('All Locations');
   const [selectedSkill, setSelectedSkill] = useState('All');
-  const [sortBy, setSortBy] = useState('best-match');
+  const [sortBy, setSortBy] = useState('newest');
+  const [userSelectedSort, setUserSelectedSort] = useState(false);
 
   // Modal State
   const [selectedJob, setSelectedJob] = useState(null);
@@ -127,12 +129,26 @@ const JobsList = () => {
   }, []);
 
   // Candidate reference skills if present in profile
+  const isCandidate = Boolean(user && user.role === 'candidate');
   const candidateSkills = useMemo(() => {
-    if (user?.skills && Array.isArray(user.skills) && user.skills.length > 0) {
-      return user.skills;
+    if (isCandidate && Array.isArray(user?.skills) && user.skills.length > 0) {
+      return user.skills.map((s) => (typeof s === 'string' ? s : s?.name || '')).filter(Boolean);
     }
     return [];
-  }, [user]);
+  }, [isCandidate, user]);
+
+  const hasCandidateSkills = candidateSkills.length > 0;
+  const candidateHasNoSkills = isCandidate && candidateSkills.length === 0;
+
+  // Canonical set of normalized lowercase skills for exact, case-insensitive overlap
+  const candidateCanonicalSkills = useMemo(() => {
+    const set = new Set();
+    candidateSkills.forEach((s) => {
+      const canonical = normalizeSkillName(s);
+      if (canonical) set.add(canonical.toLowerCase());
+    });
+    return set;
+  }, [candidateSkills]);
 
   // Enrich each job: Only real matcher scores from candidate applications are shown.
   // Unevaluated jobs receive matchScore = null (rendered as "Not evaluated yet").
@@ -147,36 +163,55 @@ const JobsList = () => {
         return appJobId === jobIdStr;
       });
 
+      // Calculate profile overlap count using normalizeSkillName (case-insensitive)
+      const overlapSkills = reqSkills.filter((s) =>
+        candidateCanonicalSkills.has(normalizeSkillName(s).toLowerCase())
+      );
+      const overlapCount = overlapSkills.length;
+
       if (candidateApp && typeof candidateApp.aiMatchScore === 'number') {
         return {
           ...job,
           matchScore: candidateApp.aiMatchScore,
-          matchedSkills: Array.isArray(candidateApp.matchedSkills) ? candidateApp.matchedSkills : [],
+          matchedSkills: Array.isArray(candidateApp.matchedSkills) && candidateApp.matchedSkills.length > 0
+            ? candidateApp.matchedSkills
+            : overlapSkills,
           missingSkills: Array.isArray(candidateApp.missingSkills) ? candidateApp.missingSkills : [],
           isStrongMatch: candidateApp.aiMatchScore >= 75,
           isEvaluated: true,
+          overlapCount,
         };
       }
 
-      // If candidate has profile skills, calculate skill overlap for breakdown
-      const matched = reqSkills.filter((s) =>
-        candidateSkills.some((cs) => cs.toLowerCase() === s.toLowerCase())
-      );
       const missing = reqSkills.filter(
-        (s) => !candidateSkills.some((cs) => cs.toLowerCase() === s.toLowerCase())
+        (s) => !candidateCanonicalSkills.has(normalizeSkillName(s).toLowerCase())
       );
 
       // Do NOT invent match scores. Stays null until evaluated by the real matcher.
       return {
         ...job,
         matchScore: null,
-        matchedSkills: matched,
+        matchedSkills: overlapSkills,
         missingSkills: missing,
         isStrongMatch: false,
         isEvaluated: false,
+        overlapCount,
       };
     });
-  }, [jobs, candidateApplications, candidateSkills]);
+  }, [jobs, candidateApplications, candidateCanonicalSkills]);
+
+  // Check if any job has an AI fit score for this candidate
+  const hasAnyAiFitScore = useMemo(() => {
+    return enrichedJobs.some((j) => typeof j.matchScore === 'number');
+  }, [enrichedJobs]);
+
+  // Default sort: if no job has an AI fit score for this candidate, default to "newest".
+  // If evaluated roles exist, default to "best-match" unless candidate manually selected a sort option.
+  useEffect(() => {
+    if (!userSelectedSort) {
+      setSortBy(hasAnyAiFitScore ? 'best-match' : 'newest');
+    }
+  }, [hasAnyAiFitScore, userSelectedSort]);
 
   // Filter & sort jobs based on search inputs and sort dropdown
   const filteredJobs = useMemo(() => {
@@ -251,6 +286,8 @@ const JobsList = () => {
     setKeyword('');
     setSelectedLocation('All Locations');
     setSelectedSkill('All');
+    setUserSelectedSort(false);
+    setSortBy(hasAnyAiFitScore ? 'best-match' : 'newest');
   };
 
   const hasActiveFilters =
@@ -590,6 +627,52 @@ const JobsList = () => {
           </div>
         </div>
 
+        {/* Profile Skills Overlap Prompt — shown once at top if logged-in candidate has no skills saved */}
+        {candidateHasNoSkills && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '0.75rem',
+              backgroundColor: '#F8FAFC',
+              border: '1px solid #E2E8F0',
+              borderRadius: '8px',
+              padding: '0.75rem 1rem',
+              marginBottom: '1.25rem',
+              fontSize: '0.86rem',
+              color: '#475569',
+              flexWrap: 'wrap',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Activity size={16} color="#0D9488" style={{ flexShrink: 0 }} />
+              <span>
+                Profile overlap:{' '}
+                <strong style={{ color: '#0F172A' }}>Add skills to your profile to see matches</strong> with open roles.
+              </span>
+            </div>
+            <Link
+              to="/profile"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.25rem',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                color: '#0D9488',
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
+              onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
+            >
+              <span>Add skills</span>
+              <ArrowRight size={13} />
+            </Link>
+          </div>
+        )}
+
         {/* Connected Results Count and Sorting Toolbar */}
         <div
           style={{
@@ -629,7 +712,10 @@ const JobsList = () => {
             <span style={{ fontSize: '0.82rem', color: '#64748B', fontWeight: 500 }}>Sort by:</span>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(e) => {
+                setUserSelectedSort(true);
+                setSortBy(e.target.value);
+              }}
               style={{
                 border: '1px solid #E2E8F0',
                 borderRadius: '6px',
@@ -642,10 +728,21 @@ const JobsList = () => {
                 outline: 'none',
               }}
             >
-              <option value="best-match">Best match (AI)</option>
-              <option value="newest">Newest first</option>
-              <option value="title">Role title (A–Z)</option>
-              <option value="company">Company name (A–Z)</option>
+              {hasAnyAiFitScore ? (
+                <>
+                  <option value="best-match">Best match (AI)</option>
+                  <option value="newest">Newest</option>
+                  <option value="title">Role title (A–Z)</option>
+                  <option value="company">Company name (A–Z)</option>
+                </>
+              ) : (
+                <>
+                  <option value="newest">Newest</option>
+                  <option value="best-match">Best match (AI)</option>
+                  <option value="title">Role title (A–Z)</option>
+                  <option value="company">Company name (A–Z)</option>
+                </>
+              )}
             </select>
           </div>
         </div>
@@ -806,7 +903,7 @@ const JobsList = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))',
               gap: '1.35rem',
             }}
           >
@@ -870,100 +967,53 @@ const JobsList = () => {
                       </div>
                     )}
 
-                    {/* Card Header: Company, Date, Match Score Badge & Bookmark */}
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: '0.5rem',
-                        marginBottom: '0.75rem',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', minWidth: 0 }}>
-                        <Building2 size={15} color="#64748B" style={{ flexShrink: 0 }} />
-                        <span
+                    {/* Card Header: Split into 2 Rows:
+                        Row 1: Company name (on its own line, wraps if long, max 2 lines) + Bookmark icon (top right)
+                        Row 2: Status badge ("Not evaluated yet" / fit %) and Date under company name */}
+                    <div style={{ marginBottom: '0.75rem' }}>
+                      {/* Row 1: Company Name + Bookmark Button */}
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          justifyContent: 'space-between',
+                          gap: '0.75rem',
+                        }}
+                      >
+                        <div
                           style={{
-                            fontSize: '0.86rem',
-                            fontWeight: 600,
-                            color: '#334155',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            gap: '0.45rem',
+                            minWidth: 0,
+                            flex: 1,
                           }}
                         >
-                          {job.company}
-                        </span>
-                        <span style={{ color: '#CBD5E1', fontSize: '0.75rem' }}>•</span>
-                        <span style={{ fontSize: '0.76rem', color: '#94A3B8', flexShrink: 0 }}>
-                          {formatDate(job.createdAt)}
-                        </span>
-                      </div>
-
-                      {/* Right Header Actions: Match Score Preview Badge + Interactive Bookmark */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexShrink: 0 }}>
-                        {/* 1. Diagnostic Match Preview Badge */}
-                        {typeof job.matchScore === 'number' ? (
-                          <div
+                          <Building2
+                            size={16}
+                            color="#64748B"
+                            style={{ flexShrink: 0, marginTop: '2px' }}
+                          />
+                          <span
                             style={{
-                              display: 'inline-flex',
-                              alignItems: 'baseline',
-                              gap: '0.2rem',
-                              padding: '0.22rem 0.55rem',
-                              borderRadius: '9999px',
-                              backgroundColor: job.isStrongMatch ? '#F0FDFA' : '#FFFBEB',
-                              border: `1px solid ${job.isStrongMatch ? '#99F6E4' : '#FDE68A'}`,
+                              fontSize: '0.88rem',
+                              fontWeight: 600,
+                              color: '#334155',
+                              lineHeight: 1.35,
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                              wordBreak: 'break-word',
+                              overflowWrap: 'break-word',
                             }}
-                            title={`Evaluated fit: ${job.matchScore}% candidate compatibility`}
+                            title={job.company}
                           >
-                            <span
-                              style={{
-                                fontFamily: "'JetBrains Mono', monospace",
-                                fontSize: '0.84rem',
-                                fontWeight: 700,
-                                color: job.isStrongMatch ? 'var(--accent-teal)' : 'var(--semantic-amber)',
-                                lineHeight: 1,
-                              }}
-                            >
-                              {job.matchScore}%
-                            </span>
-                            <span
-                              style={{
-                                fontSize: '0.72rem',
-                                fontWeight: 600,
-                                color: job.isStrongMatch ? 'var(--accent-teal)' : 'var(--semantic-amber)',
-                                lineHeight: 1,
-                              }}
-                            >
-                              fit
-                            </span>
-                          </div>
-                        ) : (
-                          <div
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              padding: '0.2rem 0.55rem',
-                              borderRadius: '9999px',
-                              backgroundColor: 'var(--bg-secondary)',
-                              border: '1px solid var(--border-default)',
-                            }}
-                            title="Not evaluated yet for your profile"
-                          >
-                            <span
-                              style={{
-                                fontSize: '0.72rem',
-                                fontWeight: 600,
-                                color: 'var(--text-muted)',
-                                lineHeight: 1,
-                              }}
-                            >
-                              Not evaluated yet
-                            </span>
-                          </div>
-                        )}
+                            {job.company}
+                          </span>
+                        </div>
 
-                        {/* 8. Interactive Bookmark Button */}
+                        {/* Interactive Bookmark Button pinned at Top Right */}
                         <button
                           type="button"
                           onClick={(e) => {
@@ -972,6 +1022,7 @@ const JobsList = () => {
                             handleToggleSave(job);
                           }}
                           style={{
+                            flexShrink: 0,
                             background: saved ? '#FFFBEB' : '#FFFFFF',
                             border: `1px solid ${saved ? '#FDE68A' : '#E2E8F0'}`,
                             borderRadius: '6px',
@@ -998,6 +1049,83 @@ const JobsList = () => {
                             color={saved ? '#D97706' : '#94A3B8'}
                           />
                         </button>
+                      </div>
+
+                      {/* Row 2: Status Badge and Date under Company Name */}
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          flexWrap: 'wrap',
+                          marginTop: '0.45rem',
+                        }}
+                      >
+                        {/* Diagnostic Match Preview Badge */}
+                        {typeof job.matchScore === 'number' ? (
+                          <div
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'baseline',
+                              gap: '0.2rem',
+                              padding: '0.2rem 0.55rem',
+                              borderRadius: '9999px',
+                              backgroundColor: job.isStrongMatch ? '#F0FDFA' : '#FFFBEB',
+                              border: `1px solid ${job.isStrongMatch ? '#99F6E4' : '#FDE68A'}`,
+                            }}
+                            title={`Evaluated fit: ${job.matchScore}% candidate compatibility`}
+                          >
+                            <span
+                              style={{
+                                fontFamily: "'JetBrains Mono', monospace",
+                                fontSize: '0.82rem',
+                                fontWeight: 700,
+                                color: job.isStrongMatch ? 'var(--accent-teal)' : 'var(--semantic-amber)',
+                                lineHeight: 1,
+                              }}
+                            >
+                              {job.matchScore}%
+                            </span>
+                            <span
+                              style={{
+                                fontSize: '0.72rem',
+                                fontWeight: 600,
+                                color: job.isStrongMatch ? 'var(--accent-teal)' : 'var(--semantic-amber)',
+                                lineHeight: 1,
+                              }}
+                            >
+                              fit
+                            </span>
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              padding: '0.18rem 0.52rem',
+                              borderRadius: '9999px',
+                              backgroundColor: 'var(--bg-secondary)',
+                              border: '1px solid var(--border-default)',
+                            }}
+                            title="Not evaluated yet for your profile"
+                          >
+                            <span
+                              style={{
+                                fontSize: '0.72rem',
+                                fontWeight: 600,
+                                color: 'var(--text-muted)',
+                                lineHeight: 1,
+                              }}
+                            >
+                              Not evaluated yet
+                            </span>
+                          </div>
+                        )}
+
+                        <span style={{ color: '#CBD5E1', fontSize: '0.75rem' }}>•</span>
+                        <span style={{ fontSize: '0.76rem', color: '#94A3B8' }}>
+                          {formatDate(job.createdAt)}
+                        </span>
                       </div>
                     </div>
 
@@ -1063,14 +1191,14 @@ const JobsList = () => {
                       {job.description}
                     </p>
 
-                    {/* 7. Skill Tags with Gap Analysis (Matched vs Missing) */}
+                    {/* 7. Skill Tags with Gap Analysis & Profile Overlap Line */}
                     <div style={{ marginBottom: '1.25rem' }}>
                       <div
                         style={{
                           fontSize: '0.72rem',
                           fontWeight: 600,
                           color: '#64748B',
-                          marginBottom: '0.4rem',
+                          marginBottom: '0.35rem',
                           display: 'flex',
                           alignItems: 'center',
                           gap: '0.35rem',
@@ -1078,9 +1206,47 @@ const JobsList = () => {
                       >
                         <span>Skills & fit:</span>
                       </div>
+
+                      {/* Small line: "X of Y skills match your profile" (Profile overlap, not AI score) */}
+                      {hasCandidateSkills && Array.isArray(job.requiredSkills) && job.requiredSkills.length > 0 && (
+                        <div
+                          style={{
+                            fontSize: '0.76rem',
+                            color: '#475569',
+                            marginBottom: '0.45rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.35rem',
+                            flexWrap: 'wrap',
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontWeight: 600,
+                              color: job.overlapCount > 0 ? '#0F766E' : '#64748B',
+                            }}
+                          >
+                            {job.overlapCount} of {job.requiredSkills.length} skills match your profile
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '0.68rem',
+                              color: '#64748B',
+                              backgroundColor: '#F1F5F9',
+                              border: '1px solid #E2E8F0',
+                              padding: '0.08rem 0.35rem',
+                              borderRadius: '3px',
+                              fontWeight: 500,
+                            }}
+                          >
+                            profile overlap
+                          </span>
+                        </div>
+                      )}
+
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
                         {job.requiredSkills?.map((skill, idx) => {
-                          const isMatched = job.matchedSkills?.includes(skill);
+                          const isMatched = candidateCanonicalSkills.has(normalizeSkillName(skill).toLowerCase());
                           return (
                             <button
                               key={idx}
@@ -1131,6 +1297,7 @@ const JobsList = () => {
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.6rem',
+                      flexWrap: 'wrap',
                     }}
                   >
                     {user?.role === 'recruiter' ? (
