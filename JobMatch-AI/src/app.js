@@ -29,6 +29,7 @@ const defaultAllowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:5173',
   'http://127.0.0.1:3000',
+  'https://aptly-zeta.vercel.app',
 ];
 const envOrigins = process.env.CLIENT_URL
   ? process.env.CLIENT_URL.split(',').map((url) => url.trim().replace(/\/$/, '')).filter(Boolean)
@@ -39,7 +40,12 @@ app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile clients, curl, server-to-server) or in whitelist
-      if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ''))) {
+      const normalizedOrigin = origin ? origin.replace(/\/$/, '') : '';
+      if (
+        !origin ||
+        allowedOrigins.includes(normalizedOrigin) ||
+        /^https:\/\/aptly[a-z0-9-]*\.vercel\.app$/.test(normalizedOrigin)
+      ) {
         return callback(null, true);
       }
       return callback(new Error(`CORS blocked: Origin ${origin} not permitted by Aptly.AI policy.`));

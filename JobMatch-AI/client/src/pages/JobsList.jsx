@@ -15,6 +15,7 @@ import {
   FileCheck,
   ArrowRight,
   Activity,
+  AlertTriangle,
   X,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -65,11 +66,26 @@ const JobsList = () => {
 
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isFallbackMode, setIsFallbackMode] = useState(false);
+  const [isWakingUp, setIsWakingUp] = useState(false);
   const [keyword, setKeyword] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('All Locations');
   const [selectedSkill, setSelectedSkill] = useState('All');
   const [sortBy, setSortBy] = useState('newest');
   const [userSelectedSort, setUserSelectedSort] = useState(false);
+
+  // Server wake-up detection for Render free-tier cold starts
+  useEffect(() => {
+    let timer;
+    if (loading) {
+      timer = setTimeout(() => {
+        setIsWakingUp(true);
+      }, 2000);
+    } else {
+      setIsWakingUp(false);
+    }
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   // Modal State
   const [selectedJob, setSelectedJob] = useState(null);
@@ -114,12 +130,15 @@ const JobsList = () => {
         const response = await api.get('/jobs');
         if (Array.isArray(response.data) && response.data.length > 0) {
           setJobs(response.data);
+          setIsFallbackMode(false);
         } else {
           setJobs(FALLBACK_JOBS);
+          setIsFallbackMode(true);
         }
       } catch (err) {
         console.warn('Jobs API unreachable, using fallback list:', err.message);
         setJobs(FALLBACK_JOBS);
+        setIsFallbackMode(true);
       } finally {
         setLoading(false);
       }
@@ -295,6 +314,10 @@ const JobsList = () => {
 
   // Distinct handler for Evaluate (diagnostic scorecard) vs Apply (direct submission)
   const handleOpenApplyModal = (job, isDiagnosticEvaluation = false) => {
+    if (isFallbackMode || String(job?._id).startsWith('job_fallback_')) {
+      showToast('Showing sample jobs (server unavailable). Applying is disabled.', 'warning');
+      return;
+    }
     setSelectedJob(job);
     if (isDiagnosticEvaluation && typeof job.matchScore === 'number') {
       setInitialEvaluationForModal({
@@ -673,6 +696,29 @@ const JobsList = () => {
           </div>
         )}
 
+        {/* Fallback Warning Notice when server is unavailable */}
+        {isFallbackMode && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.6rem',
+              backgroundColor: '#FFFBEB',
+              border: '1px solid #FDE68A',
+              borderRadius: '8px',
+              padding: '0.7rem 1rem',
+              marginBottom: '1.25rem',
+              fontSize: '0.86rem',
+              color: '#92400E',
+            }}
+          >
+            <AlertTriangle size={17} color="#D97706" style={{ flexShrink: 0 }} />
+            <span>
+              <strong>Showing sample jobs (server unavailable).</strong> Applying is disabled.
+            </span>
+          </div>
+        )}
+
         {/* Connected Results Count and Sorting Toolbar */}
         <div
           style={{
@@ -763,9 +809,32 @@ const JobsList = () => {
               className="spin"
               style={{ margin: '0 auto 0.75rem', color: '#0d9488' }}
             />
-            <p style={{ color: '#475569', fontSize: '0.94rem', margin: 0 }}>
+            <p style={{ color: '#0F172A', fontSize: '0.98rem', fontWeight: 600, margin: '0 0 0.4rem' }}>
               Loading available jobs...
             </p>
+            {isWakingUp ? (
+              <p
+                style={{
+                  color: '#0F766E',
+                  fontSize: '0.84rem',
+                  fontWeight: 500,
+                  margin: 0,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  backgroundColor: '#F0FDFA',
+                  border: '1px solid #CCFBF1',
+                  padding: '0.25rem 0.75rem',
+                  borderRadius: '9999px',
+                }}
+              >
+                <span>Server is waking up, this may take a few seconds...</span>
+              </p>
+            ) : (
+              <p style={{ color: '#64748B', fontSize: '0.84rem', margin: 0 }}>
+                Connecting to Aptly database...
+              </p>
+            )}
           </div>
         ) : jobs.length === 0 ? (
           /* Empty State — 0 Total Roles Posted */
@@ -910,6 +979,7 @@ const JobsList = () => {
             {filteredJobs.map((job) => {
               const isTopMatch = job._id === topMatchJobId;
               const saved = isSaved(job._id);
+              const isFallbackJob = isFallbackMode || String(job._id).startsWith('job_fallback_');
 
               return (
                 <article
@@ -1329,7 +1399,8 @@ const JobsList = () => {
                       <>
                         {/* Primary Dominant CTA: Apply now */}
                         <button
-                          onClick={() => handleOpenApplyModal(job, false)}
+                          disabled={isFallbackJob}
+                          onClick={() => !isFallbackJob && handleOpenApplyModal(job, false)}
                           style={{
                             flex: 1,
                             display: 'inline-flex',
@@ -1339,21 +1410,27 @@ const JobsList = () => {
                             padding: '0.55rem 0.9rem',
                             borderRadius: '7px',
                             border: 'none',
-                            backgroundColor: '#0d9488',
+                            backgroundColor: isFallbackJob ? '#94A3B8' : '#0d9488',
                             color: '#FFFFFF',
                             fontSize: '0.84rem',
                             fontWeight: 600,
-                            cursor: 'pointer',
-                            boxShadow: '0 1px 2px rgba(13, 148, 136, 0.2)',
+                            cursor: isFallbackJob ? 'not-allowed' : 'pointer',
+                            opacity: isFallbackJob ? 0.65 : 1,
+                            boxShadow: isFallbackJob ? 'none' : '0 1px 2px rgba(13, 148, 136, 0.2)',
                             transition: 'background-color 0.15s ease, transform 0.1s ease',
                           }}
+                          title={isFallbackJob ? 'Applying disabled on sample jobs' : 'Apply now'}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = '#0F6B5C';
-                            e.currentTarget.style.transform = 'translateY(-1px)';
+                            if (!isFallbackJob) {
+                              e.currentTarget.style.backgroundColor = '#0F6B5C';
+                              e.currentTarget.style.transform = 'translateY(-1px)';
+                            }
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = '#0d9488';
-                            e.currentTarget.style.transform = 'translateY(0)';
+                            if (!isFallbackJob) {
+                              e.currentTarget.style.backgroundColor = '#0d9488';
+                              e.currentTarget.style.transform = 'translateY(0)';
+                            }
                           }}
                         >
                           <Send size={13} />
@@ -1362,7 +1439,8 @@ const JobsList = () => {
 
                         {/* Secondary Supporting CTA: Run skill diagnostic */}
                         <button
-                          onClick={() => handleOpenApplyModal(job, true)}
+                          disabled={isFallbackJob}
+                          onClick={() => !isFallbackJob && handleOpenApplyModal(job, true)}
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -1370,26 +1448,31 @@ const JobsList = () => {
                             gap: '0.35rem',
                             padding: '0.52rem 0.75rem',
                             borderRadius: '7px',
-                            border: '1px solid #CCFBF1',
-                            backgroundColor: '#F0FDFA',
-                            color: '#0F6B5C',
+                            border: isFallbackJob ? '1px solid #CBD5E1' : '1px solid #CCFBF1',
+                            backgroundColor: isFallbackJob ? '#F1F5F9' : '#F0FDFA',
+                            color: isFallbackJob ? '#94A3B8' : '#0F6B5C',
                             fontSize: '0.82rem',
                             fontWeight: 600,
-                            cursor: 'pointer',
+                            cursor: isFallbackJob ? 'not-allowed' : 'pointer',
+                            opacity: isFallbackJob ? 0.65 : 1,
                             transition: 'all 0.15s ease',
                             whiteSpace: 'nowrap',
                           }}
-                          title="Review skill match and interview tips"
+                          title={isFallbackJob ? 'Diagnostic disabled on sample jobs' : 'Review skill match and interview tips'}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = '#CCFBF1';
-                            e.currentTarget.style.borderColor = '#99F6E4';
+                            if (!isFallbackJob) {
+                              e.currentTarget.style.backgroundColor = '#CCFBF1';
+                              e.currentTarget.style.borderColor = '#99F6E4';
+                            }
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = '#F0FDFA';
-                            e.currentTarget.style.borderColor = '#CCFBF1';
+                            if (!isFallbackJob) {
+                              e.currentTarget.style.backgroundColor = '#F0FDFA';
+                              e.currentTarget.style.borderColor = '#CCFBF1';
+                            }
                           }}
                         >
-                          <FileCheck size={13} color="#0d9488" />
+                          <FileCheck size={13} color={isFallbackJob ? '#94A3B8' : '#0d9488'} />
                           <span>Check match</span>
                         </button>
                       </>

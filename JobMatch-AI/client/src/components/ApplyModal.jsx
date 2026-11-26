@@ -215,6 +215,12 @@ const ApplyModal = ({ job, isOpen, onClose, onApplicationSuccess, initialEvaluat
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (job?._id && String(job._id).startsWith('job_fallback_')) {
+      showToast('Showing sample jobs (server unavailable). Applying is disabled.', 'warning');
+      setError('Applying is disabled on sample jobs while server is unavailable.');
+      return;
+    }
+
     if (!isAuthenticated) {
       showToast('Please sign in as a candidate to submit your application.', 'info');
       navigate('/login', { state: { from: location } });
