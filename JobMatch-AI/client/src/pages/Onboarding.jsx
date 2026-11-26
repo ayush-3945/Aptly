@@ -532,11 +532,11 @@ const Onboarding = () => {
               gap: '0.5rem',
               cursor: !selectedRole || submitting ? 'not-allowed' : 'pointer',
               backgroundColor: !selectedRole
-                ? 'var(--bg-muted, #E2E8F0)'
-                : 'var(--accent-teal, #0F766E)',
-              color: !selectedRole ? 'var(--text-muted, #94A3B8)' : '#FFFFFF',
-              border: !selectedRole ? '1px solid #CBD5E1' : '1px solid transparent',
-              boxShadow: selectedRole && !submitting ? '0 4px 14px rgba(15, 118, 110, 0.25)' : 'none',
+                ? '#8FAFA8'
+                : 'var(--accent-teal, #0F6B5C)',
+              color: '#FFFFFF',
+              border: !selectedRole ? '1px solid #7FA29B' : '1px solid transparent',
+              boxShadow: selectedRole && !submitting ? '0 4px 14px rgba(15, 107, 92, 0.25)' : 'none',
               transition: 'all 0.18s ease',
             }}
           >
